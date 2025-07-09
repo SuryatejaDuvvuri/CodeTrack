@@ -7,15 +7,14 @@ export default function Home() {
         <div className = "flex flex-wrap justify-between items-center p-4">
           <div className="flex space-x-4">
             <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a>
-            <a href = "#" className = "text-white hover:text-lg transition-all">Home</a>
-            <a href = "#" className = "text-white hover:text-lg transition-all">Home</a>
+            <a href = "/" className = "text-white hover:text-lg transition-all">Home</a>
             <a href = "#" className = "text-white hover:text-lg transition-all">Logout</a>
           </div>
         </div>
 
       </nav>
       <div className = "grid grid-cols-4 gap-6 mb-auto">
-        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/easy">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Warm up 1</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
@@ -23,10 +22,10 @@ export default function Home() {
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Warm up 2</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </div>
-        <div className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/choices">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">File Streams 1</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
+        </Link>
         <div className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Arrays and Strings</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
@@ -67,7 +66,7 @@ export default function Home() {
 
       <div className = "container mx-auto grid grid-cols-2 gap-6 mb-auto mt-4">
         <div className = "block flex-1 mb-auto">
-          <h3>Top 5</h3>
+          <h3>Top 5 Topics</h3>
           <div className = "mb-2 font-medium text-green-300">
             Linked List
           </div>
@@ -99,9 +98,21 @@ export default function Home() {
             <div className = "bg-emerald-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"20%"}}>20%</div>
           </div>
         </div>
-        <div className="flex-1 block">
-          Assignments bulletin board
-          <button disabled className = "text-md">
+        <div className="flex-1 block p-4 rounded-lg border-2 border-amber-300 shadow-sm">
+          <h3 className = "text-lg mb-3 font-bold">Assignments bulletin board</h3>
+          <div className = "p-2 bg-black rounded border-l-4 border-l-blue-500 shadow-sm">
+            <div className = "flex justify-between items-center">
+              <span className = "font-medium">Linked List Problems</span>
+              <span className = "text-xs bg-red-300 text-red-800 px-2 py-1 rounded">Due: September 22nd, 2025</span>
+            </div>
+            <ul>
+              <li>Finish 5 easy problems</li>
+              <li>Finish 2 medium problems</li>
+              <li>Finish 1 hard problem</li>
+            </ul>
+          </div>
+          
+          <button disabled className = "text-md mt-4 bg-gray-400 px-4 py-2 rounded disabled:opacity-50">
             Get Passcode
           </button>
         </div>
