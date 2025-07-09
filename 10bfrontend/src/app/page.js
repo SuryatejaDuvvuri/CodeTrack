@@ -1,0 +1,120 @@
+import Image from "next/image";
+import Link from "next/link"
+export default function Home() {
+  return (
+    <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
+      <nav className = "bg-black">
+        <div className = "flex flex-wrap justify-between items-center p-4">
+          <div className="flex space-x-4">
+            <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a>
+            <a href = "#" className = "text-white hover:text-lg transition-all">Home</a>
+            <a href = "#" className = "text-white hover:text-lg transition-all">Home</a>
+            <a href = "#" className = "text-white hover:text-lg transition-all">Logout</a>
+          </div>
+        </div>
+
+      </nav>
+      <div className = "grid grid-cols-4 gap-6 mb-auto">
+        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Warm up 1</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </Link>
+        <div className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Warm up 2</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+        <div className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">File Streams 1</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+        <div className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Arrays and Strings</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+        <div className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Classes 1</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+        <div className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Classes 2</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+        <div className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Inheritance and Polymorphism</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+        <div className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Recursion</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+        <div className = "block bg-orange-600 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Search and Sorting</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+         <div className = "block bg-orange-600 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Stacks and Queues</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+         <div className = "block bg-orange-600 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Linked List 1</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+         <div className = "block bg-orange-600 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Linked List 2</h1>
+          <div className = "font-normal text-sm">This is a description of a problem</div>
+        </div>
+      </div>
+
+      <div className = "container mx-auto grid grid-cols-2 gap-6 mb-auto mt-4">
+        <div className = "block flex-1 mb-auto">
+          <h3>Top 5</h3>
+          <div className = "mb-2 font-medium text-green-300">
+            Linked List
+          </div>
+          <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
+            <div className = "bg-green-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"60%"}}>60%</div>
+          </div>
+          <div className = "mb-2 font-medium text-red-300">
+            Arrays
+          </div>
+          <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
+            <div className = "bg-red-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"50%"}}>50%</div>
+          </div>
+          <div className = "mb-2 font-medium text-blue-300">
+            Strings
+          </div>
+          <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
+            <div className = "bg-blue-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"43%"}}>43%</div>
+          </div>
+          <div className = "mb-2 font-medium text-yellow-300">
+            Pointers
+          </div>
+          <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
+            <div className = "bg-yellow-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"25%"}}>25%</div>
+          </div>
+          <div className = "mb-2 font-medium text-emerald-300">
+            Recursion
+          </div>
+          <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
+            <div className = "bg-emerald-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"20%"}}>20%</div>
+          </div>
+        </div>
+        <div className="flex-1 block">
+          Assignments bulletin board
+          <button disabled className = "text-md">
+            Get Passcode
+          </button>
+        </div>
+      </div>
+       <footer className = "w-full mt-8 mb-4 px-4 rounded-lg shadow-sm">
+        <div className = "flex justify-center space-x-4">
+          <a href = "#" className = "text-gray-300">Home</a>
+          <a href = "#" className = "text-gray-300">Contact</a>
+          
+        </div>
+     </footer>
+      
+    </div>
+
+  );
+}
