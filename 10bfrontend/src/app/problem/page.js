@@ -41,8 +41,73 @@ export default function Problem() {
         <div className = "flex flex-1 bg-gray-700 rounded-lg p-4 flex-col">
           <div className = "flex-1 mb-4">
             Chat History
+            <div className = "p-3 rounded mb-3">
+              <div className = "overflow-auto">
+                <table className = "w-full text-sm">
+                  <thead>
+                    <tr className = "border-b border-gray-600">
+                      <th className = "text-left py-2 px-3">Test Case</th>
+                      <th className = "text-left py-2 px-3">Expected</th>
+                      <th className = "text-left py-2 px-3">Your Output</th>
+                      <th className = "text-left py-2 px-3">Matches?</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr className = "border-b border-gray-600">
+                      <td className = "py-2 px-3">Case 1</td>
+                      <td className = "py-2 px-3 font-mono">50</td>
+                      <td className = "py-2 px-3 font-mono">25</td>
+                      <td className = "py-2 px-3 text-red-400">False</td>
+                    </tr>
+                    <tr className = "border-b border-gray-600">
+                      <td className = "py-2 px-3">Case 2</td>
+                      <td className = "py-2 px-3 font-mono">15</td>
+                      <td className = "py-2 px-3 font-mono">15</td>
+                      <td className = "py-2 px-3 text-green-400">True</td>
+                    </tr>
+                    <tr className = "border-b border-gray-600">
+                      <td className = "py-2 px-3">Case 3</td>
+                      <td className = "py-2 px-3 font-mono">22</td>
+                      <td className = "py-2 px-3 font-mono">25</td>
+                      <td className = "py-2 px-3 text-red-400">False</td>
+                    </tr>
+                     <tr className = "border-b border-gray-600">
+                      <td className = "py-2 px-3">Case 4</td>
+                      <td className = "py-2 px-3 font-mono">50</td>
+                      <td className = "py-2 px-3 font-mono">25</td>
+                      <td className = "py-2 px-3 text-red-400">False</td>
+                    </tr>
+                    <tr className = "border-b border-gray-600">
+                      <td className = "py-2 px-3">Case 5</td>
+                      <td className = "py-2 px-3 font-mono">15</td>
+                      <td className = "py-2 px-3 font-mono">15</td>
+                      <td className = "py-2 px-3 text-green-400">True</td>
+                    </tr>
+                    <tr className = "border-b border-gray-600">
+                      <td className = "py-2 px-3">Case 6</td>
+                      <td className = "py-2 px-3 font-mono">22</td>
+                      <td className = "py-2 px-3 font-mono">25</td>
+                      <td className = "py-2 px-3 text-red-400">False</td>
+                    </tr>
+                  </tbody>
+                  
+                </table>
+              </div>
+            </div>
           </div>
           <input className = "w-full px-3 py-2 rounded bg-gray-500 text-white" placeholder="Ask for help(E.G Syntax Help)"/>  
+        </div>
+      </div>
+
+      <div className = "mb-6 px-4">
+        <h3 className = "text-lg font-semibold mb-2">Resources</h3>
+
+        <div className = "flex flex-wrap gap-3">
+          <a href = "#">C++ Reference</a>
+          <a href = "#">Zybooks</a>
+          <a href = "#">LearnCpp.com</a>
+          <a href = "#">Stack Overflow</a>
         </div>
       </div>
 
