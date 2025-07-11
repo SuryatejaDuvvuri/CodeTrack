@@ -7,6 +7,12 @@ export default function Login() {
         <button className = "bg-blue-600 mb-auto text-white px-6 py-3 rounded-lg shadow-sm hover:font-bold">
         Sign in with Google
        </button>
+       <Link href = "/instructor" className = "text-white mb-auto px-6 py-3 rounded-lg shadow-sm bg-gray-700">
+            Instructor
+       </Link>
+       <Link href = "/" className = "text-white mb-auto px-6 py-3 rounded-lg shadow-sm bg-gray-700">
+            Student
+       </Link>
        <footer className = "w-full mt-8 mb-4 px-4 rounded-lg shadow-sm">
         <div className = "flex justify-center space-x-4">
           <a href = "#" className = "text-gray-300">Home</a>
