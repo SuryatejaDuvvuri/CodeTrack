@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link"
 import CodeEditor from './codeEditor.js'
-
+import ProgressGraph from "./progressGraph.js";
+import ChatHistory from "./chatHistory.js";
 export default function Problem() {
   return (
     <div className="container mx-auto flex flex-col min h-screen font-sans">
@@ -37,7 +38,6 @@ export default function Problem() {
         </div>
         <div className = "flex flex-1 bg-gray-700 rounded-lg p-4 flex-col">
           <div className = "flex-1 mb-4">
-            Chat History
             <div className = "p-3 rounded mb-3">
               <div className = "overflow-auto">
                 <table className = "w-full text-sm">
@@ -88,16 +88,24 @@ export default function Problem() {
                       <td className = "py-2 px-3 text-red-400">False</td>
                     </tr>
                   </tbody>
-                  
                 </table>
               </div>
             </div>
+
+            <div className = "p-3 rounded">
+              <h4 className =  "text-md font-semibold">Chat History</h4>
+              <ChatHistory/>
+            </div>
           </div>
-          <input className = "w-full px-3 py-2 rounded bg-gray-500 text-white" placeholder="Ask for help(E.G Syntax Help)"/>  
+          
         </div>
       </div>
 
-      <div className = "mb-6 px-4">
+      <div>
+        <ProgressGraph/>
+      </div>
+
+      <div className = "m-auto px-4">
         <h3 className = "text-lg font-semibold mb-2">Resources</h3>
 
         <div className = "flex flex-wrap gap-3">
