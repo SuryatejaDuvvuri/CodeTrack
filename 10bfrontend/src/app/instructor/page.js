@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link"
 export default function Instructor() {
-  const [expandStudent, setExpandStudent] = useState(null);
-  const [expandModule, setExpandModule] = useState(null);
+  // const [expandStudent, setExpandStudent] = useState(null);
+  // const [expandModule, setExpandModule] = useState(null);
   return (
     <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
       <nav className = "bg-black">

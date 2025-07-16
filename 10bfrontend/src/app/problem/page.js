@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link"
+import CodeEditor from './codeEditor.js'
 
 export default function Problem() {
   return (
@@ -30,13 +31,9 @@ export default function Problem() {
         <div className = "flex-1 bg-gray-700 rounded-lg p-4 flex flex-col">
           <div className = "flex-1 mb-4">
             VS Code Editor
+            <CodeEditor/>
           </div>
-          <div className = "space-x-2">
-            <button className = "px-3 py-1 bg-gray-300 text-black rounded">Save</button>
-            <button className = "px-3 py-1 bg-gray-300 text-black rounded">Run</button>
-            <button className = "px-3 py-1 bg-gray-300 text-black rounded">Reset</button>
-            <button className = "px-3 py-1 bg-gray-300 text-black rounded">Graph</button>
-          </div>
+          
         </div>
         <div className = "flex flex-1 bg-gray-700 rounded-lg p-4 flex-col">
           <div className = "flex-1 mb-4">
