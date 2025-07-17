@@ -14,63 +14,63 @@ export default function Medium() {
 
       </nav>
       <div className = "grid grid-cols-3 gap-4 mb-auto">
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 1</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 2</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 3</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 4</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 5</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 6</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 7</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 8</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 9</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 10</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 11</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 12</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 13</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 14</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/problem">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/problem">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium 15</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>

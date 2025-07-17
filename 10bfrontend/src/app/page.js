@@ -1,6 +1,9 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link"
+import { useLockdown } from './components/Lockdown';
 export default function Home() {
+  const {logout} = useLockdown();
   return (
     <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
       <nav className = "bg-black">
@@ -8,13 +11,13 @@ export default function Home() {
           <div className="flex space-x-4">
             <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a>
             <a href = "/" className = "text-white hover:text-lg transition-all">Home</a>
-            <a href = "#" className = "text-white hover:text-lg transition-all">Logout</a>
+            <button onClick = {logout} className = "text-white hover:text-lg transition-all">Logout</button>
           </div>
         </div>
 
       </nav>
       <div className = "grid grid-cols-4 gap-6 mb-auto">
-        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/easy">
+        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/easy">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Warm up 1</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
@@ -22,7 +25,7 @@ export default function Home() {
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Warm up 2</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </div>
-        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/choices">
+        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/choices">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">File Streams 1</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>

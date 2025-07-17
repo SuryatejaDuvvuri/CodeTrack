@@ -92,8 +92,8 @@ export default function Problem() {
               </div>
             </div>
 
-            <div className = "p-3 rounded">
-              <h4 className =  "text-md font-semibold">Chat History</h4>
+            <div className = "p-2 rounded mt-18">
+              <h4 className =  "text-md font-semibold pt-8">Chat History</h4>
               <ChatHistory/>
             </div>
           </div>

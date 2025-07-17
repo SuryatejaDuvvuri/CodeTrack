@@ -23,7 +23,7 @@ export default function Login() {
                       <span className = "px-3 text-gray-400 text-sm">Continue as</span>
                       <div className = "flex-grow border-t border-gray-600"></div>
                 </div>
-                 <Link href = "/instructor" className = "text-white mb-auto px-6 py-3 rounded-lg shadow-sm bg-gray-700">
+                 <Link href = "/components/instructor" className = "text-white mb-auto px-6 py-3 rounded-lg shadow-sm bg-gray-700">
                       Instructor
                 </Link>
                 <Link href = "/" className = "text-white mb-auto px-6 py-3 rounded-lg shadow-sm bg-gray-700">

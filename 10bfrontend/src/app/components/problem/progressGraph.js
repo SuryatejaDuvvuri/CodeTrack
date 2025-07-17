@@ -93,7 +93,7 @@ export default function progressGraph({id})
             </div>
         </div>
         <div className = "relative h-40">
-            <div className = "absolute bottom-0 left-0 w-full flex justify-between text-xs">
+            <div className = "absolute left-0 w-full flex justify-between text-xs">
                 <div>{format(attemptData[0].timestamp, 'hh:mm:ss a')}</div>
                 <div>{format(attemptData[Math.floor(attemptData.length/2)].timestamp, 'hh:mm:ss a')}</div>
                 <div>{format(attemptData[attemptData.length-1].timestamp, 'hh:mm:ss a')}</div>
@@ -113,20 +113,23 @@ export default function progressGraph({id})
                 ))}
             </div>
             
-            <div className = "absolute bottom-4 left-0 w-full h-px">
-                <div>
-                    <div className = "text-gray-400">Success Rate</div>
-                    <div className="text-xl font-semibold">{Math.round((attemptData.filter(a => a.success).length / attemptData.length) * 100)}%</div>
-                </div>
-                <div>
-                    <div className = "text-gray-400">Total Attempts</div>
-                    <div className = "text-xl font-semibold">{attemptData.length}</div>
-                </div>
-                <div>
-                    <div className = "text-gray-400">Average Time Spent</div>
-                    <div className="text-xl font-semibold">
-                        {Math.round(attemptData.reduce((sum, a) => sum + a.duration, 0) / attemptData.length)}s
+            <div className = "absolute mx-auto bottom-0 left-0 w-full h-px px-4">
+                <div className = "flex flex-wrap gap-3">
+                    <div>
+                        <div className = "text-gray-400">Success Rate</div>
+                        <div className="text-xl font-semibold">{Math.round((attemptData.filter(a => a.success).length / attemptData.length) * 100)}%</div>
                     </div>
+                    <div>
+                        <div className = "text-gray-400">Total Attempts</div>
+                        <div className = "text-xl font-semibold">{attemptData.length}</div>
+                    </div>
+                    <div>
+                        <div className = "text-gray-400">Average Time Spent</div>
+                        <div className="text-xl font-semibold">
+                            {Math.round(attemptData.reduce((sum, a) => sum + a.duration, 0) / attemptData.length)}s
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
