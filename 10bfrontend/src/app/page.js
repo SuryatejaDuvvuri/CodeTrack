@@ -1,9 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link"
-import { useLockdown } from './components/Lockdown';
 export default function Home() {
-  const {logout} = useLockdown();
   return (
     <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
       <nav className = "bg-black">
@@ -11,7 +9,7 @@ export default function Home() {
           <div className="flex space-x-4">
             <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a>
             <a href = "/" className = "text-white hover:text-lg transition-all">Home</a>
-            <button onClick = {logout} className = "text-white hover:text-lg transition-all">Logout</button>
+            <button className = "text-white hover:text-lg transition-all">Logout</button>
           </div>
         </div>
 

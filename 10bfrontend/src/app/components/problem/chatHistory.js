@@ -6,15 +6,18 @@ export default function chatHistory()
     const [messages, setMessages] = useState([
     { 
       role: 'system', 
-      content: 'Welcome to CS010B Practice Portal! Ask me if you need help with your code.'
+      content: 'Welcome to CS010B <Pr>actice Portal! Ask me if you need help with your code.',
+      timestamp: null
     },
     {
       role: 'user',
-      content: 'How do I implement the sleepIn function?'
+      content: 'How do I implement the sleepIn function?',
+      timestamp: null
     },
     {
       role: 'system',
-      content: 'The sleepIn function should return true if it\'s not a weekday or if we\'re on vacation. In other words:\n\n```cpp\nreturn (!weekday || vacation);\n```'
+      content: 'The sleepIn function should return true if it\'s not a weekday or if we\'re on vacation. In other words:\n\n```cpp\nreturn (!weekday || vacation);\n```',
+      timestamp: null
     }
     ]);
 
@@ -32,7 +35,7 @@ export default function chatHistory()
                     }`}>
                         {msg.content}
                     </div>
-                     <div className="text-xs text-gray-500 mt-auto">
+                     <div className="text-xs text-gray-500 mt-auto" suppressHydrationWarning>
                         {msg.role === 'user' ? 'You' : 'AI Chatbot'} - {new Date().toLocaleTimeString()}
                     </div>
                 </div>
