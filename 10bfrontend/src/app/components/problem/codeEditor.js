@@ -1,26 +1,57 @@
 "use client"
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import Editor from '@monaco-editor/react'
 
 export default function codeEditor()
 {
-    const [code,setCode] = useState(`#include <iostream> 
+    const [code,setCode] = useState(`
+    #include <iostream> 
     using namespace std;
 
-        bool sleepIn(bool weekday, bool vacation) {
-        // code here
-        
-        }
+    bool sleepIn(bool weekday, bool vacation) {
+    // code here
+    
+    }
 
-        int main() {
+    int main() {
         cout << "Testing sleepIn function:" << endl;
         cout << "sleepIn(true, false): " << (sleepIn(true, false) ? "true" : "false") << endl;
         cout << "sleepIn(false, false): " << (sleepIn(false, false) ? "true" : "false") << endl;
         cout << "sleepIn(true, true): " << (sleepIn(true, true) ? "true" : "false") << endl;
         return 0;
-        }
+    }
     `);
 
+    const editorRef = useRef(null);
+
+    const handleEditor = (editor,m) => 
+    {
+        editorRef.current = editor;
+        editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyC, () => {
+            console.log('No Copying');
+        });
+
+        editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyV, () => {
+            console.log("No Pasting");
+        });
+    };
+
+    useEffect(() => {
+        const disableCopyPaste = (e) => {
+            e.preventDefault();
+            console.log('No Copying/Pasting');
+            return false;
+        }
+
+        document.addEventListener('copy',disableCopyPaste);
+        document.addEventListener('paste',disableCopyPaste);
+
+        return () => 
+        {
+            document.removeEventListener('copy',disableCopyPaste);
+            document.removeEventListener('paste',disableCopyPaste);
+        }
+    },[]);
     
 
     return (
@@ -28,12 +59,14 @@ export default function codeEditor()
             <div className = "flex-1 mb-4 min-h-[400px]">
                 <Editor height="100vh" defaultLanguage = "cpp" defaultValue = {code} theme = "vs-dark"
                 onChange = {setCode}
+                onMount={handleEditor}
                 options = {{
                     fontFamily: 'JetBrains Mono, monospace',
                     fontSize:14,
                     tabSize:2,
                     minimap: {enabled:false},
-                    scrollBeyondLastLine:false
+                    scrollBeyondLastLine:false,
+                    contextmenu:false
                 }}/>
             </div>
             <div className = "space-x-2">

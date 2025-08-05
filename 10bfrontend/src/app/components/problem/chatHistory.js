@@ -6,7 +6,7 @@ export default function chatHistory()
     const [messages, setMessages] = useState([
     { 
       role: 'system', 
-      content: 'Welcome to CS010B <Pr>actice Portal! Ask me if you need help with your code.',
+      content: 'Welcome to CS010B Practice Portal! Ask me if you need help with your code.',
       timestamp: null
     },
     {
