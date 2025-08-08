@@ -16,15 +16,22 @@ export const metadata = {
   description: "Practice programming exercises for CS010B",
 };
 
+
 export default function RootLayout({ children }) {
+
+  const isStudent = false;
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-       <ScreenShotProtect>
+        {isStudent ? (
+          <ScreenShotProtect>
           {children}
        </ScreenShotProtect>
+        ): (
+          children
+        )}
       </body>
     </html>
   );
