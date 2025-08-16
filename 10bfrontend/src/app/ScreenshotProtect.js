@@ -92,7 +92,7 @@ export default function ScreenShotProtect({ children }) {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0,0,0,0.9);
+                    background: rgba(0,0,0,1);
                     color: white;
                     display: flex;
                     align-items: center;

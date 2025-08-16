@@ -1,10 +1,17 @@
+'use client';
 import Image from "next/image";
 import Link from "next/link"
 import CodeEditor from './codeEditor.js'
 import ProgressGraph from "./progressGraph.js";
 import ChatHistory from "./chatHistory.js";
+// import EmbeddedViewer from "./EmbeddedViewer.js";
 
 export default function Problem() {
+  const handleResourceClick = (resource) => 
+  {
+    const embedUrl = `/embeddedviewer?url=${encodeURIComponent(resource.url)}&title=${encodeURIComponent(resource.name)}`;
+    window.open(embedUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+  };
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
       <header className="w-full py-6 px-6 border-b border-gray-700">
@@ -116,15 +123,15 @@ export default function Problem() {
                 { name: "C++ Reference", url: "https://www.w3schools.com/cpp/cpp_ref_reference.asp" },
                 { name: "Zybooks", url: "https://learn.zybooks.com/zybook/UCRCS010BMillerSummer2025?selectedPanel=view-activity" },
                 { name: "LearnCpp.com", url: "https://www.learncpp.com/" },
-                { name: "Stack Overflow", url: "https://stackoverflow.com/questions/tagged/c%2B%2B" }
+                { name: "JUnit Testing", url: "https://www.youtube.com/watch?v=vZm0lHciFsQ" }
               ].map((resource, index) => (
-                <a
+                <button
                   key={index}
-                  href={resource.url}
-                  className="block p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-center transition-colors border border-gray-600 hover:border-blue-500"
+                  onClick={() => handleResourceClick(resource)}
+                  className="block p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-center transition-colors border border-gray-600 hover:border-blue-500 w-full"
                 >
                   <span className="text-blue-400 font-medium">{resource.name}</span>
-                </a>
+                </button>
               ))}
             </div>
           </div>

@@ -25,13 +25,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {isStudent ? (
-          <ScreenShotProtect>
+        <ScreenShotProtect>
           {children}
-       </ScreenShotProtect>
-        ): (
-          children
-        )}
+        </ScreenShotProtect>
       </body>
     </html>
   );
