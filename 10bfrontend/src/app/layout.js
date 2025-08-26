@@ -25,9 +25,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ScreenShotProtect>
+        {/* <ScreenShotProtect> */}
           {children}
-        </ScreenShotProtect>
+        {/* </ScreenShotProtect> */}
       </body>
     </html>
   );

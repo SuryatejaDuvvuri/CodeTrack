@@ -12,6 +12,8 @@ export default function Problem() {
     const embedUrl = `/embeddedviewer?url=${encodeURIComponent(resource.url)}&title=${encodeURIComponent(resource.name)}`;
     window.open(embedUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
   };
+
+  const problem = "Easy-1"
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
       <header className="w-full py-6 px-6 border-b border-gray-700">
@@ -106,7 +108,7 @@ export default function Problem() {
 
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-200 mb-4">AI Assistant</h3>
-                <ChatHistory />
+                <ChatHistory problem = {problem} />
               </div>
             </div>
           </div>

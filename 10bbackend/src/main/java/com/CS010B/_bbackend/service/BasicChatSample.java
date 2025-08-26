@@ -48,8 +48,6 @@ public final class BasicChatSample
         sys.append("for an introductory C++ college level course. ");
         sys.append("Provide helpful guidance but don't write complete solutions. ");
         sys.append("Suggest approaches, explain concepts, and guide students through debugging.");
-        
-        // saveMessage(userPrompt,"user",problem,netId);
 
         try
         {

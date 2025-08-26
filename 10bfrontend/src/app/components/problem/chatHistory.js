@@ -1,7 +1,7 @@
 "use client";
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 
-export default function chatHistory()
+export default function chatHistory(problem)
 {
     const [messages, setMessages] = useState([
     { 
@@ -81,11 +81,59 @@ export default function chatHistory()
 
         try
         {
+            const response = await fetch(`http://localhost:8080/api/chat`, 
+            {
+                method:'POST',
+                headers: {'Content-Type':'application/json',},
+                body: JSON.stringify({
+                    prompt:input,
+                    problemId:problem,
+                    netId:"sduvv003"
+                }),
+            });
 
+            if(response.ok)
+            {
+                const data = await response.json();
+                console.log(data);
+                const res = {
+                    role:'system',
+                    content:data.response,
+                    timestamp: new Date()
+                };
+
+                setMessages(prev => [...prev,res]);
+            }
+            else
+            {
+                console.error("API Error: ",response.status);
+                setMessages(prev => [...prev, {
+                    role: 'system',
+                    content: 'Error processing request.',
+                    timestamp: new Date()
+                }]);
+            }
         }
         catch(error)
         {
             console.error("Failed to send messages");
+            setMessages(prev => [...prev, {
+                    role: 'system',
+                    content: 'Error processing request.',
+                    timestamp: new Date()
+                }]);
+        }
+        finally
+        {
+            setLoading(false);
+        }
+    };
+
+    const keyDown = (e) => {
+        if(e.key === 'Enter' && !e.shiftKey)
+        {
+            e.preventDefault();
+            handleSend();
         }
     }
 
@@ -106,14 +154,27 @@ export default function chatHistory()
                     </div>
                 </div>
             ))}
+
+            {isLoading && (
+                <div className="mr-auto mb-4">
+                    <div className="p-3 rounded-lg bg-gray-700 text-white rounded-bl-none flex items-center">
+                        <div className="typing-dots">
+                            <span className="dot"></span>
+                            <span className="dot"></span>
+                            <span className="dot"></span>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
         <div className = "flex items-center gap-2">
-            <input value= {input} onChange = {(e) => setInput(e.target.value)}
+            <input value= {input} onChange = {(e) => setInput(e.target.value)} onKeyDown={keyDown}
                 className = "w-full px-3 py-2 rounded bg-gray-500 text-white" placeholder="Ask for help(E.G Syntax Help)"/>  
-            <button className = "bg-blue-600 cursor-pointer hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                Send
+            <button onClick = {handleSend} disabled = {isLoading || !input.trim()} className = {`${isLoading || !input.trim() ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 cursor-pointer hover:bg-blue-700'} text-white px-4 py-2 rounded-lg transition-colors`}>
+                {isLoading ? 'Thinking...' : 'Send'}
             </button>
         </div>
+
     </div>
    );
 

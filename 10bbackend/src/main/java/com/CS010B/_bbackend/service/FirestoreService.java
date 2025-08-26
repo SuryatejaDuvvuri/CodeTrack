@@ -25,7 +25,7 @@ public class FirestoreService
 
     public void initFirestore() throws IOException
     {
-        InputStream account = getClass().getResourceAsStream("/firebase-service-account.json");
+        InputStream account = getClass().getResourceAsStream("../../resources/firebase-service-account.json");
         
         FirebaseOptions options = FirebaseOptions.builder().setCredentials(GoogleCredentials.fromStream(account)).build();
 

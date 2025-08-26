@@ -14,6 +14,9 @@ import com.CS010B._bbackend.model.ChatMessage;
 import com.CS010B._bbackend.model.ChatRequest;
 import com.CS010B._bbackend.model.ChatResponse;
 import com.CS010B._bbackend.service.BasicChatSample;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,10 +30,10 @@ public class HelloController
     @Autowired
     private BasicChatSample chatSample;
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest request) 
     {
-        String response = chatSample.getChat(request.getPrompt(), request.getProblem(), request.getNetId() != null ? request.getNetId():"default");
+        String response = chatSample.getChat(request.getPrompt(), request.getProblem(), request.getNetId());
         return ResponseEntity.ok(new ChatResponse(response));
     }
 
