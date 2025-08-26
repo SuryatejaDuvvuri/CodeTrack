@@ -22,7 +22,7 @@ export default function chatHistory()
     ]);
 
     const [input, setInput] = useState('');
-    const [isLoading, setIdLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const URL = process.env.NEXT_PUBLIC_API_URL;
 
     useEffect(() => {
@@ -30,10 +30,64 @@ export default function chatHistory()
         {
             try
             {
-                const response;
+                const response = await fetch('http://localhost:8080/api/chat/history', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        problem:problem,
+                        userId: "sduvv003"
+                    })
+                });
+
+                if(response.ok)
+                {
+                    const history = await response.json();
+                    if (history && history.length > 0)
+                    {
+                        setMessages(history.map(msg => ({
+                            role:msg.role,
+                            content:msg.content,
+                            timestamp: new Date(msg.timestamp)
+                        })))
+                    }
+                }
+            }
+            catch(error)
+            {
+                console.error("Failed to get chat history:",error);
             }
         }
-    })
+
+        loadChat();
+    }, [problem]);
+
+    const handleSend = async () => {
+        if(!input.trim())
+        {
+            return;
+        }
+
+        const userMsg = {
+            role: 'user',
+            content: input,
+            timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev,userMsg]);
+        setInput('');
+        setLoading(true);
+
+        try
+        {
+
+        }
+        catch(error)
+        {
+            console.error("Failed to send messages");
+        }
+    }
 
    return (
      <div className = 'flex-1 rounded-lg p-4 flex flex-col h-full mt-16'>
