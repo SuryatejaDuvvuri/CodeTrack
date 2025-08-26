@@ -22,6 +22,18 @@ export default function chatHistory()
     ]);
 
     const [input, setInput] = useState('');
+    const [isLoading, setIdLoading] = useState(false);
+    const URL = process.env.NEXT_PUBLIC_API_URL;
+
+    useEffect(() => {
+        async function loadChat()
+        {
+            try
+            {
+                const response;
+            }
+        }
+    })
 
    return (
      <div className = 'flex-1 rounded-lg p-4 flex flex-col h-full mt-16'>
