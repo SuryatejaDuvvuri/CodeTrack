@@ -7,11 +7,14 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.cloud.firestore.FieldValue;
 import com.google.firestore.v1.Document;
 
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -23,18 +26,32 @@ public class FirestoreService
 {
     private Firestore firestore;
 
+    @PostConstruct
     public void initFirestore() throws IOException
     {
-        InputStream account = getClass().getResourceAsStream("../../resources/firebase-service-account.json");
-        
-        FirebaseOptions options = FirebaseOptions.builder().setCredentials(GoogleCredentials.fromStream(account)).build();
-
-        if(FirebaseApp.getApps().isEmpty())
+        try
         {
-            FirebaseApp.initializeApp(options);
-        }
+            InputStream account = getClass().getResourceAsStream("/firebase-service-account.json");
+        
+            if(account == null)
+            {
+                account = new FileInputStream("src/main/resources/firebase-service-account.json");
+            }
 
-        this.firestore = FirestoreClient.getFirestore();
+            FirebaseOptions options = FirebaseOptions.builder().setCredentials(GoogleCredentials.fromStream(account)).build();
+
+            if(FirebaseApp.getApps().isEmpty())
+            {
+                FirebaseApp.initializeApp(options);
+            }
+
+            this.firestore = FirestoreClient.getFirestore();
+        }
+        catch(IOException e)
+        {
+            System.err.println("Could not initialize firestore: " + e.getMessage());
+            throw e;
+        }
     }
 
     public Map<String,Object> getProblem(String id) throws ExecutionException, InterruptedException
@@ -53,7 +70,7 @@ public class FirestoreService
         if(doc.exists())
         {
             Map<String,Object> data = doc.getData();
-            Map<String,Object> problems = (Map<String,Object>) data.get("problems");
+            Map<String,Object> problems = (Map<String,Object>) data.get("Problems");
 
             if(problems != null)
             {
@@ -82,12 +99,11 @@ public class FirestoreService
     {
         DocumentReference docRef = firestore.collection("section").document(netId);
 
-        Map<String,Object> chats = new HashMap<>();
-        chats.put("timestamp",System.currentTimeMillis());
-        chats.put("userMessage", userMsg);
-        chats.put("aiResponse", aiRes);
-
-        docRef.update("Problems.Easy" + problem + ".Chats", chats);
+        Map<String,Object> chat = new HashMap<>();
+        chat.put("timestamp",System.currentTimeMillis());
+        chat.put("userMessage", userMsg);
+        chat.put("aiResponse", aiRes);
+        docRef.update("Problems.Easy." + problem + ".Chat Logs", FieldValue.arrayUnion(chat));
 
     }
 }

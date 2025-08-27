@@ -1,7 +1,7 @@
 "use client";
 import { useState,useEffect } from 'react';
 
-export default function chatHistory(problem)
+export default function chatHistory({problem})
 {
     const [messages, setMessages] = useState([
     { 
@@ -31,7 +31,7 @@ export default function chatHistory(problem)
             try
             {
                 const response = await fetch('http://localhost:8080/api/chat/history', {
-                    method: "POST",
+                    method:"POST",
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -87,7 +87,7 @@ export default function chatHistory(problem)
                 headers: {'Content-Type':'application/json',},
                 body: JSON.stringify({
                     prompt:input,
-                    problemId:problem,
+                    problem:problem,
                     netId:"sduvv003"
                 }),
             });

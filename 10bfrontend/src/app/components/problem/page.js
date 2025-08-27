@@ -13,7 +13,7 @@ export default function Problem() {
     window.open(embedUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
   };
 
-  const problem = "Easy-1"
+  const problem = "Easy 1"
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
       <header className="w-full py-6 px-6 border-b border-gray-700">
