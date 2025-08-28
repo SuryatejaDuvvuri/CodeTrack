@@ -45,8 +45,7 @@ public final class BasicChatSample
     {
         StringBuilder sys = new StringBuilder();
         sys.append("You're an assistant helping students learn C++ programming on their own without using AI ");
-        sys.append("for an introductory C++ college level course. ");
-        sys.append("Provide helpful guidance but don't write complete solutions. ");
+        sys.append("for an introductory C++ college level course. Take a look at this problem " + problem + "and provide helpful guidance but don't write complete solutions.");
         sys.append("Suggest approaches, explain concepts, and guide students through debugging.");
 
         try

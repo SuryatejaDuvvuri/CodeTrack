@@ -138,25 +138,25 @@ export default function chatHistory({problem})
     }
 
    return (
-     <div className = 'flex-1 rounded-lg p-4 flex flex-col h-full mt-16'>
-        <div className = "flex-1 mb-6">
+     <div className = 'flex-1 rounded-lg p-3 flex flex-col h-full'>
+        <div className = "flex-1 mb-3 overflow-y-auto max-h-[600px]">
             {messages.map((msg,i) => (
-                <div key = {i} className={`mb-4 ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'}`}>
+                <div key = {i} className={`mb-3 ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'} max-w[58%]`}>
                     <div className = {`p-3 rounded-lg ${
                         msg.role === 'user' 
                         ? 'bg-blue-600 text-white rounded-br-none' 
                         : 'bg-gray-700 text-white rounded-bl-none'
                     }`}>
-                        {msg.content}
+                        <div className="whitespace-pre-wrap">{msg.content}</div>
                     </div>
-                     <div className="text-xs text-gray-500 mt-auto" suppressHydrationWarning>
+                     <div className="text-xs text-gray-500 mt-1" suppressHydrationWarning>
                         {msg.role === 'user' ? 'You' : 'AI Chatbot'} - {new Date().toLocaleTimeString()}
                     </div>
                 </div>
             ))}
 
             {isLoading && (
-                <div className="mr-auto mb-4">
+                <div className="mr-auto mb-3">
                     <div className="p-3 rounded-lg bg-gray-700 text-white rounded-bl-none flex items-center">
                         <div className="typing-dots">
                             <span className="dot"></span>
@@ -167,10 +167,10 @@ export default function chatHistory({problem})
                 </div>
             )}
         </div>
-        <div className = "flex items-center gap-2">
+        <div className = "flex items-center gap-2 mt-2">
             <input value= {input} onChange = {(e) => setInput(e.target.value)} onKeyDown={keyDown}
-                className = "w-full px-3 py-2 rounded bg-gray-500 text-white" placeholder="Ask for help(E.G Syntax Help)"/>  
-            <button onClick = {handleSend} disabled = {isLoading || !input.trim()} className = {`${isLoading || !input.trim() ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 cursor-pointer hover:bg-blue-700'} text-white px-4 py-2 rounded-lg transition-colors`}>
+                className = "w-full px-4 py-3 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-blue-500" placeholder="Ask for help(E.G Syntax Help)"/>  
+            <button onClick = {handleSend} disabled = {isLoading || !input.trim()} className = {`${isLoading || !input.trim() ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 cursor-pointer hover:bg-blue-700'} text-white px-5 py-3 rounded-md transition-colors`}>
                 {isLoading ? 'Thinking...' : 'Send'}
             </button>
         </div>

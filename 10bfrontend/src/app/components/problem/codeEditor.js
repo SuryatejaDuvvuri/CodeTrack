@@ -4,23 +4,23 @@ import Editor from '@monaco-editor/react'
 
 export default function codeEditor()
 {
-    const [code,setCode] = useState(`
-    #include <iostream> 
-    using namespace std;
+    const [code, setCode] = useState(
+`#include <iostream>
+using namespace std;
 
-    bool sleepIn(bool weekday, bool vacation) {
+bool sleepIn(bool weekday, bool vacation) {
     // code here
-    
-    }
+}
 
-    int main() {
-        cout << "Testing sleepIn function:" << endl;
-        cout << "sleepIn(true, false): " << (sleepIn(true, false) ? "true" : "false") << endl;
-        cout << "sleepIn(false, false): " << (sleepIn(false, false) ? "true" : "false") << endl;
-        cout << "sleepIn(true, true): " << (sleepIn(true, true) ? "true" : "false") << endl;
-        return 0;
-    }
-    `);
+int main() {
+    cout << "Testing sleepIn function:" << endl;
+    cout << "sleepIn(true, false): " << (sleepIn(true, false) ? "true" : "false") << endl;
+    cout << "sleepIn(false, false): " << (sleepIn(false, false) ? "true" : "false") << endl;
+    cout << "sleepIn(true, true): " << (sleepIn(true, true) ? "true" : "false") << endl;
+    return 0;
+}
+`
+    );
 
     const editorRef = useRef(null);
 
