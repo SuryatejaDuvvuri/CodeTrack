@@ -1,12 +1,70 @@
 'use client';
 import Image from "next/image";
+import { useState, useEffect } from "react";
 import Link from "next/link"
 import CodeEditor from './codeEditor.js'
 import ProgressGraph from "./progressGraph.js";
 import ChatHistory from "./chatHistory.js";
 // import EmbeddedViewer from "./EmbeddedViewer.js";
 
-export default function Problem() {
+export default function Problem() 
+{
+  const defaultCode = `#include <iostream>
+using namespace std;
+int main() {
+    int a, b;
+    cin >> a >> b;
+    cout << a + b << endl;
+    return 0;
+i
+}`;
+
+    const defaultTestcases = `1 2|3
+  5 7|12
+  10 15|25
+  3 4|7
+  0 0|0`;
+
+  const [testcases, setTestcases] = useState(defaultTestcases);
+  const [code, setCode] = useState(defaultCode);
+  const [results, setResults] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+
+  const handleRun = async () =>
+  {
+    setLoading(true);
+    const res = await fetch("http://localhost:8080/api/grade", {
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({code: code,testcases: testcases}),
+    });
+    const result = await res.json();
+    if(result.status === "error")
+    {
+        setMessages(prev => [
+          ...prev,
+          {role: "system",content:result.details}
+        ]);
+        setResults([]);
+    }
+    else
+    {
+      setResults(result);
+    }
+    setLoading(false);
+  }
+
+   useEffect(() => {
+    const chatCont = document.querySelector('.overflow-y-auto');
+    if(chatCont)
+    {
+      chatCont.scrollTop = chatCont.scrollHeight;
+    }
+  },[messages,isLoading]);
+
   const handleResourceClick = (resource) => 
   {
     const embedUrl = `/embeddedviewer?url=${encodeURIComponent(resource.url)}&title=${encodeURIComponent(resource.name)}`;
@@ -54,13 +112,12 @@ export default function Problem() {
       <main className="flex-1 py-6">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            
             <div className="bg-gray-800 rounded-xl border border-gray-700">
               <div className="p-4 border-b border-gray-700">
                 <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
               </div>
               <div className="p-4">
-                <CodeEditor />
+                <CodeEditor code = {code} setCode = {setCode} handleRun = {handleRun} />
               </div>
             </div>
             <div className="bg-gray-800 rounded-xl border border-gray-700">
@@ -78,29 +135,30 @@ export default function Problem() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-600">
-                      {[
-                        { case: 1, expected: "50", output: "25", status: false },
-                        { case: 2, expected: "15", output: "15", status: true },
-                        { case: 3, expected: "22", output: "25", status: false },
-                        { case: 4, expected: "50", output: "25", status: false },
-                        { case: 5, expected: "15", output: "15", status: true },
-                        { case: 6, expected: "22", output: "25", status: false }
-                      ].map((test, index) => (
+                      {results.length > 0 ? (results.map((test, index) => (
                         <tr key={index} className="hover:bg-gray-700/50">
-                          <td className="py-3 px-4">Case {test.case}</td>
+                          <td className="py-3 px-4">Case {index + 1}</td>
                           <td className="py-3 px-4 font-mono text-blue-400">{test.expected}</td>
                           <td className="py-3 px-4 font-mono text-gray-300">{test.output}</td>
                           <td className="py-3 px-4">
                             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              test.status 
+                              test.result === "PASS"
                                 ? 'bg-green-900 text-green-300' 
                                 : 'bg-red-900 text-red-300'
                             }`}>
-                              {test.status ? '✓ Pass' : '✗ Fail'}
+                              {test.result === "PASS" ? '✓ Pass' : '✗ Fail'}
                             </span>
                           </td>
                         </tr>
-                      ))}
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-3 px-4 text-center text-gray-400">
+                            Click Run to test your code and see results.
+                          </td>
+                        </tr>
+                      )
+                    }
                     </tbody>
                   </table>
                 </div>
@@ -108,7 +166,7 @@ export default function Problem() {
 
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-200 mb-4">AI Assistant</h3>
-                <ChatHistory problem = {problem} />
+                <ChatHistory problem = {problem} messages = {messages} setMessages = {setMessages} isLoading = {isLoading} />
               </div>
             </div>
           </div>
