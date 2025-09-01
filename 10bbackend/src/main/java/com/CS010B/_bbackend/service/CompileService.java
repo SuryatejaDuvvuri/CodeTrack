@@ -11,10 +11,9 @@ import com.jcraft.jsch.ChannelExec;
 @Service
 public class CompileService
 {
-    private final String HOST = "13.88.31.172";
-    private final String USER = "azureuser";
-    private final String KEY = "/Users/SuryatejaD/Developer/Projects/CS010BProject/IDE_key.pem";
-
+    private final String HOST = System.getenv("COMPILE_HOST");
+    private final String USER = System.getenv("COMPILE_USER");
+    private final String KEY = System.getenv("COMPILE_KEY");
     public String compileCode(String code, String testCases) throws Exception
     {
         JSch jsch = new JSch();
