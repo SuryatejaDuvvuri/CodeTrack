@@ -8,7 +8,7 @@ export default function progressGraph({id})
     { 
       timestamp: new Date('2023-07-16T04:31:25'), 
       success: false,
-      duration: 32 // seconds
+      duration: 32
     },
     { 
       timestamp: new Date('2023-07-16T04:31:55'), 
