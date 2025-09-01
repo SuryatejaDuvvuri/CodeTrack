@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -12,6 +13,9 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.CS010B._bbackend.model.ChatMessage;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.cloud.firestore.DocumentReference;
 
 @Service
 public final class BasicChatSample 
@@ -36,8 +40,6 @@ public final class BasicChatSample
                 new UserMessage("What is an implicit and explicit parameter in simple terms?")
         ));
         String res = chatModel.call(prompt).getResult().getOutput().getText();
-
-        System.out.println(res);
         return res;
     }
 
@@ -92,7 +94,7 @@ public final class BasicChatSample
         
         try
         {
-            firestore.logMessage(netId, problem, netId, response);
+            firestore.logMessage(netId, problem, userPrompt, response);
         }
         catch(Exception e)
         {
@@ -104,8 +106,41 @@ public final class BasicChatSample
 
     public List<ChatMessage> getHistory(String problem, String netId)
     {
-        String key = netId + "-" + problem;
-        return chatHistory.getOrDefault(key,new ArrayList<>());
+        try 
+        {
+            return firestore.loadChats(problem, netId);
+        } 
+        catch (ExecutionException | InterruptedException e) 
+        {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public List<Map<String,String>> createTests(String problem, String code)
+    {
+        String prompt = "You are an autograder for C++. For the following problem, generate 7 unit test cases. " +
+        "Each test case should include: test case #, input, expected output, and user's output. " +
+        "Format your response as a JSON array of objects with keys 'input', 'expectedOutput', 'userOutput'.\n" +
+        "Problem: " + problem + "\nCode:\n" + code;
+
+        Prompt promptTwo = new Prompt(List.of(new SystemMessage(prompt)));
+        String res = chatModel.call(promptTwo).getResult().getOutput().getText();
+
+        ObjectMapper map = new ObjectMapper();
+        List<Map<String,String>> testCases = new ArrayList<>();
+
+        try
+        {
+            testCases = map.readValue(res, new TypeReference<List<Map<String,String>>>() {});
+        }
+        catch(Exception e)
+        {
+            System.err.println("Could not parse JSON: " + e.getMessage());
+        }
+
+        return testCases;
+    
     }
 
 }

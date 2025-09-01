@@ -10,6 +10,8 @@ public class ChatMessage
     private LocalDateTime timestamp;
     private String problem;
     private String netId;
+    private String userMessage;
+    private String aiResponse;
 
     public String getId()
     {
@@ -69,5 +71,24 @@ public class ChatMessage
     public void setNetId(String netId)
     {
         this.netId = netId;
+    }
+
+    public String getUserMessage()
+    {
+        return userMessage;
+    }
+    public String getAiResponse()
+    {
+        return aiResponse;
+    }
+
+    public void setUserMessage(String userMessage) 
+    {
+        this.userMessage = userMessage;
+    }
+
+    public void setAiResponse(String aiResponse)
+    {
+        this.aiResponse = aiResponse;
     }
 }

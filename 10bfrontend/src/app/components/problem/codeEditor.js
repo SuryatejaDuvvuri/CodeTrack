@@ -2,42 +2,28 @@
 import {useEffect, useState, useRef} from 'react';
 import Editor from '@monaco-editor/react'
 
-export default function codeEditor()
+export default function codeEditor({code,setCode,handleRun})
 {
-    const [code, setCode] = useState(
-`#include <iostream>
-using namespace std;
-
-bool sleepIn(bool weekday, bool vacation) {
-    // code here
-}
-
-int main() {
-    cout << "Testing sleepIn function:" << endl;
-    cout << "sleepIn(true, false): " << (sleepIn(true, false) ? "true" : "false") << endl;
-    cout << "sleepIn(false, false): " << (sleepIn(false, false) ? "true" : "false") << endl;
-    cout << "sleepIn(true, true): " << (sleepIn(true, true) ? "true" : "false") << endl;
-    return 0;
-}
-`
-    );
 
     const editorRef = useRef(null);
 
     const handleEditor = (editor,m) => 
     {
         editorRef.current = editor;
-        editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyC, () => {
+        editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyC, () => 
+        {
             console.log('No Copying');
         });
 
-        editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyV, () => {
+        editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyV, () => 
+        {
             console.log("No Pasting");
         });
     };
 
     useEffect(() => {
-        const disableCopyPaste = (e) => {
+        const disableCopyPaste = (e) => 
+        {
             e.preventDefault();
             console.log('No Copying/Pasting');
             return false;
@@ -71,7 +57,7 @@ int main() {
             </div>
             <div className = "space-x-2">
                 <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors">Save</button>
-                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors">Run</button>
+                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {handleRun}>Run</button>
                 <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors">Reset</button>
                 <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors">Graph</button>
             </div>
