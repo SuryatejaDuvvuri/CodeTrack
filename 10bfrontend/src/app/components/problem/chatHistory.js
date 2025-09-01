@@ -1,28 +1,28 @@
 "use client";
 import { useState,useEffect } from 'react';
 
-export default function chatHistory({problem})
+export default function chatHistory({problem, messages = [], setMessages, isLoading})
 {
-    const [messages, setMessages] = useState([
-    { 
-      role: 'system', 
-      content: 'Welcome to CS010B Practice Portal! Ask me if you need help with your code.',
-      timestamp: null
-    },
-    {
-      role: 'user',
-      content: 'How do I implement the sleepIn function?',
-      timestamp: null
-    },
-    {
-      role: 'system',
-      content: 'The sleepIn function should return true if it\'s not a weekday or if we\'re on vacation. In other words:\n\n```cpp\nreturn (!weekday || vacation);\n```',
-      timestamp: null
-    }
-    ]);
+    // const [messages, setMessages] = useState([
+    // { 
+    //   role: 'system', 
+    //   content: 'Welcome to CS010B Practice Portal! Ask me if you need help with your code.',
+    //   timestamp: null
+    // },
+    // {
+    //   role: 'user',
+    //   content: 'How do I implement the sleepIn function?',
+    //   timestamp: null
+    // },
+    // {
+    //   role: 'system',
+    //   content: 'The sleepIn function should return true if it\'s not a weekday or if we\'re on vacation. In other words:\n\n```cpp\nreturn (!weekday || vacation);\n```',
+    //   timestamp: null
+    // }
+    // ]);
 
     const [input, setInput] = useState('');
-    const [isLoading, setLoading] = useState(false);
+    // const [isLoading, setLoading] = useState(false);
     const URL = process.env.NEXT_PUBLIC_API_URL;
 
     useEffect(() => {
@@ -37,21 +37,43 @@ export default function chatHistory({problem})
                     },
                     body: JSON.stringify({
                         problem:problem,
-                        userId: "sduvv003"
+                        netId: "sduvv003"
                     })
                 });
 
                 if(response.ok)
                 {
-                    const history = await response.json();
-                    if (history && history.length > 0)
-                    {
-                        setMessages(history.map(msg => ({
-                            role:msg.role,
-                            content:msg.content,
-                            timestamp: new Date(msg.timestamp)
-                        })))
-                    }
+                        const history = await response.json();
+                        if (history && history.length > 0)
+                        {
+                            setMessages(history.map(msg => {
+                               const arr = [];
+                                if (msg.userMessage) 
+                                {
+                                    arr.push(
+                                    {
+                                        role: 'user',
+                                        content: msg.userMessage,
+                                        timestamp: msg.timestamp
+                                    });
+                                }
+                                if (msg.aiResponse) 
+                                {
+                                    arr.push(
+                                    {
+                                        role: 'system',
+                                        content: msg.aiResponse,
+                                        timestamp: msg.timestamp
+                                    });
+                                }
+
+                                return arr;
+                            }))
+                        }
+                        // else
+                        // {
+                        //      setMessages([]);
+                        // }
                 }
             }
             catch(error)
@@ -95,7 +117,6 @@ export default function chatHistory({problem})
             if(response.ok)
             {
                 const data = await response.json();
-                console.log(data);
                 const res = {
                     role:'system',
                     content:data.response,
@@ -140,8 +161,8 @@ export default function chatHistory({problem})
    return (
      <div className = 'flex-1 rounded-lg p-3 flex flex-col h-full'>
         <div className = "flex-1 mb-3 overflow-y-auto max-h-[600px]">
-            {messages.map((msg,i) => (
-                <div key = {i} className={`mb-3 ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'} max-w[58%]`}>
+            {messages.flat().map((msg,i) => (
+                <div key = {i} className={`mb-3 ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'} max-w-[70%]`}>
                     <div className = {`p-3 rounded-lg ${
                         msg.role === 'user' 
                         ? 'bg-blue-600 text-white rounded-br-none' 
@@ -150,10 +171,15 @@ export default function chatHistory({problem})
                         <div className="whitespace-pre-wrap">{msg.content}</div>
                     </div>
                      <div className="text-xs text-gray-500 mt-1" suppressHydrationWarning>
-                        {msg.role === 'user' ? 'You' : 'AI Chatbot'} - {new Date().toLocaleTimeString()}
+                        {msg.role === 'user' ? 'You' : 'AI Chatbot'} - {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()}
                     </div>
                 </div>
             ))}
+            {/* {msgs.map((msg,index) => (
+                <div key = {index} className={`mb-2 ${msg.role === 'system' ? 'text-red-400' : 'text-gray-200'}`}>
+                 {msg.content}
+                </div>
+            ))} */}
 
             {isLoading && (
                 <div className="mr-auto mb-3">

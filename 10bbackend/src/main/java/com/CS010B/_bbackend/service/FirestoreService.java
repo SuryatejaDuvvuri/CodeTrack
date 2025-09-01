@@ -1,5 +1,6 @@
 package com.CS010B._bbackend.service;
 
+import com.CS010B._bbackend.model.ChatMessage;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -17,7 +18,12 @@ import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -104,6 +110,97 @@ public class FirestoreService
         chat.put("userMessage", userMsg);
         chat.put("aiResponse", aiRes);
         docRef.update("Problems.Easy." + problem + ".Chat Logs", FieldValue.arrayUnion(chat));
-
     }
+
+    public void storeTests(String problem, List<Map<String,String>> testCases)
+    {
+        DocumentReference docRef = firestore.collection("problems").document(problem);
+        docRef.update("unitTests",testCases);
+    }
+
+    public List<Map<String,String>> getTests(String problem) throws Exception
+    {
+        DocumentReference docRef = firestore.collection("problems").document(problem);
+        DocumentSnapshot doc = docRef.get().get();
+        if(doc.exists() && doc.contains("unitTests"))
+        {
+            return (List<Map<String,String>>) doc.get("unitTests");
+        }
+
+        return null;
+    }
+
+    public List<ChatMessage> loadChats(String problem, String netId) throws ExecutionException, InterruptedException 
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = docRef.get().get();
+
+        if(doc.exists())
+        {
+            Map<String,Object> data = doc.getData();
+            Map<String,Object> problems = (Map<String,Object>) data.get("Problems");
+            Map<String,Object> details = null;
+            
+            if(problems != null)
+            {
+                if(problems.containsKey("Easy") && problem.startsWith("Easy"))
+                {
+                    details = (Map<String,Object>)problems.get("Easy");
+                }
+                else if(problems.containsKey("Medium") && problem.startsWith("Medium"))
+                {
+                    details = (Map<String,Object>)problems.get("Medium");
+                }
+                else if(problems.containsKey("Hard") && problem.startsWith("Hard"))
+                {
+                    details = (Map<String,Object>)problems.get("Hard");
+                }
+
+                if(details == null) 
+                {
+                    return new ArrayList<>();
+                }
+                Map<String,Object> probData = (Map<String,Object>) details.get(problem);
+                if(probData == null) 
+                {
+                    return new ArrayList<>();
+                }
+                List<Map<String,Object>> logs =  (List<Map<String,Object>>) probData.get("Chat Logs");
+                if(logs == null) 
+                {
+                    return new ArrayList<>();
+                }
+                List<ChatMessage> messages = new ArrayList<>();
+                
+                for(Map<String,Object> chat: logs)
+                {
+                    String userMsg = chat.get("userMessage") != null ? chat.get("userMessage").toString() : "";
+                    String aiRes = chat.get("aiResponse") != null ? chat.get("aiResponse").toString() : "";
+                    if (userMsg.isEmpty() && aiRes.isEmpty())
+                    {
+                        continue;
+                    }
+                    ChatMessage msg = new ChatMessage();
+                    Object tsObj = chat.get("timestamp");
+                    LocalDateTime timestamp = null;
+                    if (tsObj instanceof Long) 
+                    {
+                        timestamp = LocalDateTime.ofInstant(Instant.ofEpochMilli((Long) tsObj), ZoneId.systemDefault());
+                    } else if (tsObj instanceof Integer) 
+                    {
+                        timestamp = LocalDateTime.ofInstant(Instant.ofEpochMilli(((Integer) tsObj).longValue()), ZoneId.systemDefault());
+                    }
+                    msg.setTimestamp(timestamp);
+                    msg.setUserMessage(userMsg);
+                    msg.setAiResponse(aiRes);
+
+                    messages.add(msg);
+                }
+                return messages;
+
+            }
+        }
+        return new ArrayList<>();
+    }
+
 }
