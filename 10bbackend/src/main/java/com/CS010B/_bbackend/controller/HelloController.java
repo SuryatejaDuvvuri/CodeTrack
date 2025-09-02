@@ -51,7 +51,4 @@ public class HelloController
         String response = chatSample.getResponse();
         return ResponseEntity.ok(new ChatResponse(response));
     }
-    
-
-    
 }

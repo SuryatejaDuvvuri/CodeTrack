@@ -1,7 +1,8 @@
 package com.CS010B._bbackend.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import java.util.*;
+// import java.util.*;
 import java.io.*;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
@@ -11,9 +12,15 @@ import com.jcraft.jsch.ChannelExec;
 @Service
 public class CompileService
 {
-    private final String HOST = System.getenv("COMPILE_HOST");
-    private final String USER = System.getenv("COMPILE_USER");
-    private final String KEY = System.getenv("COMPILE_KEY");
+    @Value("${compile.host}")
+    private String HOST;
+
+    @Value("${compile.user}")
+    private String USER;
+
+    @Value("${compile.key}")
+    private String KEY;
+    
     public String compileCode(String code, String testCases) throws Exception
     {
         JSch jsch = new JSch();
