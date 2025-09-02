@@ -39,7 +39,7 @@ i
       headers: {
         "Content-Type":"application/json"
       },
-      body: JSON.stringify({code: code,testcases: testcases}),
+      body: JSON.stringify({netId: "sduvv003", problem:problem, code: code,testcases: testcases}),
     });
     const result = await res.json();
     if(result.status === "error")
@@ -49,12 +49,37 @@ i
           {role: "system",content:result.details}
         ]);
         setResults([]);
+        setLoading(false);
+        return;
     }
     else
     {
       setResults(result);
     }
-    setLoading(false);
+
+    const chatRes = await fetch ("http://localhost:8080/api/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          prompt: "Can you give me feedback on my code?",
+          problem: problem,
+          netId: "sduvv003"
+      }),
+    });
+
+    if(chatRes.ok)
+    {
+        const data = await chatRes.json();
+        const res = 
+        {
+            role:'system',
+            content:data.response,
+            timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev,res]);
+        setLoading(false);
+    }
   }
 
    useEffect(() => {
@@ -84,9 +109,9 @@ i
               <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                 Next
               </button>
-              <button className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
+              {/* <button className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
                 Random
-              </button>
+              </button> */}
             </div>
             <div className="flex items-center space-x-2">
               <span className="px-3 py-1 bg-yellow-600 rounded-lg text-sm font-medium">
