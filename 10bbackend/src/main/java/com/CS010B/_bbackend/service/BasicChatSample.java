@@ -15,15 +15,12 @@ import org.springframework.stereotype.Service;
 import com.CS010B._bbackend.model.ChatMessage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.cloud.firestore.DocumentReference;
+// import com.google.cloud.firestore.DocumentReference;
 
 @Service
 public final class BasicChatSample 
 {
     private final AzureOpenAiChatModel chatModel;
-    
-    //Temp for now but change this to using firebase
-    private Map<String,List<ChatMessage>> chatHistory = new HashMap<>();
 
     @Autowired
     private FirestoreService firestore;
@@ -48,11 +45,13 @@ public final class BasicChatSample
         StringBuilder sys = new StringBuilder();
         sys.append("You're an assistant helping students learn C++ programming on their own without using AI ");
         sys.append("for an introductory C++ college level course. Take a look at this problem " + problem + "and provide helpful guidance but don't write complete solutions.");
-        sys.append("Suggest approaches, explain concepts, and guide students through debugging.");
+        sys.append("Suggest approaches, explain concepts, and guide students through debugging. Make it short and concise.");
 
         try
         {
-            Map<String,Object> details = firestore.getProblem(problem);
+            String diff = problem.startsWith("Easy") ? "easy" : problem.startsWith("Medium") ? "medium" : "hard";
+            Map<String,Object> details = firestore.getProblem(diff,problem);
+            System.out.println(details);
             if(details != null)
             {
                 String desc = (String)details.get("Description");
@@ -63,6 +62,16 @@ public final class BasicChatSample
                 sys.append("Title: ").append(problemTitle).append("\n");
                 sys.append("Difficulty: ").append(difficulty).append("\n");
                 sys.append("Description: ").append(desc).append("\n");
+
+                if(!details.containsKey("Solution") || !details.containsKey("Testcases"))
+                {
+                    String solutionPrompt = "Write a correct C++ solution for the following problem. Only output code, no explanation.\nProblem: " + desc;
+                    Prompt pr = new Prompt(List.of(new SystemMessage(solutionPrompt)));
+                    String solCode = chatModel.call(pr).getResult().getOutput().getText();
+
+                    List<Map<String,String>> testCases = createTests(desc, solCode);
+                    firestore.storeTests(problem, solCode, testCases);
+                }
             }
 
             Map<String,Object> studentDetails = firestore.getStudentProblem(netId, problem);

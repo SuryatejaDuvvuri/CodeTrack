@@ -60,12 +60,16 @@ public class FirestoreService
         }
     }
 
-    public Map<String,Object> getProblem(String id) throws ExecutionException, InterruptedException
+    public Map<String,Object> getProblem(String id, String problem) throws ExecutionException, InterruptedException
     {
-        DocumentReference docRef = firestore.collection("problems").document(id);
+        DocumentReference docRef = firestore.collection("problems").document(id.toLowerCase());
         DocumentSnapshot doc = docRef.get().get();
 
-        return doc.exists() ? doc.getData() : null;
+        if(doc.exists() && doc.contains(problem.toLowerCase())) 
+        {
+            return (Map<String, Object>) doc.get(problem.toLowerCase());
+        }
+        return null;
     }
 
     public Map<String,Object> getStudentProblem(String netId, String problem) throws ExecutionException, InterruptedException
@@ -109,22 +113,31 @@ public class FirestoreService
         chat.put("timestamp",System.currentTimeMillis());
         chat.put("userMessage", userMsg);
         chat.put("aiResponse", aiRes);
-        docRef.update("Problems.Easy." + problem + ".Chat Logs", FieldValue.arrayUnion(chat));
+        String difficulty = problem.startsWith("Easy") ? "Easy" : problem.startsWith("Medium") ? "Medium" : "Hard";
+        docRef.update("Problems." + difficulty + "." + problem + ".Chat Logs", FieldValue.arrayUnion(chat));
     }
 
-    public void storeTests(String problem, List<Map<String,String>> testCases)
+    public void storeTests(String problem, String solution, List<Map<String,String>> testCases)
     {
-        DocumentReference docRef = firestore.collection("problems").document(problem);
-        docRef.update("unitTests",testCases);
+        String difficulty = problem.startsWith("Easy") ? "easy" : problem.startsWith("Medium") ? "medium" : "hard";
+        DocumentReference docRef = firestore.collection("problems").document(difficulty);
+        Map<String, Object> problemMap = new HashMap<>();
+        problemMap.put("Testcases", testCases);
+        problemMap.put("solution", solution);
+        
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(problem.toLowerCase(), problemMap);
+        docRef.set(updates, com.google.cloud.firestore.SetOptions.merge());
+        System.out.println("Added test cases and solution");
     }
 
     public List<Map<String,String>> getTests(String problem) throws Exception
     {
         DocumentReference docRef = firestore.collection("problems").document(problem);
         DocumentSnapshot doc = docRef.get().get();
-        if(doc.exists() && doc.contains("unitTests"))
+        if(doc.exists() && doc.contains("Testcases"))
         {
-            return (List<Map<String,String>>) doc.get("unitTests");
+            return (List<Map<String,String>>) doc.get("Testcases");
         }
 
         return null;
@@ -201,6 +214,13 @@ public class FirestoreService
             }
         }
         return new ArrayList<>();
+    }
+
+    public void updateCode(String netId, String problem, String code) throws ExecutionException, InterruptedException
+    {
+        String difficulty = problem.startsWith("Easy") ? "Easy" : problem.startsWith("Medium") ? "Medium" : "Hard";
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        docRef.update("Problems." + difficulty + "." + problem + ".Latest Code", code);
     }
 
 }
