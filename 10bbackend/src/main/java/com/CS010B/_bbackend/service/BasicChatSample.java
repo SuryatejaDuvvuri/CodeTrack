@@ -140,8 +140,7 @@ public final class BasicChatSample
         "Each Each test case should have:\n" + //
                         "- input: the raw values that would be entered via cin (e.g., \"false false\")\n" + //
                         "- expectedOutput: the output value (e.g., \"true\")\n" + //
-                        "Format as a JSON array of objects with keys 'input' and 'expected'. " +
-        "Format your response as a JSON array of objects with keys 'input', 'expected', 'userOutput'.\n" +
+        "Format your response as a JSON array of objects with keys 'input', 'expectedOutput', 'userOutput'.\n" +
         "Problem: " + problem + "\nCode:\n" + code;
 
         Prompt promptTwo = new Prompt(List.of(new SystemMessage(prompt)));

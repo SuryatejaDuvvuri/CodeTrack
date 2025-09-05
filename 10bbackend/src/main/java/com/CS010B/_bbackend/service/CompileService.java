@@ -2,7 +2,6 @@ package com.CS010B._bbackend.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-// import java.util.*;
 import java.io.*;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +34,11 @@ public class CompileService
         for(Map<String,String> testCase: testCases)
         {
             convertCases.append(testCase.get("input"))
-                 .append(" ")
-                 .append(testCase.get("expectedOutput"))
-                 .append("|")
-                 .append(testCase.get("userOutput"))
-                 .append("\n");
+                .append("|")
+                .append(testCase.get("expectedOutput"))
+                .append("|")
+                .append(testCase.get("userOutput") != null ? testCase.get("userOutput") : "")
+                .append("\n");
         }
         String cases = convertCases.toString();
         JSch jsch = new JSch();

@@ -11,6 +11,7 @@ export default function Problem()
 {
 
   const [defaultCode, setDefaultCode] = useState("");
+  const [testcases,setTestcases] = useState([]);
   const problem = "Easy 1";
   const start = async () => {
     const res = await fetch ("http://localhost:8080/api/chat/load?difficulty=easy&problem=easy 1")
@@ -21,12 +22,6 @@ export default function Problem()
   useEffect(() => {
     start();
   }, []);
-
-    const defaultTestcases = `1 2|3
-  5 7|12
-  10 15|25
-  3 4|7
-  0 0|0`;
 
   const loadCode = async () => 
   {
@@ -57,7 +52,6 @@ export default function Problem()
     });
   }
 
-  const [testcases, setTestcases] = useState(defaultTestcases);
   const [code, setCode] = useState(loadCode);
   const [results, setResults] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -72,7 +66,7 @@ export default function Problem()
       headers: {
         "Content-Type":"application/json"
       },
-      body: JSON.stringify({netId: "sduvv003", problem:problem, code: code,testcases: testcases}),
+      body: JSON.stringify({netId: "sduvv003", problem:problem, code: code}),
     });
     const result = await res.json();
     if(result.status === "error")
@@ -88,6 +82,7 @@ export default function Problem()
     else
     {
       setResults(result);
+      console.log(result);
     }
 
     const chatRes = await fetch ("http://localhost:8080/api/chat", {
@@ -190,6 +185,7 @@ export default function Problem()
                     <thead>
                       <tr className="border-b border-gray-600">
                         <th className="text-left py-3 px-4 font-medium text-gray-300">Test Case</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-300">Input</th>
                         <th className="text-left py-3 px-4 font-medium text-gray-300">Expected</th>
                         <th className="text-left py-3 px-4 font-medium text-gray-300">Your Output</th>
                         <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
@@ -199,8 +195,9 @@ export default function Problem()
                       {results.length > 0 ? (results.map((test, index) => (
                         <tr key={index} className="hover:bg-gray-700/50">
                           <td className="py-3 px-4">Case {index + 1}</td>
-                          <td className="py-3 px-4 font-mono text-blue-400">{test.expected}</td>
-                          <td className="py-3 px-4 font-mono text-gray-300">{test.output}</td>
+                          <td>{test.input}</td>
+                          <td className="py-3 px-4 font-mono text-blue-400">{test.expectedOutput}</td>
+                          <td className="py-3 px-4 font-mono text-gray-300">{test.userOutput}</td>
                           <td className="py-3 px-4">
                             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                               test.result === "PASS"
