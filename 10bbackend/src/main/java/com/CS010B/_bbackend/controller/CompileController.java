@@ -1,5 +1,8 @@
 package com.CS010B._bbackend.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.CS010B._bbackend.service.BasicChatSample;
 import com.CS010B._bbackend.service.CompileService;
 import com.CS010B._bbackend.service.FirestoreService;
 
@@ -21,11 +25,17 @@ public class CompileController
     @Autowired
     private FirestoreService fireStore;
 
+    @Autowired
+    private BasicChatSample chatSample;
+
     @PostMapping
     public String grade(@RequestBody CompileRequest req) throws Exception
     {
         fireStore.updateCode(req.getNetId(), req.getProblem(), req.getCode());
-        return compileService.compileCode(req.getCode(), req.getTestcases());
+        chatSample.getChat(" ", req.getProblem(),req.getNetId());
+        List<Map<String,String>> testCases = fireStore.getTests(req.getProblem());
+        System.out.println(testCases);
+        return compileService.compileCode(req.getCode(), testCases);
     }
 
     @PostMapping("/update")
@@ -45,7 +55,6 @@ public class CompileController
 class CompileRequest
 {
     private String code;
-    private String testcases;
     private String netId;
     private String problem;
 
@@ -54,19 +63,9 @@ class CompileRequest
         this.code = code;
     }
 
-    public void setTestcases(String testcases)
-    {
-        this.testcases = testcases;
-    }
-
     public String getCode()
     {
         return code;
-    }
-
-    public String getTestcases()
-    {
-        return testcases;
     }
 
     public String getNetId()

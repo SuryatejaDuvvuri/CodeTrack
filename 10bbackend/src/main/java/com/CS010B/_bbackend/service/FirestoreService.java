@@ -5,6 +5,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.SetOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
@@ -142,20 +143,33 @@ public class FirestoreService
         
         Map<String, Object> updates = new HashMap<>();
         updates.put(problem.toLowerCase(), problemMap);
-        docRef.set(updates, com.google.cloud.firestore.SetOptions.merge());
-        System.out.println("Added test cases and solution");
+        docRef.set(updates, SetOptions.merge());
     }
 
     public List<Map<String,String>> getTests(String problem) throws Exception
     {
-        DocumentReference docRef = firestore.collection("problems").document(problem);
+        String prob = problem.toLowerCase();
+        String difficulty = prob.startsWith("easy") ? "easy" :
+                        prob.startsWith("medium") ? "medium" : "hard";
+        DocumentReference docRef = firestore.collection("problems").document(difficulty);
         DocumentSnapshot doc = docRef.get().get();
-        if(doc.exists() && doc.contains("Testcases"))
+        if(doc.exists() && doc.contains(prob))
         {
-            return (List<Map<String,String>>) doc.get("Testcases");
+            System.out.println("Found problem field: " + problem.toLowerCase());
+            Map<String, Object> probMap = (Map<String, Object>) doc.get(prob);
+            if(probMap != null && probMap.containsKey("Testcases"))
+            {
+                
+                Object rawTestcases = probMap.get("Testcases");
+                if(rawTestcases instanceof List)
+                {
+                    System.out.println("here");
+                    return (List<Map<String,String>>) rawTestcases;
+                }
+            }
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     public List<ChatMessage> loadChats(String problem, String netId) throws ExecutionException, InterruptedException 

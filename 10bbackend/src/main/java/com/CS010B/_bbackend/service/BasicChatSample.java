@@ -51,7 +51,6 @@ public final class BasicChatSample
         {
             String diff = problem.startsWith("Easy") ? "easy" : problem.startsWith("Medium") ? "medium" : "hard";
             Map<String,Object> details = firestore.getProblem(diff,problem);
-            System.out.println(details);
             if(details != null)
             {
                 String desc = (String)details.get("Description");
@@ -63,14 +62,23 @@ public final class BasicChatSample
                 sys.append("Difficulty: ").append(difficulty).append("\n");
                 sys.append("Description: ").append(desc).append("\n");
 
-                if(!details.containsKey("Solution") || !details.containsKey("Testcases"))
+                if(userPrompt.equals(" "))
                 {
-                    String solutionPrompt = "Write a correct C++ solution for the following problem. Only output code, no explanation.\nProblem: " + desc;
-                    Prompt pr = new Prompt(List.of(new SystemMessage(solutionPrompt)));
-                    String solCode = chatModel.call(pr).getResult().getOutput().getText();
+                    if(!details.containsKey("Solution") || !details.containsKey("Testcases"))
+                    {
+                        String solutionPrompt = "Write a correct C++ solution for the following problem. Only output code, no explanation.\nProblem: " + desc;
+                        Prompt pr = new Prompt(List.of(new SystemMessage(solutionPrompt)));
+                        String solCode = chatModel.call(pr).getResult().getOutput().getText();
 
-                    List<Map<String,String>> testCases = createTests(desc, solCode);
-                    firestore.storeTests(problem, solCode, testCases);
+                        List<Map<String,String>> testCases = createTests(desc, solCode);
+                        if(testCases != null && !testCases.isEmpty() && solCode != null && !solCode.isEmpty())
+                        {
+                            firestore.storeTests(problem, solCode, testCases);
+                        }
+                    }
+
+                    return " ";
+
                 }
             }
 
@@ -129,12 +137,16 @@ public final class BasicChatSample
     public List<Map<String,String>> createTests(String problem, String code)
     {
         String prompt = "You are an autograder for C++. For the following problem, generate 7 unit test cases. " +
-        "Each test case should include: test case #, input, expected output, and user's output. " +
-        "Format your response as a JSON array of objects with keys 'input', 'expectedOutput', 'userOutput'.\n" +
+        "Each Each test case should have:\n" + //
+                        "- input: the raw values that would be entered via cin (e.g., \"false false\")\n" + //
+                        "- expectedOutput: the output value (e.g., \"true\")\n" + //
+                        "Format as a JSON array of objects with keys 'input' and 'expected'. " +
+        "Format your response as a JSON array of objects with keys 'input', 'expected', 'userOutput'.\n" +
         "Problem: " + problem + "\nCode:\n" + code;
 
         Prompt promptTwo = new Prompt(List.of(new SystemMessage(prompt)));
         String res = chatModel.call(promptTwo).getResult().getOutput().getText();
+        res = res.replaceAll("```json", "").replaceAll("```", "").trim();
 
         ObjectMapper map = new ObjectMapper();
         List<Map<String,String>> testCases = new ArrayList<>();

@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 // import java.util.*;
 import java.io.*;
+import java.util.List;
+import java.util.Map;
+
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.ChannelSftp;
@@ -20,9 +23,25 @@ public class CompileService
 
     @Value("${compile.key}")
     private String KEY;
-    
-    public String compileCode(String code, String testCases) throws Exception
+
+
+    public String compileCode(String code, List<Map<String, String>> testCases) throws Exception
     {
+        StringBuilder convertCases  = new StringBuilder();
+        if(testCases == null)
+        {
+            return "No test cases yet...";
+        }
+        for(Map<String,String> testCase: testCases)
+        {
+            convertCases.append(testCase.get("input"))
+                 .append(" ")
+                 .append(testCase.get("expectedOutput"))
+                 .append("|")
+                 .append(testCase.get("userOutput"))
+                 .append("\n");
+        }
+        String cases = convertCases.toString();
         JSch jsch = new JSch();
         jsch.addIdentity(KEY);
         Session sesh = jsch.getSession(USER,HOST,22);
@@ -33,7 +52,7 @@ public class CompileService
         sftp.cd("/home/azureuser");
         try(InputStream codeSt = new ByteArrayInputStream(code.getBytes()))
         {
-            InputStream tc = new ByteArrayInputStream(testCases.getBytes());
+            InputStream tc = new ByteArrayInputStream(cases.getBytes());
             sftp.put(codeSt, "solution.cpp");
             sftp.put(tc,"testcases.txt");
         }
