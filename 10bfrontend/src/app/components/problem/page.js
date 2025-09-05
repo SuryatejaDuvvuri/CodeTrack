@@ -57,10 +57,13 @@ export default function Problem()
   const [messages, setMessages] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
+  const [progressData, setProgressData] = useState([]);
+  const [startTime, setStartTime] = useState(null);
 
   const handleRun = async () =>
   {
     setLoading(true);
+    const runStart = Date.now();
     const res = await fetch("http://localhost:8080/api/grade", {
       method: "POST",
       headers: {
@@ -69,6 +72,9 @@ export default function Problem()
       body: JSON.stringify({netId: "sduvv003", problem:problem, code: code}),
     });
     const result = await res.json();
+    const runEnd = Date.now();
+    const timeSpent = startTime ? Math.round((runEnd - runStart) / 1000) : 0;
+    setStartTime(null); 
     if(result.status === "error")
     {
         setMessages(prev => [
@@ -82,7 +88,21 @@ export default function Problem()
     else
     {
       setResults(result);
-      console.log(result);
+      
+      const passed = result.filter(r => r.result === "PASS").length;
+      const total = result.length;
+      await fetch("http://localhost:8080/api/progress", {
+        method: "POST",
+        headers: {
+          "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+          netId:"sduvv003",problem,passed,total,timeSpent
+        })
+      });
+
+      fetchProgress();
+
     }
 
     const chatRes = await fetch ("http://localhost:8080/api/chat", {
@@ -118,6 +138,28 @@ export default function Problem()
     }
   },[messages,isLoading]);
 
+  const fetchProgress = async () => {
+    const progressRes = await fetch(`http://localhost:8080/api/progress?netId=sduvv003&problem=${problem}`);
+
+    if(progressRes.ok)
+    {
+      const data = await progressRes.json();
+      setProgressData(data.map(run => ({
+        timestamp:new Date(run.timestamp),
+        success:run.successRate >= 80,
+        duration: run.timeSpent,
+        successRate:run.successRate
+      })))
+    }
+  }
+
+  useEffect(() => {
+    if(showGraph)
+    {
+      fetchProgress();
+    }
+  }, [showGraph]);
+
   const toggle = () => 
   {
       setShowGraph(prev => !prev);
@@ -128,6 +170,12 @@ export default function Problem()
     const embedUrl = `/embeddedviewer?url=${encodeURIComponent(resource.url)}&title=${encodeURIComponent(resource.name)}`;
     window.open(embedUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
   };
+
+  const totalAttempts = progressData.length;
+  const avgTime = totalAttempts > 0 ? Math.round(progressData.reduce((a, b) => a + b.timeSpent, 0) / totalAttempts) : 0;
+  const overallSuccess = totalAttempts > 0 ? Math.round(progressData.reduce((a, b) => a + (b.successRate >= 70 ? 1 : 0), 0) * 100 / totalAttempts) : 0;
+
+
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
       <header className="w-full py-6 px-6 border-b border-gray-700">
@@ -173,7 +221,7 @@ export default function Problem()
                 <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
               </div>
               <div className="p-4">
-                <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph}/>
+                <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph} setStartTime={setStartTime}/>
               </div>
             </div>
             <div className="bg-gray-800 rounded-xl border border-gray-700">
@@ -232,7 +280,7 @@ export default function Problem()
          {showGraph && (
               <div className="bg-gray-800 rounded-xl border border-gray-700 p-11 mb-6">
                   <h3 className="text-xl font-semibold text-gray-200 mb-4">Progress Overview</h3>
-                  <ProgressGraph />
+                  <ProgressGraph attemptData = {progressData} totalAttempts={totalAttempts} avgTime = {avgTime} overallSuccess={overallSuccess}/>
               </div>
           )}
 
@@ -243,7 +291,7 @@ export default function Problem()
                 { name: "C++ Reference", url: "https://www.w3schools.com/cpp/cpp_ref_reference.asp" },
                 { name: "Zybooks", url: "https://learn.zybooks.com/zybook/UCRCS010BMillerSummer2025?selectedPanel=view-activity" },
                 { name: "LearnCpp.com", url: "https://www.learncpp.com/" },
-                { name: "JUnit Testing", url: "https://www.youtube.com/watch?v=vZm0lHciFsQ" }
+                { name: "Tutorial Videos", url: "https://www.youtube.com/watch?v=cec5DV42wjI&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS&index=14" }
               ].map((resource, index) => (
                 <button
                   key={index}

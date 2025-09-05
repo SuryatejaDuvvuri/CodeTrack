@@ -4,7 +4,7 @@ import Editor from '@monaco-editor/react'
 import ProgressGraph from "./progressGraph.js";
 
 
-export default function codeEditor({defaultCode, code,setCode,handleRun, saveCode, toggle, showGraph})
+export default function codeEditor({defaultCode, code,setCode,handleRun, saveCode, toggle, showGraph, setStartTime})
 {
 
     const editorRef = useRef(null);
@@ -12,6 +12,12 @@ export default function codeEditor({defaultCode, code,setCode,handleRun, saveCod
     const handleEditor = (editor,m) => 
     {
         editorRef.current = editor;
+        editor.onDidFocusEditorWidget(() => {
+            if(setStartTime)
+            {
+                setStartTime(Date.now());
+            }
+        })
         editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyC, () => 
         {
             console.log('No Copying');
