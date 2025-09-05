@@ -34,8 +34,8 @@ public class CompileController
         fireStore.updateCode(req.getNetId(), req.getProblem(), req.getCode());
         chatSample.getChat(" ", req.getProblem(),req.getNetId());
         List<Map<String,String>> testCases = fireStore.getTests(req.getProblem());
-        System.out.println(testCases);
         return compileService.compileCode(req.getCode(), testCases);
+        
     }
 
     @PostMapping("/update")

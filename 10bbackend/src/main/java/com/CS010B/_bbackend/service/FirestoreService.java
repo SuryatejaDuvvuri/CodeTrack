@@ -252,4 +252,46 @@ public class FirestoreService
         docRef.update("Problems." + difficulty + "." + problem + ".Latest Code", code);
     }
 
+    public void logAttempt(String netId, String problem,int passed, int total, long timeSpent)
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        String difficulty = problem.startsWith("Easy") ? "Easy" :
+                        problem.startsWith("Medium") ? "Medium" : "Hard";
+        Map<String,Object> run = new HashMap<>();
+        run.put("timestamp",System.currentTimeMillis());
+        run.put("problem",problem);
+        run.put("passed", passed);
+        run.put("total", total);
+        run.put("successRate", total > 0 ? (passed * 100.0 / total) : 0);
+        run.put("timeSpent", timeSpent / 1000);
+        docRef.update("Problems." + difficulty + "." + problem + ".Runs", FieldValue.arrayUnion(run));
+    }
+
+    public List<Map<String,Object>> getRuns(String netId, String problem) throws Exception
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = docRef.get().get();
+        String difficulty = problem.startsWith("Easy") ? "Easy" :
+                        problem.startsWith("Medium") ? "Medium" : "Hard";
+        if(doc.exists())
+        {
+            Map<String,Object> data = doc.getData();
+            Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
+            if(problems != null && problems.containsKey(difficulty))
+            {
+                Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
+                if (diff != null && diff.containsKey(problem)) 
+                {
+                    Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
+                    if (probMap != null && probMap.containsKey("Runs")) 
+                    {
+                        return (List<Map<String, Object>>) probMap.get("Runs");
+                    }
+                }
+            }
+        }
+
+        return new ArrayList<>();
+    }
+
 }
