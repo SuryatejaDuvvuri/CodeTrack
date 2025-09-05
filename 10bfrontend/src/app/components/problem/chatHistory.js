@@ -70,10 +70,6 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
                                 return arr;
                             }))
                         }
-                        // else
-                        // {
-                        //      setMessages([]);
-                        // }
                 }
             }
             catch(error)
@@ -175,11 +171,6 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
                     </div>
                 </div>
             ))}
-            {/* {msgs.map((msg,index) => (
-                <div key = {index} className={`mb-2 ${msg.role === 'system' ? 'text-red-400' : 'text-gray-200'}`}>
-                 {msg.content}
-                </div>
-            ))} */}
 
             {isLoading && (
                 <div className="mr-auto mb-3">

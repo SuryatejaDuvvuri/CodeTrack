@@ -14,6 +14,7 @@ import com.CS010B._bbackend.model.ChatMessage;
 import com.CS010B._bbackend.model.ChatRequest;
 import com.CS010B._bbackend.model.ChatResponse;
 import com.CS010B._bbackend.service.BasicChatSample;
+import com.CS010B._bbackend.service.FirestoreService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -30,6 +31,9 @@ public class HelloController
     @Autowired
     private BasicChatSample chatSample;
 
+    @Autowired
+    private FirestoreService fireStore;
+
 
     @PostMapping
     public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest request) 
@@ -45,10 +49,16 @@ public class HelloController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<ChatResponse> test() 
+    @GetMapping("/load")
+    public String getCode(@RequestParam String difficulty, @RequestParam String problem) throws Exception
     {
-        String response = chatSample.getResponse();
-        return ResponseEntity.ok(new ChatResponse(response));
+        return (String)fireStore.getStarterCode(difficulty,problem);
     }
+
+    // @GetMapping("/test")
+    // public ResponseEntity<ChatResponse> test() 
+    // {
+    //     String response = chatSample.getResponse();
+    //     return ResponseEntity.ok(new ChatResponse(response));
+    // }
 }

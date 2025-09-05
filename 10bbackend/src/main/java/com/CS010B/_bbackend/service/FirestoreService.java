@@ -72,6 +72,21 @@ public class FirestoreService
         return null;
     }
 
+    public String getStarterCode(String id, String problem) throws Exception
+    {
+        Map<String,Object> probDetails = getProblem(id,problem);
+        if (probDetails == null) return "";
+        return (String)probDetails.get("Startercode");
+    }
+
+    public String getCode(String netId, String problem) throws ExecutionException, InterruptedException
+    {
+        Map<String,Object> probData = (Map<String,Object>) getStudentProblem(netId, problem);
+        if (probData == null) return " ";
+        String res = (String)probData.get("Latest Code");
+        return res == null ? " " : res;
+    }
+
     public Map<String,Object> getStudentProblem(String netId, String problem) throws ExecutionException, InterruptedException
     {
         DocumentReference docRef = firestore.collection("section").document(netId);

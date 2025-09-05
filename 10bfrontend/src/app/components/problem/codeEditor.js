@@ -1,8 +1,10 @@
 "use client"
 import {useEffect, useState, useRef} from 'react';
 import Editor from '@monaco-editor/react'
+import ProgressGraph from "./progressGraph.js";
 
-export default function codeEditor({code,setCode,handleRun})
+
+export default function codeEditor({defaultCode, code,setCode,handleRun, saveCode, toggle, showGraph})
 {
 
     const editorRef = useRef(null);
@@ -21,7 +23,13 @@ export default function codeEditor({code,setCode,handleRun})
         });
     };
 
-    useEffect(() => {
+    const handleReset = () => 
+    {
+        setCode(defaultCode);
+    };
+
+    useEffect(() => 
+    {
         const disableCopyPaste = (e) => 
         {
             e.preventDefault();
@@ -43,7 +51,7 @@ export default function codeEditor({code,setCode,handleRun})
     return (
         <div className = "flex-1 bg-gray-800 rounded-lg p-4 flex flex-col h-full">
             <div className = "flex-1 mb-4 min-h-[400px]">
-                <Editor height="100vh" defaultLanguage = "cpp" defaultValue = {code} theme = "vs-dark"
+                <Editor height="100vh" defaultLanguage = "cpp" value = {code} theme = "vs-dark"
                 onChange = {setCode}
                 onMount={handleEditor}
                 options = {{
@@ -56,10 +64,10 @@ export default function codeEditor({code,setCode,handleRun})
                 }}/>
             </div>
             <div className = "space-x-2">
-                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors">Save</button>
+                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {saveCode}>Save</button>
                 <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {handleRun}>Run</button>
-                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors">Reset</button>
-                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors">Graph</button>
+                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {handleReset}>Reset</button>
+                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {toggle}>{showGraph ? "Hide Graph" : "Show Graph"}</button>
             </div>
         </div>
     )

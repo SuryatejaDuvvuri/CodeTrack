@@ -17,7 +17,7 @@ public class BasicChatSampleTest {
     {
         System.out.println("Response from Azure OpenAI:");
         System.out.println("-------------------------");
-        System.out.println(aiService.getResponse());
+        // System.out.println(aiService.getResponse());
         System.out.println("-------------------------");
     }
     

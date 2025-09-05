@@ -9,15 +9,18 @@ import ChatHistory from "./chatHistory.js";
 
 export default function Problem() 
 {
-  const defaultCode = `#include <iostream>
-using namespace std;
-int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << a + b << endl;
-    return 0;
-i
-}`;
+
+  const [defaultCode, setDefaultCode] = useState("");
+  const problem = "Easy 1";
+  const start = async () => {
+    const res = await fetch ("http://localhost:8080/api/chat/load?difficulty=easy&problem=easy 1")
+    const wait = await res.text();
+    setDefaultCode(wait);
+  };
+  
+  useEffect(() => {
+    start();
+  }, []);
 
     const defaultTestcases = `1 2|3
   5 7|12
@@ -25,11 +28,41 @@ i
   3 4|7
   0 0|0`;
 
+  const loadCode = async () => 
+  {
+    const res = await fetch(`http://localhost:8080/api/grade/code?netId=sduvv003&problem=${problem}`, {
+      method: "GET",
+      headers: {
+        "Content-Type":"application/json"
+      }
+    });
+
+    if(res.ok)
+    {
+      const data = await res.text();
+      setCode(data);
+    }
+    else
+    {
+      setCode(defaultCode);
+    }
+  };
+
+  const saveCode = async () =>
+  {
+      const chatRes = await fetch ("http://localhost:8080/api/grade/update", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({netId: "sduvv003", problem:problem, code: code}),
+    });
+  }
+
   const [testcases, setTestcases] = useState(defaultTestcases);
-  const [code, setCode] = useState(defaultCode);
+  const [code, setCode] = useState(loadCode);
   const [results, setResults] = useState([]);
   const [messages, setMessages] = useState([]);
   const [isLoading, setLoading] = useState(false);
+  const [showGraph, setShowGraph] = useState(false);
 
   const handleRun = async () =>
   {
@@ -90,13 +123,16 @@ i
     }
   },[messages,isLoading]);
 
+  const toggle = () => 
+  {
+      setShowGraph(prev => !prev);
+  }
+
   const handleResourceClick = (resource) => 
   {
     const embedUrl = `/embeddedviewer?url=${encodeURIComponent(resource.url)}&title=${encodeURIComponent(resource.name)}`;
     window.open(embedUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
   };
-
-  const problem = "Easy 1"
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
       <header className="w-full py-6 px-6 border-b border-gray-700">
@@ -142,7 +178,7 @@ i
                 <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
               </div>
               <div className="p-4">
-                <CodeEditor code = {code} setCode = {setCode} handleRun = {handleRun} />
+                <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph}/>
               </div>
             </div>
             <div className="bg-gray-800 rounded-xl border border-gray-700">
@@ -196,10 +232,12 @@ i
             </div>
           </div>
 
-          <div className="bg-gray-800 rounded-xl border border-gray-700 p-11 mb-6">
-            <h3 className="text-xl font-semibold text-gray-200 mb-4">Progress Overview</h3>
-            <ProgressGraph />
-          </div>
+         {showGraph && (
+              <div className="bg-gray-800 rounded-xl border border-gray-700 p-11 mb-6">
+                  <h3 className="text-xl font-semibold text-gray-200 mb-4">Progress Overview</h3>
+                  <ProgressGraph />
+              </div>
+          )}
 
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <h3 className="text-lg font-semibold text-gray-200 mb-4">Learning Resources</h3>
