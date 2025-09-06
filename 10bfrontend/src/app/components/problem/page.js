@@ -12,6 +12,8 @@ export default function Problem()
 
   const [defaultCode, setDefaultCode] = useState("");
   const [testcases,setTestcases] = useState([]);
+  const[aiAttempts,setAIAttempts] = useState(0);
+  const MAX_ATTEMPTS = 4;
   const problem = "Easy 1";
   const start = async () => {
     const res = await fetch ("http://localhost:8080/api/chat/load?difficulty=easy&problem=easy 1")
@@ -59,10 +61,12 @@ export default function Problem()
   const [showGraph, setShowGraph] = useState(false);
   const [progressData, setProgressData] = useState([]);
   const [startTime, setStartTime] = useState(null);
+  const [latestScore, setLatestScore] = useState(null);
 
   const handleRun = async () =>
   {
     setLoading(true);
+    await fetchAttempts();
     const runStart = Date.now();
     const res = await fetch("http://localhost:8080/api/grade", {
       method: "POST",
@@ -105,29 +109,99 @@ export default function Problem()
 
     }
 
-    const chatRes = await fetch ("http://localhost:8080/api/chat", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-          prompt: "Can you give me feedback on my code?",
-          problem: problem,
-          netId: "sduvv003"
-      }),
-    });
 
-    if(chatRes.ok)
+    if(aiAttempts < MAX_ATTEMPTS)
     {
-        const data = await chatRes.json();
-        const res = 
-        {
-            role:'system',
-            content:data.response,
-            timestamp: new Date()
-        };
+        const chatRes = await fetch ("http://localhost:8080/api/chat", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+              prompt: "Can you give me feedback on my code?",
+              problem: problem,
+              netId: "sduvv003"
+          }),
+        });
 
-        setMessages(prev => [...prev,res]);
-        setLoading(false);
+        if(chatRes.ok)
+        {
+            const data = await chatRes.json();
+            const res = 
+            {
+                role:'system',
+                content:data.response,
+                timestamp: new Date()
+            };
+
+            setMessages(prev => [...prev,res]);
+            setLoading(false);
+        }
+
+        await fetch("http://localhost:8080/api/progress/update", {
+          method: "POST",
+          headers: {"Content-Type" : "application/json"},
+          body: JSON.stringify({netId: "sduvv003",problem,aiAttempts:aiAttempts+1})
+        });
+        setAIAttempts(aiAttempts + 1);
     }
+    else if(aiAttempts === MAX_ATTEMPTS)
+    {
+        const passed = result.filter(r => r.result === "PASS").length;
+        const total = result.length;
+        const rate = (passed/total) * 100;
+
+        if(rate >= 80 && aiAttempts <= MAX_ATTEMPTS)
+        {
+            const chatRes = await fetch ("http://localhost:8080/api/chat", {
+              method: "POST",
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({
+                prompt: "Can you give me feedback on my code?",
+                problem: problem,
+                netId: "sduvv003"
+            }),
+          });
+
+          if(chatRes.ok)
+          {
+              const data = await chatRes.json();
+              const res = 
+              {
+                  role:'system',
+                  content:data.response,
+                  timestamp: new Date()
+              };
+
+              setMessages(prev => [...prev,res]);
+              setLoading(false);
+          }
+
+          await fetch("http://localhost:8080/api/progress/update", {
+            method: "POST",
+            headers: {"Content-Type" : "application/json"},
+            body: JSON.stringify({netId: "sduvv003",problem,aiAttempts:aiAttempts+1})
+          });
+          setAIAttempts(aiAttempts + 1);
+       }
+       else
+       {
+          setMessages(prev => [
+            ...prev,
+            {role: "system", content: "Pass at least 80% of test cases to unlock final feedback."}
+          ]);
+          setLoading(false);
+          setAIAttempts(aiAttempts + 1);
+          return;
+       }
+    }
+    else
+    {
+      setMessages(prev => [
+        ...prev,
+        {role: "system", content: "AI attempts exceeded. Your attempts will reset in 5 hours but do rely on test cases."}
+      ]);
+      setLoading(false);
+    }
+   
   }
 
    useEffect(() => {
@@ -153,12 +227,66 @@ export default function Problem()
     }
   }
 
+  const fetchAttempts = async () => 
+  {
+    const res = await fetch(`http://localhost:8080/api/progress/attempts?netId=sduvv003&problem=${problem}`);
+
+    if(res.ok)
+    {
+      const data = await res.json();
+      const lastAIAttempt = data.lastAIAttempt || 0;
+      const now = Date.now();
+      const hoursPassed = (now - lastAIAttempt) / (1000 * 60 * 60);
+
+      if(hoursPassed >= 5)
+      {
+        setAIAttempts(0);
+        await fetch("http://localhost:8080/api/progress/update", {
+          method: "POST",
+          headers: {"Content-Type" : "application/json"},
+          body: JSON.stringify({
+            netId: "sduvv003",
+            problem,
+            aiAttempts: 0,
+          })
+        });
+      }
+      else
+      {
+        setAIAttempts(data.aiAttempts || 0);
+      }
+    }
+  }
+
+  const fetchScore = async () => 
+  {
+    const res = await fetch(`http://localhost:8080/api/progress/latestScore?netId=sduvv003&problem=${problem}`);
+    if (res.ok) 
+    {
+      const data = await res.json();
+      console.log(data);
+      setLatestScore(
+        typeof data.latestScore === "number" && !isNaN(data.latestScore)
+          ? data.latestScore
+          : 0
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchScore();
+  }, [problem]);
+
   useEffect(() => {
     if(showGraph)
     {
       fetchProgress();
     }
   }, [showGraph]);
+
+  useEffect(() => {
+    fetchAttempts();
+  },[problem]);
 
   const toggle = () => 
   {
@@ -219,6 +347,10 @@ export default function Problem()
             <div className="bg-gray-800 rounded-xl border border-gray-700">
               <div className="p-4 border-b border-gray-700">
                 <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
+                {/* <h2 className="text-xl font-semibold text-gray-200">Latest Score</h2>
+                <div className="text-2xl font-bold text-blue-400 mt-2">
+                  {latestScore !== null ? `${Math.round(latestScore)}%` : "No score yet"}
+                </div> */}
               </div>
               <div className="p-4">
                 <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph} setStartTime={setStartTime}/>
@@ -228,6 +360,12 @@ export default function Problem()
               
               <div className="p-4 border-b border-gray-700">
                 <h2 className="text-xl font-semibold text-gray-200 mb-4">Test Results</h2>
+                <div className="mb-2">
+                  <span className="text-gray-200 font-medium mr-2">Latest Score:</span>
+                  <span className="text-xl font-bold text-blue-400">
+                    {latestScore !== null ? `${Math.round(latestScore)}%` : "0"}
+                  </span>
+                </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -272,7 +410,7 @@ export default function Problem()
 
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-200 mb-4">AI Assistant</h3>
-                <ChatHistory problem = {problem} messages = {messages} setMessages = {setMessages} isLoading = {isLoading} />
+                <ChatHistory problem = {problem} messages = {messages} setMessages = {setMessages} isLoading = {isLoading} aiAttempts={aiAttempts} setAIAttempts={setAIAttempts} />
               </div>
             </div>
           </div>

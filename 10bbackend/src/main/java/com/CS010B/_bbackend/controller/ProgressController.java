@@ -1,5 +1,6 @@
 package com.CS010B._bbackend.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,28 @@ public class ProgressController
     public void setRuns(@RequestBody Progress entity) {
         fireStore.logAttempt(entity.getNetId(), entity.getProblem(), entity.getPassed(), entity.getTotal(), entity.getTimeSpent());
     }
+
+    @GetMapping("/attempts")
+    public int getAttempts(@RequestParam String netId, @RequestParam String problem) throws Exception 
+    {
+        return fireStore.getAttempts(netId,problem);
+    }
+
+    @PostMapping("/update")
+    public void setAttempts(@RequestBody Progress entity) throws Exception
+    {
+        fireStore.setAIAttempts(entity.getNetId(), entity.getProblem(), entity.getAiAttempts(), System.currentTimeMillis());
+    }
+
+    @GetMapping("/latestScore")
+    public int getLatestScore(@RequestParam String netId, @RequestParam String problem) throws Exception 
+    {
+        return fireStore.getScore(netId,problem);
+    }
+    
+    
+    
+    
     
 }
 
@@ -42,6 +65,8 @@ class Progress
     private int passed;
     private int total;
     private long timeSpent;
+    private int aiAttempts;
+    private long lastAttempt;
 
     public String getProblem()
     { 
@@ -86,5 +111,15 @@ class Progress
     public void setTimeSpent(long timeSpent) 
     { 
         this.timeSpent = timeSpent; 
+    }
+
+    public int getAiAttempts()
+    {
+        return aiAttempts;
+    }
+
+    public void setAiAttempts(int aiAttempts)
+    {
+        this.aiAttempts = aiAttempts;
     }
 }

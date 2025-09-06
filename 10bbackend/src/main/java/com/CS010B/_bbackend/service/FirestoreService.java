@@ -258,6 +258,7 @@ public class FirestoreService
         String difficulty = problem.startsWith("Easy") ? "Easy" :
                         problem.startsWith("Medium") ? "Medium" : "Hard";
         Map<String,Object> run = new HashMap<>();
+        double latestScore = total > 0 ? (passed * 100.0 / total) : 0;
         run.put("timestamp",System.currentTimeMillis());
         run.put("problem",problem);
         run.put("passed", passed);
@@ -265,6 +266,8 @@ public class FirestoreService
         run.put("successRate", total > 0 ? (passed * 100.0 / total) : 0);
         run.put("timeSpent", timeSpent / 1000);
         docRef.update("Problems." + difficulty + "." + problem + ".Runs", FieldValue.arrayUnion(run));
+        docRef.update("Problems." + difficulty + "." + problem + ".Latest Score", latestScore);
+
     }
 
     public List<Map<String,Object>> getRuns(String netId, String problem) throws Exception
@@ -292,6 +295,88 @@ public class FirestoreService
         }
 
         return new ArrayList<>();
+    }
+
+    public int getAttempts(String netId, String problem) throws Exception
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = docRef.get().get();
+        String difficulty = problem.startsWith("Easy") ? "Easy" :
+                        problem.startsWith("Medium") ? "Medium" : "Hard";
+
+        if(doc.exists())
+        {
+            Map<String,Object> data = doc.getData();
+            Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
+            if(problems != null && problems.containsKey(difficulty))
+            {
+                Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
+                if (diff != null && diff.containsKey(problem)) 
+                {
+                    Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
+                    if (probMap != null) 
+                    {
+                        int attempts = probMap.containsKey("# of AI Attempts") ? ((Number) probMap.get("# of AI Attempts")).intValue() : 0;
+                        long lastAttempt = probMap.containsKey("lastAIAttempt") ? ((Number) probMap.get("lastAIAttempt")).longValue() : 0L;
+                        long now = System.currentTimeMillis();
+                        long hours = (now-lastAttempt) / (1000*3600);
+
+                        if(attempts > 0 && hours >= 5)
+                        {
+                            setAIAttempts(netId, problem, 0,now);
+                            return 0;
+                        }
+                        return attempts;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    public void setAIAttempts(String netId, String problem, int aiAttempts, long lastAttempt) throws Exception
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        String difficulty = problem.startsWith("Easy") ? "Easy" :
+                        problem.startsWith("Medium") ? "Medium" : "Hard";
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("Problems." + difficulty + "." + problem + ".# of AI Attempts", aiAttempts);
+        updates.put("Problems." + difficulty + "." + problem + ".lastAIAttempt", lastAttempt);
+
+        docRef.update(updates).get();
+    }
+
+    public int getScore(String netId, String problem) throws Exception
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = docRef.get().get();
+        String difficulty = problem.startsWith("Easy") ? "Easy" :
+                        problem.startsWith("Medium") ? "Medium" : "Hard";
+
+        if(doc.exists())
+        {
+            Map<String,Object> data = doc.getData();
+            Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
+            if(problems != null && problems.containsKey(difficulty))
+            {
+                Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
+                if (diff != null && diff.containsKey(problem)) 
+                {
+                    Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
+                    if (probMap != null) 
+                    {
+                        int score = 0;
+                        Object scoreObj = probMap.get("Latest Score");
+                        if(scoreObj instanceof Number)
+                        {
+                            score = ((Number)scoreObj).intValue();
+                        }
+                        return score;
+                    }
+                }
+            }
+        }
+        return 0;
     }
 
 }

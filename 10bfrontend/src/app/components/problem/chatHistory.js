@@ -1,28 +1,11 @@
 "use client";
 import { useState,useEffect } from 'react';
 
-export default function chatHistory({problem, messages = [], setMessages, isLoading})
+export default function chatHistory({problem, messages = [], setMessages, isLoading, aiAttempts, setAIAttempts})
 {
-    // const [messages, setMessages] = useState([
-    // { 
-    //   role: 'system', 
-    //   content: 'Welcome to CS010B Practice Portal! Ask me if you need help with your code.',
-    //   timestamp: null
-    // },
-    // {
-    //   role: 'user',
-    //   content: 'How do I implement the sleepIn function?',
-    //   timestamp: null
-    // },
-    // {
-    //   role: 'system',
-    //   content: 'The sleepIn function should return true if it\'s not a weekday or if we\'re on vacation. In other words:\n\n```cpp\nreturn (!weekday || vacation);\n```',
-    //   timestamp: null
-    // }
-    // ]);
-
+    
     const [input, setInput] = useState('');
-    // const [isLoading, setLoading] = useState(false);
+    const MAX_ATTEMPTS = 4;
     const URL = process.env.NEXT_PUBLIC_API_URL;
 
     useEffect(() => {
@@ -70,6 +53,14 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
                                 return arr;
                             }))
                         }
+                        else
+                        {
+                            setMessages([{
+                                role: 'system',
+                                content: 'Welcome to CS010B Practice Portal! Ask me if you need help with your code.',
+                                timestamp: null
+                            }]);
+                        }
                 }
             }
             catch(error)
@@ -81,11 +72,65 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
         loadChat();
     }, [problem]);
 
+    useEffect(() => {
+        async function fetchAttempts() 
+        {
+            const res = await fetch(`http://localhost:8080/api/progress/attempts?netId=sduvv003&problem=${problem}`);
+            if(res.ok)
+            {
+                const data = await res.json();
+                const lastAIAttempt = data.lastAIAttempt || 0;
+                const now = Date.now();
+                const hoursPassed = (now - lastAIAttempt) / (1000 * 60 * 60);
+
+                if(hoursPassed >= 5)
+                {
+                    setAIAttempts(0);
+                    await fetch("http://localhost:8080/api/progress/update", {
+                    method: "POST",
+                    headers: {"Content-Type" : "application/json"},
+                    body: JSON.stringify({
+                        netId: "sduvv003",
+                        problem,
+                        aiAttempts: 0,
+                    })
+                    });
+                }
+                else
+                {
+                    setAIAttempts(data.aiAttempts || 0);
+                }
+            }    
+        }
+    },[problem]);
+
     const handleSend = async () => {
         if(!input.trim())
         {
             return;
         }
+
+        if (aiAttempts >= MAX_ATTEMPTS) 
+        {
+            console.log(aiAttempts);
+            setMessages(prev => [...prev, {
+                role: 'system',
+                content: 'AI attempts exceeded. Please rely on test cases or wait for reset.',
+                timestamp: new Date()
+            }]);
+            return;
+        }
+        await fetch('http://localhost:8080/api/progress/update', 
+        {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                problem,
+                netId: "sduvv003",
+                aiAttempts: aiAttempts + 1,
+            })
+        });
+        setAIAttempts(aiAttempts + 1);
 
         const userMsg = {
             role: 'user',
@@ -95,7 +140,6 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
 
         setMessages(prev => [...prev,userMsg]);
         setInput('');
-        setLoading(true);
 
         try
         {
@@ -140,10 +184,6 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
                     timestamp: new Date()
                 }]);
         }
-        finally
-        {
-            setLoading(false);
-        }
     };
 
     const keyDown = (e) => {
@@ -185,7 +225,7 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
             )}
         </div>
         <div className = "flex items-center gap-2 mt-2">
-            <input value= {input} onChange = {(e) => setInput(e.target.value)} onKeyDown={keyDown}
+            <input value= {input} onChange = {(e) => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { handleSend();}}}
                 className = "w-full px-4 py-3 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-blue-500" placeholder="Ask for help(E.G Syntax Help)"/>  
             <button onClick = {handleSend} disabled = {isLoading || !input.trim()} className = {`${isLoading || !input.trim() ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 cursor-pointer hover:bg-blue-700'} text-white px-5 py-3 rounded-md transition-colors`}>
                 {isLoading ? 'Thinking...' : 'Send'}
