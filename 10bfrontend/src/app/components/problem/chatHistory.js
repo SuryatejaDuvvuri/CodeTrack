@@ -112,7 +112,7 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
 
         if (aiAttempts >= MAX_ATTEMPTS) 
         {
-            console.log(aiAttempts);
+            // console.log(aiAttempts);
             setMessages(prev => [...prev, {
                 role: 'system',
                 content: 'AI attempts exceeded. Please rely on test cases or wait for reset.',

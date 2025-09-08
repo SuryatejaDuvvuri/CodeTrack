@@ -66,7 +66,8 @@ export default function Problem()
   const handleRun = async () =>
   {
     setLoading(true);
-    await fetchAttempts();
+    // await fetchAttempts();
+    setTimeout(fetchAttempts,100);
     const runStart = Date.now();
     const res = await fetch("http://localhost:8080/api/grade", {
       method: "POST",
@@ -81,11 +82,11 @@ export default function Problem()
     setStartTime(null); 
     if(result.status === "error")
     {
+        console.log(result);
         setMessages(prev => [
           ...prev,
           {role: "system",content:result.details}
         ]);
-        setResults([]);
         setLoading(false);
         return;
     }
@@ -105,8 +106,9 @@ export default function Problem()
         })
       });
 
-      fetchProgress();
+      setTimeout(fetchScore, 100);
 
+      fetchProgress();
     }
 
 
@@ -135,7 +137,6 @@ export default function Problem()
             setMessages(prev => [...prev,res]);
             setLoading(false);
         }
-
         await fetch("http://localhost:8080/api/progress/update", {
           method: "POST",
           headers: {"Content-Type" : "application/json"},
@@ -229,17 +230,22 @@ export default function Problem()
 
   const fetchAttempts = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/attempts?netId=sduvv003&problem=${problem}`);
+    const res = await fetch(`http://localhost:8080/api/progress/lastTime?netId=sduvv003&problem=${problem}`);
+    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?netId=sduvv003&problem=${problem}`);
 
-    if(res.ok)
+    if(res.ok && resTwo.ok)
     {
-      const data = await res.json();
-      const lastAIAttempt = data.lastAIAttempt || 0;
+      const data = await res.json(); // last AI Attempt time
+      const dataTwo = await resTwo.json(); // last attempt number
+      console.log(data);
+      const lastAIAttempt = data;
       const now = Date.now();
+      console.log(now);
       const hoursPassed = (now - lastAIAttempt) / (1000 * 60 * 60);
 
       if(hoursPassed >= 5)
       {
+        // console.log(hoursPassed);
         setAIAttempts(0);
         await fetch("http://localhost:8080/api/progress/update", {
           method: "POST",
@@ -253,7 +259,7 @@ export default function Problem()
       }
       else
       {
-        setAIAttempts(data.aiAttempts || 0);
+        setAIAttempts(dataTwo);
       }
     }
   }
@@ -264,12 +270,7 @@ export default function Problem()
     if (res.ok) 
     {
       const data = await res.json();
-      console.log(data);
-      setLatestScore(
-        typeof data.latestScore === "number" && !isNaN(data.latestScore)
-          ? data.latestScore
-          : 0
-      );
+      setLatestScore(data);
     }
   };
 
@@ -347,10 +348,6 @@ export default function Problem()
             <div className="bg-gray-800 rounded-xl border border-gray-700">
               <div className="p-4 border-b border-gray-700">
                 <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
-                {/* <h2 className="text-xl font-semibold text-gray-200">Latest Score</h2>
-                <div className="text-2xl font-bold text-blue-400 mt-2">
-                  {latestScore !== null ? `${Math.round(latestScore)}%` : "No score yet"}
-                </div> */}
               </div>
               <div className="p-4">
                 <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph} setStartTime={setStartTime}/>

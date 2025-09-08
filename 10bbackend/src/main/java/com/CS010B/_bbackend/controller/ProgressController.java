@@ -51,6 +51,13 @@ public class ProgressController
     {
         return fireStore.getScore(netId,problem);
     }
+
+    @GetMapping("/lastTime")
+    public long getLastAttemptTime(@RequestParam String netId, @RequestParam String problem) throws Exception 
+    {
+        return fireStore.getLastAttempt(netId, problem);
+    }
+    
     
     
     

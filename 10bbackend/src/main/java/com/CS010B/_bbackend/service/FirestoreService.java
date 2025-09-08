@@ -155,7 +155,6 @@ public class FirestoreService
         DocumentSnapshot doc = docRef.get().get();
         if(doc.exists() && doc.contains(prob))
         {
-            System.out.println("Found problem field: " + problem.toLowerCase());
             Map<String, Object> probMap = (Map<String, Object>) doc.get(prob);
             if(probMap != null && probMap.containsKey("Testcases"))
             {
@@ -163,7 +162,6 @@ public class FirestoreService
                 Object rawTestcases = probMap.get("Testcases");
                 if(rawTestcases instanceof List)
                 {
-                    System.out.println("here");
                     return (List<Map<String,String>>) rawTestcases;
                 }
             }
@@ -318,10 +316,12 @@ public class FirestoreService
                     {
                         int attempts = probMap.containsKey("# of AI Attempts") ? ((Number) probMap.get("# of AI Attempts")).intValue() : 0;
                         long lastAttempt = probMap.containsKey("lastAIAttempt") ? ((Number) probMap.get("lastAIAttempt")).longValue() : 0L;
+                        System.out.println(lastAttempt);
                         long now = System.currentTimeMillis();
                         long hours = (now-lastAttempt) / (1000*3600);
+                        // System.out.println(hours);
 
-                        if(attempts > 0 && hours >= 5)
+                        if(attempts > 0 && lastAttempt > 0 && hours >= 5)
                         {
                             setAIAttempts(netId, problem, 0,now);
                             return 0;
@@ -332,6 +332,34 @@ public class FirestoreService
             }
         }
         return 0;
+    }
+
+    public long getLastAttempt(String netId, String problem) throws Exception
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = docRef.get().get();
+        String difficulty = problem.startsWith("Easy") ? "Easy" :
+                        problem.startsWith("Medium") ? "Medium" : "Hard";
+
+        if(doc.exists())
+        {
+            Map<String,Object> data = doc.getData();
+            Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
+            if(problems != null && problems.containsKey(difficulty))
+            {
+                Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
+                if (diff != null && diff.containsKey(problem)) 
+                {
+                    Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
+                    if (probMap != null) 
+                    {
+                        long lastAttempt = probMap.containsKey("lastAIAttempt") ? ((Number) probMap.get("lastAIAttempt")).longValue() : 0L;
+                        return lastAttempt;
+                    }
+                }
+            }
+        }
+        return System.currentTimeMillis();
     }
 
     public void setAIAttempts(String netId, String problem, int aiAttempts, long lastAttempt) throws Exception
