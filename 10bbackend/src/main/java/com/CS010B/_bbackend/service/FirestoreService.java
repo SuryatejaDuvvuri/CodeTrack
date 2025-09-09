@@ -319,7 +319,6 @@ public class FirestoreService
                         System.out.println(lastAttempt);
                         long now = System.currentTimeMillis();
                         long hours = (now-lastAttempt) / (1000*3600);
-                        // System.out.println(hours);
 
                         if(attempts > 0 && lastAttempt > 0 && hours >= 5)
                         {
@@ -405,6 +404,46 @@ public class FirestoreService
             }
         }
         return 0;
+    }
+
+    public void createProblems(String t) 
+    {
+        DocumentReference docRef = firestore
+            .collection("section")
+            .document("sduvv003");
+
+        String[] difficulties = {"Easy", "Medium", "Hard"};
+        Map<String, Object> problemsMap = new HashMap<>();
+        Map<String, Object> topicMap = new HashMap<>();
+        String topic = "Linked List 2";
+
+        for (String difficulty : difficulties) {
+            Map<String, Object> difficultyMap = new HashMap<>();
+            for (int i = 1; i <= 15; i++) 
+            {
+                String problemName = difficulty + " " + i;
+                difficultyMap.put(problemName, createProblemData());
+            }
+            topicMap.put(difficulty, difficultyMap);
+        }
+
+        problemsMap.put(topic, topicMap);
+        Map<String, Object> update = new HashMap<>();
+        update.put("Problems", problemsMap);
+        docRef.set(update, SetOptions.merge());
+    }
+
+    public Map<String, Object> createProblemData() 
+    {
+        Map<String, Object> data = new HashMap<>();
+        data.put("# of AI Attempts", 0);
+        data.put("Chat Logs", new ArrayList<Map<String, Object>>());
+        data.put("Due Date", 0);
+        data.put("Latest Code", "");
+        data.put("Latest Score", 0);
+        data.put("Runs", new ArrayList<Map<String, Object>>());
+        data.put("lastAIAttempt", 0);
+        return data;
     }
 
 }

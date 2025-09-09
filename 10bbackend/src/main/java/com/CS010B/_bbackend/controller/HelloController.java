@@ -42,6 +42,8 @@ public class HelloController
         return ResponseEntity.ok(new ChatResponse(response));
     }
 
+    
+
     @PostMapping("/history")
     public ResponseEntity<List<ChatMessage>> getChatHistory(@RequestBody ChatRequest request) 
     {
@@ -53,6 +55,12 @@ public class HelloController
     public String getCode(@RequestParam String difficulty, @RequestParam String problem) throws Exception
     {
         return (String)fireStore.getStarterCode(difficulty,problem);
+    }
+
+    @PostMapping("/create")
+    public void createStudentProblems(@RequestBody ChatRequest request)
+    {
+        fireStore.createProblems(null);
     }
 
     // @GetMapping("/test")

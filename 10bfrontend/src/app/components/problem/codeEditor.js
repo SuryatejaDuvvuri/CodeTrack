@@ -1,32 +1,39 @@
 "use client"
 import {useEffect, useState, useRef} from 'react';
-import Editor from '@monaco-editor/react'
+import Editor,{loader} from '@monaco-editor/react'
 import ProgressGraph from "./progressGraph.js";
 
-
-export default function codeEditor({defaultCode, code,setCode,handleRun, saveCode, toggle, showGraph, setStartTime})
+export default function CodeEditor({defaultCode, code,setCode,handleRun, saveCode, toggle, showGraph, setStartTime})
 {
 
     const editorRef = useRef(null);
+    loader.config({
+        paths: {
+            vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.34.0/min/vs'
+        }
+    });
 
     const handleEditor = (editor,m) => 
     {
         editorRef.current = editor;
-        editor.onDidFocusEditorWidget(() => {
-            if(setStartTime)
+        if(m)
+        {
+            editor.onDidFocusEditorWidget(() => {
+                if(setStartTime)
+                {
+                    setStartTime(Date.now());
+                }
+            })
+            editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyC, () => 
             {
-                setStartTime(Date.now());
-            }
-        })
-        editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyC, () => 
-        {
-            console.log('No Copying');
-        });
+                console.log('No Copying');
+            });
 
-        editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyV, () => 
-        {
-            console.log("No Pasting");
-        });
+            editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyV, () => 
+            {
+                console.log("No Pasting");
+            });
+        }
     };
 
     const handleReset = () => 
@@ -60,6 +67,7 @@ export default function codeEditor({defaultCode, code,setCode,handleRun, saveCod
                 <Editor height="100vh" defaultLanguage = "cpp" value = {code} theme = "vs-dark"
                 onChange = {setCode}
                 onMount={handleEditor}
+                loading={<div className="text-white p-4">Loading editor...</div>}
                 options = {{
                     fontFamily: 'JetBrains Mono, monospace',
                     fontSize:14,
