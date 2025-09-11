@@ -2,6 +2,25 @@
 import Image from "next/image";
 import Link from "next/link"
 export default function Home() {
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState(null);
+  const [selectedProblem, setSelectedProblem] = useState(null);
+
+  const topics = [
+  { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!" route: "easy"},
+  { name: "Warm up 2", color: "bg-emerald-400", description: "More warm up problems to challenge yourself", route: "easy" },
+  { name: "File Streams 1", color: "bg-emerald-400", description: "Practice Stream Concepts", route: "choices" },
+  { name: "Arrays and Strings", color: "bg-emerald-400", description: "Array problems", route: "choices" },
+  { name: "Classes 1", color: "bg-amber-400", description: "Basic problems on classes", route: "choices" },
+  { name: "Classes 2", color: "bg-amber-400", description: "More classes problem to challenge yourself!", route: "choices" },
+  { name: "Inheritance and Polymorphism", color: "bg-amber-400", description: "Test your OOPS!", route: "choices"},
+  { name: "Recursion", color: "bg-amber-400", description: "Dive deeper on solving recursive problems!", route: "choices" },
+  { name: "Search and Sorting", color: "bg-orange-600", description: "Basic DSA Problems", route: "choices" },
+  { name: "Stacks and Queues", color: "bg-orange-600", description: "More DSA to challenge yourself", route: "choices" },
+  { name: "Linked List 1", color: "bg-orange-600", description: "Basic Linked List for getting started", route: "choices"},
+  { name: "Linked List 2", color: "bg-orange-600", description: "More Linked List problems to challenge yourself!", route: "choices" },
+];
+
   return (
     <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
       <nav className = "bg-black">
@@ -12,9 +31,19 @@ export default function Home() {
             <button className = "text-white hover:text-lg transition-all">Logout</button>
           </div>
         </div>
-
       </nav>
       <div className = "grid grid-cols-4 gap-6 mb-auto">
+        {topics.map((topic,index) => {
+          <Link key = {index} onClick = {() => {
+            setSelectedTopic(topic.name);
+            // router.push(`/problem?topic=${encodeURIComponent(topic.name)}`)
+          }}
+          href = {topic.route ? `/components/${topic.route}`: " "}
+          className = {`block ${topic.color} rounded-lg shadow-sm p-6 hover:scale-110 transition-all`}>
+          <h1 className=  "mb-2 text-xl font-bold tracking-tight"{topic.name}</h1>
+          <div className = "font-normal text-sm">{topic.description}</div>
+          </Link>
+        })}
         <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/easy">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Warm up 1</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>

@@ -13,8 +13,8 @@ export default function Problem()
   const [defaultCode, setDefaultCode] = useState("");
   const [testcases,setTestcases] = useState([]);
   const[aiAttempts,setAIAttempts] = useState(0);
+  const [problem, setProblem] = useState(null);
   const MAX_ATTEMPTS = 4;
-  const problem = "Easy 1";
   const start = async () => {
     const res = await fetch ("http://localhost:8080/api/chat/load?difficulty=easy&problem=easy 1")
     const wait = await res.text();
