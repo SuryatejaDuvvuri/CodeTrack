@@ -36,12 +36,15 @@ public final class BasicChatSample
     //             new SystemMessage("You're an assistant helping students learn C++ programming on their own without using AI for an introductory C++ college level course."),
     //             new UserMessage("What is an implicit and explicit parameter in simple terms?")
     //     ));
-    //     String res = chatModel.call(prompt).getResult().getOutput().getText();
+    //     String res = chatModel.call(prompt).getResult().getOutput().getText();n
     //     return res;
     // }
 
-    public String getChat(String userPrompt, String problem, String netId)
+
+    public String getChat(String userPrompt, String topic, String difficulty, String problemName, String netId) throws Exception
     {
+        Map<String,Object> details = firestore.getProblem(topic,difficulty,problemName);
+        String problem = (String)details.get("Description");
         StringBuilder sys = new StringBuilder();
         sys.append("You're an assistant helping students learn C++ programming on their own without using AI ");
         sys.append("for an introductory C++ college level course. Take a look at this problem " + problem + "and provide helpful guidance but don't write complete solutions.");
@@ -49,52 +52,52 @@ public final class BasicChatSample
 
         try
         {
-            String diff = problem.startsWith("Easy") ? "easy" : problem.startsWith("Medium") ? "medium" : "hard";
-            Map<String,Object> details = firestore.getProblem(diff,problem);
-            if(details != null)
-            {
-                String desc = (String)details.get("Description");
-                String difficulty = String.valueOf(details.get("Difficulty"));
-                String problemTitle = (String) details.get("Problem");
+            // String diff = problem.startsWith("Easy") ? "easy" : problem.startsWith("Medium") ? "medium" : "hard";
+            // Map<String,Object> details = firestore.getProblem(topic,difficulty,problemName);
+            // if(details != null)
+            // {
+                // String desc = (String)details.get("Description");
+                // String diff = String.valueOf(details.get("Difficulty"));
+                // String problemTitle = (String) details.get("Problem");
                 
                 sys.append("\nThe student is working on this problem: \n");
-                sys.append("Title: ").append(problemTitle).append("\n");
+                sys.append("Title: ").append(problemName).append("\n");
                 sys.append("Difficulty: ").append(difficulty).append("\n");
-                sys.append("Description: ").append(desc).append("\n");
+                sys.append("Description: ").append(problem).append("\n");
 
                 if(userPrompt.equals(" "))
                 {
                     if(!details.containsKey("Solution") || !details.containsKey("Testcases"))
                     {
-                        String solutionPrompt = "Write a correct C++ solution for the following problem. Only output code, no explanation.\nProblem: " + desc;
+                        String solutionPrompt = "Write a correct C++ solution for the following problem. Only output code, no explanation.\nProblem: " + problem;
                         Prompt pr = new Prompt(List.of(new SystemMessage(solutionPrompt)));
                         String solCode = chatModel.call(pr).getResult().getOutput().getText();
 
-                        List<Map<String,String>> testCases = createTests(desc, solCode);
+                        List<Map<String,String>> testCases = createTests(problem, solCode);
                         if(testCases != null && !testCases.isEmpty() && solCode != null && !solCode.isEmpty())
                         {
-                            firestore.storeTests(problem, solCode, testCases);
+                            firestore.storeTests(topic,difficulty,problemName, solCode, testCases);
                         }
                     }
 
                     return " ";
 
                 }
-            }
+            // }
 
-            Map<String,Object> studentDetails = firestore.getStudentProblem(netId, problem);
+            Map<String,Object> studentDetails = firestore.getStudentProblem(netId, topic, difficulty, problemName);
             if(studentDetails != null)
             {
                 int attempts = ((Number) studentDetails.getOrDefault("# of Attempts", 0)).intValue();
-                Object timeSpent = studentDetails.get("Avg Time Spent");
+                // Object timeSpent = studentDetails.get("Avg Time Spent");
                 String latestCode = (String) studentDetails.get("Latest Code");
                 
                 sys.append("\nStudent Progress: \n");
                 sys.append("Attempts so far: ").append(attempts).append("\n");
-                if (timeSpent != null) 
-                {
-                    sys.append("Time spent: ").append(timeSpent).append(" minutes\n");
-                }
+                // if (timeSpent != null) 
+                // {
+                //     sys.append("Time spent: ").append(timeSpent).append(" minutes\n");
+                // }
                 if (latestCode != null && !latestCode.isEmpty()) 
                 {
                     sys.append("Latest code submission: \n```cpp\n").append(latestCode).append("\n```\n");
@@ -111,7 +114,7 @@ public final class BasicChatSample
         
         try
         {
-            firestore.logMessage(netId, problem, userPrompt, response);
+            firestore.logMessage(netId, topic,difficulty,problemName, userPrompt, response);
         }
         catch(Exception e)
         {
@@ -121,11 +124,11 @@ public final class BasicChatSample
         return response;
     }
 
-    public List<ChatMessage> getHistory(String problem, String netId)
+    public List<ChatMessage> getHistory(String topic, String difficulty, String problemName, String netId)
     {
         try 
         {
-            return firestore.loadChats(problem, netId);
+            return firestore.loadChats(topic, difficulty,problemName, netId);
         } 
         catch (ExecutionException | InterruptedException e) 
         {

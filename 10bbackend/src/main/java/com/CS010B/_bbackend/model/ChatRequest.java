@@ -5,6 +5,8 @@ public class ChatRequest
     private String prompt;
     private String problem;
     private String netId;
+    private String topic;
+    private String difficulty;
 
     public String getPrompt() 
     {
@@ -32,5 +34,25 @@ public class ChatRequest
 
     public void setNetId(String netId) {
         this.netId = netId;
+    }
+
+    public String getTopic()
+    {
+        return topic;
+    }
+
+    public void setTopic(String topic)
+    {
+        this.topic = topic;
+    }
+
+    public String getDifficulty()
+    {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty)
+    {
+        this.difficulty = difficulty;
     }
 }

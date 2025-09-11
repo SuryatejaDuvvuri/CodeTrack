@@ -36,9 +36,9 @@ public class HelloController
 
 
     @PostMapping
-    public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest request) 
+    public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest request) throws Exception
     {
-        String response = chatSample.getChat(request.getPrompt(), request.getProblem(), request.getNetId());
+        String response = chatSample.getChat(request.getPrompt(), request.getTopic(), request.getDifficulty(), request.getProblem(), request.getNetId());
         return ResponseEntity.ok(new ChatResponse(response));
     }
 
@@ -47,14 +47,14 @@ public class HelloController
     @PostMapping("/history")
     public ResponseEntity<List<ChatMessage>> getChatHistory(@RequestBody ChatRequest request) 
     {
-        List<ChatMessage> response = chatSample.getHistory(request.getProblem(), request.getNetId() != null ? request.getNetId():"default");
+        List<ChatMessage> response = chatSample.getHistory(request.getProblem(), request.getTopic(), request.getDifficulty(), request.getProblem());
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/load")
-    public String getCode(@RequestParam String difficulty, @RequestParam String problem) throws Exception
+    public String getCode(@RequestParam String topic, @RequestParam String difficulty, @RequestParam String problemName) throws Exception
     {
-        return (String)fireStore.getStarterCode(difficulty,problem);
+        return (String)fireStore.getStarterCode(topic,difficulty,problemName);
     }
 
     @PostMapping("/create")

@@ -61,59 +61,59 @@ public class FirestoreService
         }
     }
 
-    public Map<String,Object> getProblem(String id, String problem) throws ExecutionException, InterruptedException
+    public Map<String,Object> getProblem(String topic, String difficulty, String problemName) throws ExecutionException, InterruptedException
     {
-        DocumentReference docRef = firestore.collection("problems").document(id.toLowerCase());
+        DocumentReference docRef = firestore.collection("problems").document(topic).collection(difficulty).document(problemName);
         DocumentSnapshot doc = docRef.get().get();
 
-        if(doc.exists() && doc.contains(problem.toLowerCase())) 
+        if(doc.exists()) 
         {
-            return (Map<String, Object>) doc.get(problem.toLowerCase());
+            return (Map<String, Object>) doc.getData();
         }
         return null;
     }
 
-    public String getStarterCode(String id, String problem) throws Exception
+    public String getStarterCode(String topic, String difficulty, String problemName) throws Exception
     {
-        Map<String,Object> probDetails = getProblem(id,problem);
+        Map<String,Object> probDetails = getProblem(topic,difficulty,problemName);
         if (probDetails == null) return "";
-        return (String)probDetails.get("Startercode");
+        return (String)probDetails.get("Starter Code");
     }
 
-    public String getCode(String netId, String problem) throws ExecutionException, InterruptedException
+    public String getCode(String netId, String topic, String difficulty, String problemName) throws ExecutionException, InterruptedException
     {
-        Map<String,Object> probData = (Map<String,Object>) getStudentProblem(netId, problem);
+        Map<String,Object> probData = (Map<String,Object>) getStudentProblem(netId,topic,difficulty,problemName);
         if (probData == null) return " ";
         String res = (String)probData.get("Latest Code");
         return res == null ? " " : res;
     }
 
-    public Map<String,Object> getStudentProblem(String netId, String problem) throws ExecutionException, InterruptedException
+    public Map<String,Object> getStudentProblem(String netId, String topic, String difficulty, String problemName) throws ExecutionException, InterruptedException
     {
-        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentReference docRef = firestore.collection("section").document(netId).collection(topic).document(difficulty);
         DocumentSnapshot doc = docRef.get().get();
 
         if(doc.exists())
         {
             Map<String,Object> data = doc.getData();
-            Map<String,Object> problems = (Map<String,Object>) data.get("Problems");
+            Map<String,Object> problems = (Map<String,Object>) data.get(problemName);
 
             if(problems != null)
             {
-                if(problems.containsKey("Easy") && problem.startsWith("Easy"))
+                if(problems.containsKey("Easy") && problemName.startsWith("Easy"))
                 {
                     Map<String,Object> easy = (Map<String,Object>)problems.get("Easy");
-                    return (Map<String,Object>) easy.get(problem);
+                    return (Map<String,Object>) easy.get(problemName);
                 }
-                else if(problems.containsKey("Medium") && problem.startsWith("Medium"))
+                else if(problems.containsKey("Medium") && problemName.startsWith("Medium"))
                 {
                     Map<String,Object> med = (Map<String,Object>)problems.get("Medium");
-                    return (Map<String,Object>) med.get(problem);
+                    return (Map<String,Object>) med.get(problemName);
                 }
-                else if(problems.containsKey("Hard") && problem.startsWith("Hard"))
+                else if(problems.containsKey("Hard") && problemName.startsWith("Hard"))
                 {
                     Map<String,Object> hard = (Map<String,Object>)problems.get("Hard");
-                    return (Map<String,Object>) hard.get(problem);
+                    return (Map<String,Object>) hard.get(problemName);
                 }
             }
         }
@@ -121,7 +121,7 @@ public class FirestoreService
         return null;
     }
 
-    public void logMessage(String netId, String problem, String userMsg, String aiRes) throws ExecutionException, InterruptedException 
+    public void logMessage(String netId, String topic, String difficulty, String problemName, String userMsg, String aiRes) throws ExecutionException, InterruptedException 
     {
         DocumentReference docRef = firestore.collection("section").document(netId);
 
@@ -129,33 +129,33 @@ public class FirestoreService
         chat.put("timestamp",System.currentTimeMillis());
         chat.put("userMessage", userMsg);
         chat.put("aiResponse", aiRes);
-        String difficulty = problem.startsWith("Easy") ? "Easy" : problem.startsWith("Medium") ? "Medium" : "Hard";
-        docRef.update("Problems." + difficulty + "." + problem + ".Chat Logs", FieldValue.arrayUnion(chat));
+        // String diff = problem.startsWith("Easy") ? "Easy" : problem.startsWith("Medium") ? "Medium" : "Hard";
+        docRef.update("Problems." + topic + "." + difficulty + "." + problemName + ".Chat Logs", FieldValue.arrayUnion(chat));
     }
 
-    public void storeTests(String problem, String solution, List<Map<String,String>> testCases)
+    public void storeTests(String topic, String difficulty, String problemName, String solution, List<Map<String,String>> testCases)
     {
-        String difficulty = problem.startsWith("Easy") ? "easy" : problem.startsWith("Medium") ? "medium" : "hard";
-        DocumentReference docRef = firestore.collection("problems").document(difficulty);
+        // String difficulty = problem.startsWith("Easy") ? "easy" : problem.startsWith("Medium") ? "medium" : "hard";
+        DocumentReference docRef = firestore.collection("problems").document(topic).collection(difficulty).document(problemName);
         Map<String, Object> problemMap = new HashMap<>();
         problemMap.put("Testcases", testCases);
-        problemMap.put("solution", solution);
+        problemMap.put("Solution", solution);
         
         Map<String, Object> updates = new HashMap<>();
-        updates.put(problem.toLowerCase(), problemMap);
+        updates.put(problemName, problemMap);
         docRef.set(updates, SetOptions.merge());
     }
 
-    public List<Map<String,String>> getTests(String problem) throws Exception
+    public List<Map<String,String>> getTests(String topic, String difficulty, String problemName) throws Exception
     {
-        String prob = problem.toLowerCase();
-        String difficulty = prob.startsWith("easy") ? "easy" :
-                        prob.startsWith("medium") ? "medium" : "hard";
-        DocumentReference docRef = firestore.collection("problems").document(difficulty);
+        // String prob = problem.toLowerCase();
+        // String difficulty = prob.startsWith("easy") ? "easy" :
+                        // prob.startsWith("medium") ? "medium" : "hard";
+        DocumentReference docRef = firestore.collection("problems").document(topic).collection(difficulty).document(problemName);
         DocumentSnapshot doc = docRef.get().get();
-        if(doc.exists() && doc.contains(prob))
+        if(doc.exists())
         {
-            Map<String, Object> probMap = (Map<String, Object>) doc.get(prob);
+            Map<String, Object> probMap = (Map<String, Object>) doc.getData();
             if(probMap != null && probMap.containsKey("Testcases"))
             {
                 
@@ -170,42 +170,39 @@ public class FirestoreService
         return new ArrayList<>();
     }
 
-    public List<ChatMessage> loadChats(String problem, String netId) throws ExecutionException, InterruptedException 
+    public List<ChatMessage> loadChats(String topic, String difficulty, String problemName, String netId) throws ExecutionException, InterruptedException 
     {
-        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentReference docRef = firestore.collection("section").document(netId).collection(topic).document(difficulty);
         DocumentSnapshot doc = docRef.get().get();
 
         if(doc.exists())
         {
-            Map<String,Object> data = doc.getData();
-            Map<String,Object> problems = (Map<String,Object>) data.get("Problems");
-            Map<String,Object> details = null;
-            
-            if(problems != null)
-            {
-                if(problems.containsKey("Easy") && problem.startsWith("Easy"))
-                {
-                    details = (Map<String,Object>)problems.get("Easy");
-                }
-                else if(problems.containsKey("Medium") && problem.startsWith("Medium"))
-                {
-                    details = (Map<String,Object>)problems.get("Medium");
-                }
-                else if(problems.containsKey("Hard") && problem.startsWith("Hard"))
-                {
-                    details = (Map<String,Object>)problems.get("Hard");
-                }
+            // Map<String,Object> problems = (Map<String,Object>)doc.get(problemName);
+            // Map<String,Object> problems = (Map<String,Object>) data.get("Problems");
+            Map<String,Object> details = (Map<String,Object>)doc.get(problemName);
+                // if(problems.containsKey("Easy") && problem.startsWith("Easy"))
+                // {
+                //     details = (Map<String,Object>)problems.get("Easy");
+                // }
+                // else if(problems.containsKey("Medium") && problem.startsWith("Medium"))
+                // {
+                //     details = (Map<String,Object>)problems.get("Medium");
+                // }
+                // else if(problems.containsKey("Hard") && problem.startsWith("Hard"))
+                // {
+                //     details = (Map<String,Object>)problems.get("Hard");
+                // }
 
                 if(details == null) 
                 {
                     return new ArrayList<>();
                 }
-                Map<String,Object> probData = (Map<String,Object>) details.get(problem);
-                if(probData == null) 
-                {
-                    return new ArrayList<>();
-                }
-                List<Map<String,Object>> logs =  (List<Map<String,Object>>) probData.get("Chat Logs");
+                // Map<String,Object> probData = (Map<String,Object>) details.get(problem);
+                // if(probData == null) 
+                // {
+                //     return new ArrayList<>();
+                // }
+                List<Map<String,Object>> logs =  (List<Map<String,Object>>) details.get("Chat Logs");
                 if(logs == null) 
                 {
                     return new ArrayList<>();
@@ -238,80 +235,85 @@ public class FirestoreService
                 }
                 return messages;
 
-            }
+            
         }
         return new ArrayList<>();
     }
 
-    public void updateCode(String netId, String problem, String code) throws ExecutionException, InterruptedException
+    public void updateCode(String netId, String topic, String difficulty, String problemName, String code) throws ExecutionException, InterruptedException
     {
-        String difficulty = problem.startsWith("Easy") ? "Easy" : problem.startsWith("Medium") ? "Medium" : "Hard";
-        DocumentReference docRef = firestore.collection("section").document(netId);
-        docRef.update("Problems." + difficulty + "." + problem + ".Latest Code", code);
+        // String difficulty = problem.startsWith("Easy") ? "Easy" : problem.startsWith("Medium") ? "Medium" : "Hard";
+        DocumentReference docRef = firestore.collection("section").document(netId).collection(topic).document(difficulty);
+        docRef.update("Problems." + topic + "." + difficulty + "." + problemName + ".Latest Code", code);
     }
 
-    public void logAttempt(String netId, String problem,int passed, int total, long timeSpent)
+    public void logAttempt(String netId, String topic, String difficulty, String problemName, int passed, int total, long timeSpent)
     {
-        DocumentReference docRef = firestore.collection("section").document(netId);
-        String difficulty = problem.startsWith("Easy") ? "Easy" :
-                        problem.startsWith("Medium") ? "Medium" : "Hard";
+        DocumentReference docRef = firestore.collection("section").document(netId).collection(topic).document(difficulty);
+        // String difficulty = problem.startsWith("Easy") ? "Easy" :
+        //                 problem.startsWith("Medium") ? "Medium" : "Hard";
         Map<String,Object> run = new HashMap<>();
         double latestScore = total > 0 ? (passed * 100.0 / total) : 0;
         run.put("timestamp",System.currentTimeMillis());
-        run.put("problem",problem);
+        // run.put("problem",problem);
         run.put("passed", passed);
         run.put("total", total);
         run.put("successRate", total > 0 ? (passed * 100.0 / total) : 0);
         run.put("timeSpent", timeSpent / 1000);
-        docRef.update("Problems." + difficulty + "." + problem + ".Runs", FieldValue.arrayUnion(run));
-        docRef.update("Problems." + difficulty + "." + problem + ".Latest Score", latestScore);
+        docRef.update("Problems." + topic + "." + difficulty + "." + problemName  + ".Runs", FieldValue.arrayUnion(run));
+        docRef.update("Problems." + topic + "." + difficulty + "." + problemName  + ".Latest Score", latestScore);
 
     }
 
-    public List<Map<String,Object>> getRuns(String netId, String problem) throws Exception
+    public List<Map<String,Object>> getRuns(String netId, String topic, String difficulty, String problemName) throws Exception
     {
-        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentReference docRef = firestore.collection("section").document(netId).collection(topic).document(difficulty);
         DocumentSnapshot doc = docRef.get().get();
-        String difficulty = problem.startsWith("Easy") ? "Easy" :
-                        problem.startsWith("Medium") ? "Medium" : "Hard";
+        // String difficulty = problem.startsWith("Easy") ? "Easy" :
+        //                 problem.startsWith("Medium") ? "Medium" : "Hard";
         if(doc.exists())
         {
-            Map<String,Object> data = doc.getData();
-            Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
-            if(problems != null && problems.containsKey(difficulty))
+            Map<String,Object> problems = (Map<String, Object>)doc.get(problemName);
+            // Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
+            if(problems != null && problems.containsKey("Runs"))
             {
-                Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
-                if (diff != null && diff.containsKey(problem)) 
-                {
-                    Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
-                    if (probMap != null && probMap.containsKey("Runs")) 
-                    {
-                        return (List<Map<String, Object>>) probMap.get("Runs");
-                    }
-                }
+                return (List<Map<String, Object>>) problems.get("Runs");
+
+                // Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
+                // if (diff != null && diff.containsKey(problem)) 
+                // {
+                //     Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
+                //     if (probMap != null && probMap.containsKey("Runs")) 
+                //     {
+                //         return (List<Map<String, Object>>) probMap.get("Runs");
+                //     }
+                // }
             }
         }
 
         return new ArrayList<>();
     }
 
-    public int getAttempts(String netId, String problem) throws Exception
+    public int getAttempts(String netId, String topic, String difficulty, String problemName) throws Exception
     {
-        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentReference docRef =  firestore.collection("section").document(netId);
         DocumentSnapshot doc = docRef.get().get();
-        String difficulty = problem.startsWith("Easy") ? "Easy" :
-                        problem.startsWith("Medium") ? "Medium" : "Hard";
+        // String difficulty = problem.startsWith("Easy") ? "Easy" :
+        //                 problem.startsWith("Medium") ? "Medium" : "Hard";
 
         if(doc.exists())
         {
-            Map<String,Object> data = doc.getData();
-            Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
-            if(problems != null && problems.containsKey(difficulty))
-            {
-                Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
-                if (diff != null && diff.containsKey(problem)) 
-                {
-                    Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
+            // Map<String,Object> data = doc.getData();
+            // Map<String,Object> problems = (Map<String, Object>) doc.get("Problems");
+            // if(problems != null && problems.containsKey(difficulty))
+            // {
+                Map<String, Object> problemsMap = (Map<String, Object>) doc.get("Problems");
+                Map<String, Object> topicMap = (Map<String, Object>) problemsMap.get(topic);
+                Map<String, Object> difficultyMap = (Map<String, Object>) topicMap.get(difficulty);
+                Map<String, Object> probMap = (Map<String, Object>) difficultyMap.get(problemName);
+                // if (diff != null) 
+                // {
+                    // Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
                     if (probMap != null) 
                     {
                         int attempts = probMap.containsKey("# of AI Attempts") ? ((Number) probMap.get("# of AI Attempts")).intValue() : 0;
@@ -322,85 +324,85 @@ public class FirestoreService
 
                         if(attempts > 0 && lastAttempt > 0 && hours >= 5)
                         {
-                            setAIAttempts(netId, problem, 0,now);
+                            setAIAttempts(netId, topic,difficulty,problemName, 0,now);
                             return 0;
                         }
                         return attempts;
                     }
-                }
-            }
+                // }
+            // }
         }
         return 0;
     }
 
-    public long getLastAttempt(String netId, String problem) throws Exception
+    public long getLastAttempt(String netId, String topic, String difficulty, String problemName) throws Exception
     {
-        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentReference docRef = firestore.collection("section").document(netId).collection(topic).document(difficulty);;
         DocumentSnapshot doc = docRef.get().get();
-        String difficulty = problem.startsWith("Easy") ? "Easy" :
-                        problem.startsWith("Medium") ? "Medium" : "Hard";
+        // String difficulty = problem.startsWith("Easy") ? "Easy" :
+        //                 problem.startsWith("Medium") ? "Medium" : "Hard";
 
         if(doc.exists())
         {
-            Map<String,Object> data = doc.getData();
-            Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
-            if(problems != null && problems.containsKey(difficulty))
-            {
-                Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
-                if (diff != null && diff.containsKey(problem)) 
+            // Map<String,Object> data = doc.getData();
+            // Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
+            // if(problems != null && problems.containsKey(difficulty))
+            // {
+                // Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
+                // if (diff != null && diff.containsKey(problem)) 
                 {
-                    Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
+                    Map<String, Object> probMap = (Map<String, Object>) doc.get(problemName);
                     if (probMap != null) 
                     {
                         long lastAttempt = probMap.containsKey("lastAIAttempt") ? ((Number) probMap.get("lastAIAttempt")).longValue() : 0L;
                         return lastAttempt;
                     }
                 }
-            }
+            // }
         }
         return System.currentTimeMillis();
     }
 
-    public void setAIAttempts(String netId, String problem, int aiAttempts, long lastAttempt) throws Exception
+    public void setAIAttempts(String netId, String topic, String difficulty, String problemName,  int aiAttempts, long lastAttempt) throws Exception
     {
         DocumentReference docRef = firestore.collection("section").document(netId);
-        String difficulty = problem.startsWith("Easy") ? "Easy" :
-                        problem.startsWith("Medium") ? "Medium" : "Hard";
+        // String difficulty = problem.startsWith("Easy") ? "Easy" :
+        //                 problem.startsWith("Medium") ? "Medium" : "Hard";
         Map<String, Object> updates = new HashMap<>();
-        updates.put("Problems." + difficulty + "." + problem + ".# of AI Attempts", aiAttempts);
-        updates.put("Problems." + difficulty + "." + problem + ".lastAIAttempt", lastAttempt);
+        updates.put("Problems." + topic + "." + difficulty + "." + problemName  + ".# of AI Attempts", aiAttempts);
+        updates.put("Problems." + topic + "." + difficulty + "." + problemName  + ".lastAIAttempt", lastAttempt);
 
         docRef.update(updates).get();
     }
 
-    public int getScore(String netId, String problem) throws Exception
+    public int getScore(String netId, String topic, String difficulty, String problemName) throws Exception
     {
-        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentReference docRef = firestore.collection("section").document(netId).collection(topic).document(difficulty);
         DocumentSnapshot doc = docRef.get().get();
-        String difficulty = problem.startsWith("Easy") ? "Easy" :
-                        problem.startsWith("Medium") ? "Medium" : "Hard";
+        // String difficulty = problem.startsWith("Easy") ? "Easy" :
+        //                 problem.startsWith("Medium") ? "Medium" : "Hard";
 
         if(doc.exists())
         {
-            Map<String,Object> data = doc.getData();
-            Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
-            if(problems != null && problems.containsKey(difficulty))
+            // Map<String,Object> data = doc.getData();
+            Map<String,Object> problems = (Map<String, Object>) doc.get(problemName);
+            if(problems != null)
             {
-                Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
-                if (diff != null && diff.containsKey(problem)) 
-                {
-                    Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
-                    if (probMap != null) 
-                    {
+                // Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
+                // if (diff != null && diff.containsKey(problem)) 
+                // {
+                    // Map<String, Object> probMap = (Map<String, Object>) problems.get(problem);
+                    // if (probMap != null) 
+                    // {
                         int score = 0;
-                        Object scoreObj = probMap.get("Latest Score");
+                        Object scoreObj = problems.get("Latest Score");
                         if(scoreObj instanceof Number)
                         {
                             score = ((Number)scoreObj).intValue();
                         }
                         return score;
-                    }
-                }
+                    // }
+                // }
             }
         }
         return 0;
