@@ -5,20 +5,25 @@ import Link from "next/link"
 import CodeEditor from './codeEditor.js'
 import ProgressGraph from "./progressGraph.js";
 import ChatHistory from "./chatHistory.js";
+import { useSearchParams } from "next/navigation";
 // import EmbeddedViewer from "./EmbeddedViewer.js";
 
 export default function Problem() 
 {
-
+  const search = useSearchParams();
+  const topic = search.get("topic");
+  const difficulty = search.get("difficulty");
+  const problemName = search.get("problem");
   const [defaultCode, setDefaultCode] = useState("");
   const [testcases,setTestcases] = useState([]);
   const[aiAttempts,setAIAttempts] = useState(0);
-  const [problem, setProblem] = useState(null);
+  // const [problem, setProblem] = useState(null);
   const MAX_ATTEMPTS = 4;
   const start = async () => {
-    const res = await fetch ("http://localhost:8080/api/chat/load?difficulty=easy&problem=easy 1")
+    const res = await fetch (`http://localhost:8080/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
     const wait = await res.text();
-    setDefaultCode(wait);
+    setDefaultCode(typeof wait === "string" ? wait : "");
+    setCode(typeof wait === "string" ? wait : "");
   };
   
   useEffect(() => {
@@ -27,7 +32,7 @@ export default function Problem()
 
   const loadCode = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/grade/code?netId=sduvv003&problem=${problem}`, {
+    const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`, {
       method: "GET",
       headers: {
         "Content-Type":"application/json"
@@ -37,7 +42,7 @@ export default function Problem()
     if(res.ok)
     {
       const data = await res.text();
-      setCode(data);
+      setCode(typeof data === "string" ? data : "");
     }
     else
     {
@@ -50,11 +55,11 @@ export default function Problem()
       const chatRes = await fetch ("http://localhost:8080/api/grade/update", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({netId: "sduvv003", problem:problem, code: code}),
+        body: JSON.stringify({topic,difficulty,problemName,code:code,netId: "sduvv003"}),
     });
   }
 
-  const [code, setCode] = useState(loadCode);
+  const [code, setCode] = useState(""); 
   const [results, setResults] = useState([]);
   const [messages, setMessages] = useState([]);
   const [isLoading, setLoading] = useState(false);
@@ -74,7 +79,7 @@ export default function Problem()
       headers: {
         "Content-Type":"application/json"
       },
-      body: JSON.stringify({netId: "sduvv003", problem:problem, code: code}),
+      body: JSON.stringify({topic,difficulty,problemName,code: code, netId: "sduvv003"}),
     });
     const result = await res.json();
     const runEnd = Date.now();
@@ -102,7 +107,7 @@ export default function Problem()
           "Content-Type":"application/json"
         },
         body: JSON.stringify({
-          netId:"sduvv003",problem,passed,total,timeSpent
+          topic,difficulty,problemName,passed,total,timeSpent,netId:"sduvv003"
         })
       });
 
@@ -118,8 +123,10 @@ export default function Problem()
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
+              topic,
+              difficulty,
+              problemName,
               prompt: "Can you give me feedback on my code?",
-              problem: problem,
               netId: "sduvv003"
           }),
         });
@@ -140,7 +147,7 @@ export default function Problem()
         await fetch("http://localhost:8080/api/progress/update", {
           method: "POST",
           headers: {"Content-Type" : "application/json"},
-          body: JSON.stringify({netId: "sduvv003",problem,aiAttempts:aiAttempts+1})
+          body: JSON.stringify({topic,difficulty,problemName,aiAttempts:aiAttempts+1,netId:"sduvv003"})
         });
         setAIAttempts(aiAttempts + 1);
     }
@@ -156,8 +163,10 @@ export default function Problem()
               method: "POST",
               headers: {"Content-Type": "application/json"},
               body: JSON.stringify({
+                topic,
+                difficulty,
+                problemName,
                 prompt: "Can you give me feedback on my code?",
-                problem: problem,
                 netId: "sduvv003"
             }),
           });
@@ -179,7 +188,7 @@ export default function Problem()
           await fetch("http://localhost:8080/api/progress/update", {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
-            body: JSON.stringify({netId: "sduvv003",problem,aiAttempts:aiAttempts+1})
+            body: JSON.stringify({topic,difficulty,problemName,aiAttempts:aiAttempts+1,netId: "sduvv003"})
           });
           setAIAttempts(aiAttempts + 1);
        }
@@ -214,7 +223,7 @@ export default function Problem()
   },[messages,isLoading]);
 
   const fetchProgress = async () => {
-    const progressRes = await fetch(`http://localhost:8080/api/progress?netId=sduvv003&problem=${problem}`);
+    const progressRes = await fetch(`http://localhost:8080/api/progress?${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
 
     if(progressRes.ok)
     {
@@ -230,14 +239,13 @@ export default function Problem()
 
   const fetchAttempts = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/lastTime?netId=sduvv003&problem=${problem}`);
-    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?netId=sduvv003&problem=${problem}`);
+    const res = await fetch(`http://localhost:8080/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
+    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
 
     if(res.ok && resTwo.ok)
     {
       const data = await res.json(); // last AI Attempt time
       const dataTwo = await resTwo.json(); // last attempt number
-      console.log(data);
       const lastAIAttempt = data;
       const now = Date.now();
       console.log(now);
@@ -251,9 +259,11 @@ export default function Problem()
           method: "POST",
           headers: {"Content-Type" : "application/json"},
           body: JSON.stringify({
-            netId: "sduvv003",
-            problem,
+            topic,
+            difficulty,
+            problemName,
             aiAttempts: 0,
+            netId: "sduvv003"
           })
         });
       }
@@ -266,7 +276,7 @@ export default function Problem()
 
   const fetchScore = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/latestScore?netId=sduvv003&problem=${problem}`);
+    const res = await fetch(`http://localhost:8080/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
     if (res.ok) 
     {
       const data = await res.json();
@@ -276,7 +286,7 @@ export default function Problem()
 
   useEffect(() => {
     fetchScore();
-  }, [problem]);
+  }, [problemName]);
 
   useEffect(() => {
     if(showGraph)
@@ -287,7 +297,7 @@ export default function Problem()
 
   useEffect(() => {
     fetchAttempts();
-  },[problem]);
+  },[problemName]);
 
   const toggle = () => 
   {
@@ -407,7 +417,7 @@ export default function Problem()
 
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-200 mb-4">AI Assistant</h3>
-                <ChatHistory problem = {problem} messages = {messages} setMessages = {setMessages} isLoading = {isLoading} aiAttempts={aiAttempts} setAIAttempts={setAIAttempts} />
+                <ChatHistory topic={topic} difficulty={difficulty} problemName={problemName} messages = {messages} setMessages = {setMessages} isLoading = {isLoading} aiAttempts={aiAttempts} setAIAttempts={setAIAttempts} />
               </div>
             </div>
           </div>

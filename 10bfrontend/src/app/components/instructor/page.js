@@ -4,14 +4,14 @@ import Link from "next/link"
 export default function Instructor() {
   // const [expandStudent, setExpandStudent] = useState(null);
   // const [expandModule, setExpandModule] = useState(null);
-  const createProblem = async () => 
-  {
-    await fetch("http://localhost:8080/api/chat/create", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({topic:"Arrays and Strings", difficulty: "Easy"})
-    })
-  }
+  // const createProblem = async () => 
+  // {
+  //   await fetch("http://localhost:8080/api/chat/create", {
+  //     method: "POST",
+  //     headers: {"Content-Type": "application/json"},
+  //     body: JSON.stringify({topic:"Arrays and Strings", difficulty: "Easy"})
+  //   })
+  // }
   return (
     <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
       <nav className = "bg-black">

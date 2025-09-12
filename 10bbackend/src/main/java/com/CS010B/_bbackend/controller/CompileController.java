@@ -31,7 +31,7 @@ public class CompileController
     @PostMapping
     public String grade(@RequestBody CompileRequest req) throws Exception
     {
-        fireStore.updateCode(req.getNetId(), req.getTopic(), req.getDifficulty(), req.getProblem(), req.getCode());
+        fireStore.updateCode(req.getTopic(), req.getDifficulty(), req.getProblem(), req.getCode(),req.getNetId());
         chatSample.getChat(" ", req.getTopic(), req.getDifficulty(), req.getProblem(),req.getNetId());
         List<Map<String,String>> testCases = fireStore.getTests(req.getTopic(), req.getDifficulty(), req.getProblem());
         return compileService.compileCode(req.getCode(), testCases);
@@ -41,14 +41,14 @@ public class CompileController
     @PostMapping("/update")
     public void update(@RequestBody CompileRequest req) throws Exception
     {
-        fireStore.updateCode(req.getNetId(), req.getTopic(), req.getDifficulty(), req.getProblem(), req.getCode());
+        fireStore.updateCode(req.getTopic(), req.getDifficulty(), req.getProblem(), req.getCode(),req.getNetId());
     }
     
 
     @GetMapping("/code")
-    public String loadCode(@RequestParam String netId, @RequestParam String topic, @RequestParam String difficulty, @RequestParam String problemName) throws Exception
+    public String loadCode(@RequestParam String topic, @RequestParam String difficulty, @RequestParam String problem, @RequestParam String netId) throws Exception
     {
-        return fireStore.getCode(netId,topic,difficulty,problemName);
+        return fireStore.getCode(topic,difficulty,problem,netId);
     }
 }
 

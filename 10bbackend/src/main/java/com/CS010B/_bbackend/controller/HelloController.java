@@ -38,23 +38,22 @@ public class HelloController
     @PostMapping
     public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest request) throws Exception
     {
+        
         String response = chatSample.getChat(request.getPrompt(), request.getTopic(), request.getDifficulty(), request.getProblem(), request.getNetId());
         return ResponseEntity.ok(new ChatResponse(response));
     }
 
-    
-
     @PostMapping("/history")
     public ResponseEntity<List<ChatMessage>> getChatHistory(@RequestBody ChatRequest request) 
     {
-        List<ChatMessage> response = chatSample.getHistory(request.getProblem(), request.getTopic(), request.getDifficulty(), request.getProblem());
+        List<ChatMessage> response = chatSample.getHistory(request.getTopic(), request.getDifficulty(),request.getProblem(), request.getNetId());
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/load")
-    public String getCode(@RequestParam String topic, @RequestParam String difficulty, @RequestParam String problemName) throws Exception
+    public String getCode(@RequestParam String topic, @RequestParam String difficulty, @RequestParam String problem) throws Exception
     {
-        return (String)fireStore.getStarterCode(topic,difficulty,problemName);
+        return (String)fireStore.getStarterCode(topic,difficulty,problem);
     }
 
     @PostMapping("/create")

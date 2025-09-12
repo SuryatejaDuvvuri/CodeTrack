@@ -41,19 +41,20 @@ public final class BasicChatSample
     // }
 
 
-    public String getChat(String userPrompt, String topic, String difficulty, String problemName, String netId) throws Exception
+    public String getChat(String userPrompt, String topic, String difficulty, String problem, String netId) throws Exception
     {
-        Map<String,Object> details = firestore.getProblem(topic,difficulty,problemName);
-        String problem = (String)details.get("Description");
+        Map<String,Object> details = firestore.getProblem(topic,difficulty,problem);
+        String problemDesc = (String)details.get("Description");
+        System.out.println(problemDesc);
         StringBuilder sys = new StringBuilder();
         sys.append("You're an assistant helping students learn C++ programming on their own without using AI ");
-        sys.append("for an introductory C++ college level course. Take a look at this problem " + problem + "and provide helpful guidance but don't write complete solutions.");
+        sys.append("for an introductory C++ college level course. Take a look at this problem " + problemDesc + "and provide helpful guidance but don't write complete solutions.");
         sys.append("Suggest approaches, explain concepts, and guide students through debugging. Make it short and concise.");
 
         try
         {
             // String diff = problem.startsWith("Easy") ? "easy" : problem.startsWith("Medium") ? "medium" : "hard";
-            // Map<String,Object> details = firestore.getProblem(topic,difficulty,problemName);
+            // Map<String,Object> details = firestore.getProblem(topic,difficulty,problem);
             // if(details != null)
             // {
                 // String desc = (String)details.get("Description");
@@ -61,22 +62,22 @@ public final class BasicChatSample
                 // String problemTitle = (String) details.get("Problem");
                 
                 sys.append("\nThe student is working on this problem: \n");
-                sys.append("Title: ").append(problemName).append("\n");
+                sys.append("Title: ").append(problem).append("\n");
                 sys.append("Difficulty: ").append(difficulty).append("\n");
-                sys.append("Description: ").append(problem).append("\n");
+                sys.append("Description: ").append(problemDesc).append("\n");
 
                 if(userPrompt.equals(" "))
                 {
                     if(!details.containsKey("Solution") || !details.containsKey("Testcases"))
                     {
-                        String solutionPrompt = "Write a correct C++ solution for the following problem. Only output code, no explanation.\nProblem: " + problem;
+                        String solutionPrompt = "Write a correct C++ solution for the following problem. Only output code, no explanation.\nProblem: " + problemDesc;
                         Prompt pr = new Prompt(List.of(new SystemMessage(solutionPrompt)));
                         String solCode = chatModel.call(pr).getResult().getOutput().getText();
 
-                        List<Map<String,String>> testCases = createTests(problem, solCode);
+                        List<Map<String,String>> testCases = createTests(problemDesc, solCode);
                         if(testCases != null && !testCases.isEmpty() && solCode != null && !solCode.isEmpty())
                         {
-                            firestore.storeTests(topic,difficulty,problemName, solCode, testCases);
+                            firestore.storeTests(topic,difficulty,problem, solCode, testCases);
                         }
                     }
 
@@ -85,7 +86,7 @@ public final class BasicChatSample
                 }
             // }
 
-            Map<String,Object> studentDetails = firestore.getStudentProblem(netId, topic, difficulty, problemName);
+            Map<String,Object> studentDetails = firestore.getStudentProblem(topic, difficulty, problem,netId);
             if(studentDetails != null)
             {
                 int attempts = ((Number) studentDetails.getOrDefault("# of Attempts", 0)).intValue();
@@ -114,7 +115,7 @@ public final class BasicChatSample
         
         try
         {
-            firestore.logMessage(netId, topic,difficulty,problemName, userPrompt, response);
+            firestore.logMessage(netId, topic,difficulty,problem, userPrompt, response);
         }
         catch(Exception e)
         {
@@ -124,11 +125,11 @@ public final class BasicChatSample
         return response;
     }
 
-    public List<ChatMessage> getHistory(String topic, String difficulty, String problemName, String netId)
+    public List<ChatMessage> getHistory(String topic, String difficulty, String problem, String netId)
     {
         try 
         {
-            return firestore.loadChats(topic, difficulty,problemName, netId);
+            return firestore.loadChats(topic, difficulty,problem, netId);
         } 
         catch (ExecutionException | InterruptedException e) 
         {

@@ -1,6 +1,10 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link"
+import { useSearchParams } from "next/navigation";
 export default function Easy() {
+  const search = useSearchParams();
+  const topic = search.get("topic");
   return (
     <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
       <nav className = "bg-black">
@@ -14,17 +18,17 @@ export default function Easy() {
 
       </nav>
       <div className = "grid grid-cols-3 gap-4 mb-auto">
-        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/easy">
+        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = {`/components/problems?topic=${encodeURIComponent(topic)}&difficulty=Easy`}>
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Easy</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
+          <div className = "font-normal text-sm">Start off with ease!</div>
         </Link>
-        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/medium">
+        <Link className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = {`/components/problems?topic=${encodeURIComponent(topic)}&difficulty=Medium`}>
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Medium</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
+          <div className = "font-normal text-sm">You think that's easy? Try this!</div>
         </Link>
-        <Link className = "block bg-orange-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/hard">
+        <Link className = "block bg-orange-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = {`/components/problems?topic=${encodeURIComponent(topic)}&difficulty=Hard`}>
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Hard</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
+          <div className = "font-normal text-sm">Still think this is easy? Try me!</div>
         </Link>
               
       </div>

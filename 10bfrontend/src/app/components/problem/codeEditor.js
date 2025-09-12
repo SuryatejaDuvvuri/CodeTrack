@@ -1,17 +1,13 @@
 "use client"
 import {useEffect, useState, useRef} from 'react';
-import Editor,{loader} from '@monaco-editor/react'
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-c_cpp";
+import "ace-builds/src-noconflict/theme-monokai";
 import ProgressGraph from "./progressGraph.js";
 
 export default function CodeEditor({defaultCode, code,setCode,handleRun, saveCode, toggle, showGraph, setStartTime})
 {
-
     const editorRef = useRef(null);
-    loader.config({
-        paths: {
-            vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.34.0/min/vs'
-        }
-    });
 
     const handleEditor = (editor,m) => 
     {
@@ -64,18 +60,16 @@ export default function CodeEditor({defaultCode, code,setCode,handleRun, saveCod
     return (
         <div className = "flex-1 bg-gray-800 rounded-lg p-4 flex flex-col h-full">
             <div className = "flex-1 mb-4 min-h-[400px]">
-                <Editor height="100vh" defaultLanguage = "cpp" value = {code} theme = "vs-dark"
-                onChange = {setCode}
-                onMount={handleEditor}
-                loading={<div className="text-white p-4">Loading editor...</div>}
-                options = {{
-                    fontFamily: 'JetBrains Mono, monospace',
-                    fontSize:14,
-                    tabSize:2,
-                    minimap: {enabled:false},
-                    scrollBeyondLastLine:false,
-                    contextmenu:false
-                }}/>
+                <AceEditor
+                mode="c_cpp"
+                theme="monokai"
+                value={typeof code === "string" ? code : (typeof defaultCode === "string" ? defaultCode : "")}
+                onChange={setCode}
+                name="code-editor"
+                editorProps={{ $blockScrolling: true }}
+                width="100%"
+                height="400px"
+                />
             </div>
             <div className = "space-x-2">
                 <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {saveCode}>Save</button>

@@ -1,13 +1,12 @@
 "use client";
+import {useState} from 'react';
 import Image from "next/image";
 import Link from "next/link"
 export default function Home() {
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [selectedDifficulty, setSelectedDifficulty] = useState(null);
-  const [selectedProblem, setSelectedProblem] = useState(null);
 
   const topics = [
-  { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!" route: "easy"},
+  { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!", route: "easy"},
   { name: "Warm up 2", color: "bg-emerald-400", description: "More warm up problems to challenge yourself", route: "easy" },
   { name: "File Streams 1", color: "bg-emerald-400", description: "Practice Stream Concepts", route: "choices" },
   { name: "Arrays and Strings", color: "bg-emerald-400", description: "Array problems", route: "choices" },
@@ -34,17 +33,20 @@ export default function Home() {
       </nav>
       <div className = "grid grid-cols-4 gap-6 mb-auto">
         {topics.map((topic,index) => {
-          <Link key = {index} onClick = {() => {
-            setSelectedTopic(topic.name);
-            // router.push(`/problem?topic=${encodeURIComponent(topic.name)}`)
-          }}
-          href = {topic.route ? `/components/${topic.route}`: " "}
-          className = {`block ${topic.color} rounded-lg shadow-sm p-6 hover:scale-110 transition-all`}>
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight"{topic.name}</h1>
-          <div className = "font-normal text-sm">{topic.description}</div>
-          </Link>
+          const isWarmUp = topic.name.toLowerCase().includes("warm up");
+          const href = isWarmUp
+            ? `/components/problems?topic=${encodeURIComponent(topic.name)}&difficulty=Easy`
+            : `/components/${topic.route}?topic=${encodeURIComponent(topic.name)}`;
+          return (
+            <Link key = {index} href = {href}
+            className = {`block ${topic.color} rounded-lg shadow-sm p-6 hover:scale-110 transition-all`}
+            onClick = {() => setSelectedTopic(topic.name)}>
+              <h1 className=  "mb-2 text-xl font-bold tracking-tight">{topic.name}</h1>
+              <div className = "font-normal text-sm">{topic.description}</div>
+            </Link>
+          );
         })}
-        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/easy">
+        {/* <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/easy">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Warm up 1</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
         </Link>
@@ -91,7 +93,7 @@ export default function Home() {
          <div className = "block bg-orange-600 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
           <h1 className=  "mb-2 text-xl font-bold tracking-tight">Linked List 2</h1>
           <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
+        </div> */}
       </div>
 
       <div className = "container mx-auto grid grid-cols-2 gap-6 mb-auto mt-4">

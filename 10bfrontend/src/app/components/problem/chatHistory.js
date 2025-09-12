@@ -1,7 +1,7 @@
 "use client";
 import { useState,useEffect } from 'react';
 
-export default function chatHistory({problem, messages = [], setMessages, isLoading, aiAttempts, setAIAttempts})
+export default function chatHistory({topic,difficulty,problemName, messages = [], setMessages, isLoading, aiAttempts, setAIAttempts})
 {
     
     const [input, setInput] = useState('');
@@ -19,7 +19,9 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        problem:problem,
+                        topic:topic,
+                        difficulty:difficulty,
+                        problemName:problemName,
                         netId: "sduvv003"
                     })
                 });
@@ -70,12 +72,12 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
         }
 
         loadChat();
-    }, [problem]);
+    }, [problemName]);
 
     useEffect(() => {
         async function fetchAttempts() 
         {
-            const res = await fetch(`http://localhost:8080/api/progress/attempts?netId=sduvv003&problem=${problem}`);
+            const res = await fetch(`http://localhost:8080/api/progress/attempts?topic=${topic}&difficulty=${difficulty}&problem=${problemName}&netId=sduvv003`);
             if(res.ok)
             {
                 const data = await res.json();
@@ -86,14 +88,16 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
                 if(hoursPassed >= 5)
                 {
                     setAIAttempts(0);
-                    await fetch("http://localhost:8080/api/progress/update", {
+                    await fetch("http://localhost:8080/api/progress/update?topic=${topic}&difficulty=${difficulty}&problem=${problemName}&netId=sduvv003&aiAttempts=0", {
                     method: "POST",
                     headers: {"Content-Type" : "application/json"},
-                    body: JSON.stringify({
-                        netId: "sduvv003",
-                        problem,
-                        aiAttempts: 0,
-                    })
+                    // body: JSON.stringify({
+                    //     topic,
+                    //     difficulty,
+                    //     problemName,
+                    //     netId: "sduvv003",
+                    //     aiAttempts: 0,
+                    // })
                     });
                 }
                 else
@@ -102,7 +106,7 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
                 }
             }    
         }
-    },[problem]);
+    },[problemName]);
 
     const handleSend = async () => {
         if(!input.trim())
@@ -125,7 +129,9 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                problem,
+                topic,
+                difficulty,
+                problemName,
                 netId: "sduvv003",
                 aiAttempts: aiAttempts + 1,
             })
@@ -148,8 +154,10 @@ export default function chatHistory({problem, messages = [], setMessages, isLoad
                 method:'POST',
                 headers: {'Content-Type':'application/json',},
                 body: JSON.stringify({
+                    topic,
+                    difficulty,
+                    problemName,
                     prompt:input,
-                    problem:problem,
                     netId:"sduvv003"
                 }),
             });
