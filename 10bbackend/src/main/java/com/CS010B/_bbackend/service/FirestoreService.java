@@ -82,6 +82,51 @@ public class FirestoreService
         return (String)probDetails.get("Starter Code");
     }
 
+    public int getProgress(String topic, String difficulty, String netId) throws Exception 
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = docRef.get().get();
+
+        if(doc.exists())
+        {
+            Map<String,Object> problemsMap = (Map<String, Object>)doc.get("Problems");
+            Map<String,Object> topicMap = (Map<String, Object>)problemsMap.get(topic);
+            Map<String,Object> diffMap = (Map<String, Object>)topicMap.get(difficulty);
+
+            double totalProg = 0.0;
+            int count = 0;
+
+            for(int i = 1; i <= 15; i++)
+            {
+                String probName = difficulty + " " + i;
+                Map<String,Object> details = (Map<String, Object>)diffMap.get(probName);
+                if(details != null)
+                {
+                    double score = ((Number)details.get("Latest Score")).doubleValue();
+
+                    if(score >= 80.0)
+                    {
+                        totalProg += 1.0;
+                    }
+                    else if(score > 0)
+                    {
+                        totalProg += (score/80.0);
+                    }
+
+                }
+                count++;
+            }
+
+            if(count <= 0)
+            {
+                return 0;
+            }
+            return (int)Math.round((totalProg / 15.0) * 100.0);
+        }
+
+        return 0;
+    }
+
     public String getCode(String topic, String difficulty, String problem,String netId) throws ExecutionException, InterruptedException
     {
         Map<String,Object> probData = (Map<String,Object>) getStudentProblem(topic,difficulty,problem,netId);

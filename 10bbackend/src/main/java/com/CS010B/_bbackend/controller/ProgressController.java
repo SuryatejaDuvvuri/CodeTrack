@@ -62,6 +62,12 @@ public class ProgressController
     {
         return fireStore.getLastAttempt(topic,difficulty,problem,netId);
     }
+
+    @GetMapping("/getTotal")
+    public int getProgress(@RequestParam String topic, @RequestParam String difficulty, @RequestParam String netId) throws Exception
+    {
+        return fireStore.getProgress(topic, difficulty, netId);
+    }
     
     
     

@@ -140,6 +140,7 @@ export default function Problem()
       body: JSON.stringify({topic,difficulty,problem:problemName,code: code, netId: "sduvv003"}),
     });
     const result = await res.json();
+    console.log(result);
     const runEnd = Date.now();
     const timeSpent = startTime ? Math.round((runEnd - runStart) / 1000) : 0;
     setStartTime(null); 
@@ -346,11 +347,11 @@ export default function Problem()
   const diff = problemDetails?.Difficulty;
   if(diff <= 4)
   {
-    color = "bg-emerald-400";
+    color = "bg-amber-400";
   }
   else if(diff >= 7)
   {
-    color = "bg-red-400";
+    color = "bg-orange-600";
   }
 
   return (

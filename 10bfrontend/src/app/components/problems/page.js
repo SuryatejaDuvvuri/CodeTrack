@@ -1,4 +1,5 @@
 "use client";
+import {useState,useEffect} from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -8,6 +9,8 @@ export default function ProblemList()
     const search = useSearchParams();
     const topic = search.get("topic");
     const difficulty = search.get("difficulty");
+    const [progress, setProgress] = useState(0);
+    
     var color = "bg-emerald-400";
 
     if(difficulty === "Medium")
@@ -18,6 +21,19 @@ export default function ProblemList()
     {
         color = "bg-orange-600";
     }
+
+    useEffect(() => {
+      const fetchProgress = async () => {
+            const res = await fetch(`http://localhost:8080/api/progress/getTotal?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&netId=sduvv003`);
+            if(res.ok)
+            {
+                const data = await res.json();
+                setProgress(data);
+            }
+        };
+        fetchProgress();  
+    }, [topic,difficulty]);
+    
 
 
     const problems = [];
@@ -52,7 +68,7 @@ export default function ProblemList()
                     Progress Completed
             </div>
             <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
-                <div className = "bg-cyan-400 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"40%"}}>60%</div>
+                <div className = "bg-cyan-400 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:`${progress}%`}}>{progress}%</div>
             </div>
     
             <footer className = "w-full mt-8 mb-4 px-4 rounded-lg shadow-sm">
