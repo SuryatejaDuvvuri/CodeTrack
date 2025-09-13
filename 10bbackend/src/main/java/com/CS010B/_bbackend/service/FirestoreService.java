@@ -127,6 +127,84 @@ public class FirestoreService
         return 0;
     }
 
+    public List<Map<String,Object>> getRankings(String netId) throws Exception
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = docRef.get().get();
+        Map<String, Map<String, Object>> combined = new HashMap<>();
+
+        if(doc.exists())
+        {
+            Map<String,Object> problems = (Map<String,Object>)doc.get("Problems");
+            
+            if(problems != null)
+            {
+                for(String topic: problems.keySet())
+                {
+                    String normTopic = topic.replaceAll("\\s*\\d+$", "").trim().toLowerCase();
+                    Map<String,Object> topics = (Map<String,Object>)problems.get(topic);
+                    double totalScore = 0.0;
+                    int totalAttempts = 0;
+                    int count = 0;
+                    if(topics != null)
+                    {
+                        for(String diff: topics.keySet())
+                        {
+                            Map<String,Object> diffMap = (Map<String,Object>)topics.get(diff);
+                            
+                            if(diffMap != null)
+                            {
+                                for(String probName : diffMap.keySet())
+                                {
+                                    Object obj = diffMap.get(probName);
+                                    if (!(obj instanceof Map)) 
+                                    {
+                                        System.out.println(obj);
+                                        continue;
+                                    }
+                                    Map<String, Object> details = (Map<String, Object>)obj;
+                                    if(details != null)
+                                    {
+                                        double score = ((Number)details.get("Latest Score")).doubleValue();
+                                        int attempts =  ((List<Map<String,Object>>)details.get("Runs")).size();
+                                        totalScore += score;
+                                        totalAttempts += attempts;
+                                        count++;
+                                    }
+                                }
+                            }
+
+                        }
+
+                        if(count > 0)
+                        {
+                            double avgScore = totalScore/count;
+                            double avgAttempts = totalAttempts/(double)count;
+                            double strength = avgScore / (avgAttempts > 0 ? avgAttempts : 1);
+                            if(combined.containsKey(normTopic))
+                            {
+                                double prevStrength = (double)combined.get(normTopic).get("strength");
+                                double newStrength = Math.min(prevStrength + strength, 100.0);
+                                combined.get(normTopic).put("strength", newStrength);
+                            }
+                            else
+                            {
+                                Map<String,Object> topicRank = new HashMap<>();
+                                normTopic = normTopic.length() > 0 ? Character.toUpperCase(normTopic.charAt(0)) + normTopic.substring(1) : normTopic;
+                                topicRank.put("topic",normTopic);
+                                topicRank.put("strength",Math.min(strength, 100.0));
+                                combined.put(normTopic,topicRank);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        List<Map<String, Object>> ranking = new ArrayList<>(combined.values());
+        ranking.sort((a, b) -> Double.compare((double) b.get("strength"), (double) a.get("strength")));
+        return ranking;
+    }
+
     public String getCode(String topic, String difficulty, String problem,String netId) throws ExecutionException, InterruptedException
     {
         Map<String,Object> probData = (Map<String,Object>) getStudentProblem(topic,difficulty,problem,netId);

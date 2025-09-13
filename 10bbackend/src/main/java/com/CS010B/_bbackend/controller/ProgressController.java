@@ -68,6 +68,13 @@ public class ProgressController
     {
         return fireStore.getProgress(topic, difficulty, netId);
     }
+
+    @GetMapping("/ranks")
+    public List<Map<String, Object>> getRankings(@RequestParam String netId) throws Exception
+    {
+        List<Map<String, Object>> ranking = fireStore.getRankings(netId);
+        return ranking;
+    }
     
     
     

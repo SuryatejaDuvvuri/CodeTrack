@@ -1,24 +1,39 @@
 "use client";
-import {useState} from 'react';
 import Image from "next/image";
 import Link from "next/link"
-export default function Home() {
-  const [selectedTopic, setSelectedTopic] = useState(null);
+import {useState,useEffect} from "react";
 
+export default function Home() 
+{
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [topTopics, setTopTopics] = useState([]);
   const topics = [
-  { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!", route: "easy"},
-  { name: "Warm up 2", color: "bg-emerald-400", description: "More warm up problems to challenge yourself", route: "easy" },
-  { name: "File Streams 1", color: "bg-emerald-400", description: "Practice Stream Concepts", route: "choices" },
-  { name: "Arrays and Strings", color: "bg-emerald-400", description: "Array problems", route: "choices" },
-  { name: "Classes 1", color: "bg-amber-400", description: "Basic problems on classes", route: "choices" },
-  { name: "Classes 2", color: "bg-amber-400", description: "More classes problem to challenge yourself!", route: "choices" },
-  { name: "Inheritance and Polymorphism", color: "bg-amber-400", description: "Test your OOPS!", route: "choices"},
-  { name: "Recursion", color: "bg-amber-400", description: "Dive deeper on solving recursive problems!", route: "choices" },
-  { name: "Search and Sorting", color: "bg-orange-600", description: "Basic DSA Problems", route: "choices" },
-  { name: "Stacks and Queues", color: "bg-orange-600", description: "More DSA to challenge yourself", route: "choices" },
-  { name: "Linked List 1", color: "bg-orange-600", description: "Basic Linked List for getting started", route: "choices"},
-  { name: "Linked List 2", color: "bg-orange-600", description: "More Linked List problems to challenge yourself!", route: "choices" },
-];
+    { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!", route: "easy"},
+    { name: "Warm up 2", color: "bg-emerald-400", description: "More warm up problems to challenge yourself", route: "easy" },
+    { name: "File Streams 1", color: "bg-emerald-400", description: "Practice Stream Concepts", route: "choices" },
+    { name: "Arrays and Strings", color: "bg-emerald-400", description: "Array problems", route: "choices" },
+    { name: "Classes 1", color: "bg-amber-400", description: "Basic problems on classes", route: "choices" },
+    { name: "Classes 2", color: "bg-amber-400", description: "More classes problem to challenge yourself!", route: "choices" },
+    { name: "Inheritance and Polymorphism", color: "bg-amber-400", description: "Test your OOPS!", route: "choices"},
+    { name: "Recursion", color: "bg-amber-400", description: "Dive deeper on solving recursive problems!", route: "choices" },
+    { name: "Search and Sorting", color: "bg-orange-600", description: "Basic DSA Problems", route: "choices" },
+    { name: "Stacks and Queues", color: "bg-orange-600", description: "More DSA to challenge yourself", route: "choices" },
+    { name: "Linked List 1", color: "bg-orange-600", description: "Basic Linked List for getting started", route: "choices"},
+    { name: "Linked List 2", color: "bg-orange-600", description: "More Linked List problems to challenge yourself!", route: "choices" },
+  ];
+  const progressColors = ["green-300", "red-300", "blue-300", "yellow-300", "indigo-300"]
+
+  useEffect(() => {
+    const fetchRankings = async () => {
+      const res = await fetch('http://localhost:8080/api/progress/ranks?netId=sduvv003');
+      if(res.ok)
+      {
+        const data = await res.json();
+        setTopTopics(data.slice(0,5));
+      }
+    };
+    fetchRankings();
+  },[]);
 
   return (
     <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
@@ -46,60 +61,22 @@ export default function Home() {
             </Link>
           );
         })}
-        {/* <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/easy">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Warm up 1</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </Link>
-        <div className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Warm up 2</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
-        <Link className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all" href = "/components/choices">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">File Streams 1</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </Link>
-        <div className = "block bg-emerald-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Arrays and Strings</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
-        <div className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Classes 1</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
-        <div className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Classes 2</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
-        <div className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Inheritance and Polymorphism</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
-        <div className = "block bg-amber-400 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Recursion</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
-        <div className = "block bg-orange-600 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Search and Sorting</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
-         <div className = "block bg-orange-600 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Stacks and Queues</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
-         <div className = "block bg-orange-600 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Linked List 1</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div>
-         <div className = "block bg-orange-600 rounded-lg shadow-sm p-6 hover:scale-110 transition-all">
-          <h1 className=  "mb-2 text-xl font-bold tracking-tight">Linked List 2</h1>
-          <div className = "font-normal text-sm">This is a description of a problem</div>
-        </div> */}
       </div>
 
       <div className = "container mx-auto grid grid-cols-2 gap-6 mb-auto mt-4">
         <div className = "block flex-1 mb-auto">
-          <h3>Top 5 Topics</h3>
-          <div className = "mb-2 font-medium text-green-300">
+          <h3 className = "text-xl text-rose-400 mb-3">Top 5 Topics</h3>
+          {topTopics.map((topic,index) => (
+            <div key = {index}>
+              <div className = {`mb-2 font-medium text-${progressColors[index]}`}>
+                {topic.topic}
+              </div>
+              <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
+                  <div className = {`bg-${progressColors[index]} text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full`} style={{width:`${Math.round(topic.strength)}%`}}>{Math.round(topic.strength)}%</div>
+              </div>
+            </div>
+          ))}
+          {/* <div className = "mb-2 font-medium text-green-300">
             Linked List
           </div>
           <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
@@ -128,7 +105,7 @@ export default function Home() {
           </div>
           <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
             <div className = "bg-emerald-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"20%"}}>20%</div>
-          </div>
+          </div> */}
         </div>
         <div className="flex-1 block p-4 rounded-lg border-2 border-amber-300 shadow-sm">
           <h3 className = "text-lg mb-3 font-bold">Assignments bulletin board</h3>
