@@ -24,8 +24,8 @@ export default function Problem()
   const start = async () => {
     const res = await fetch (`http://localhost:8080/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
     const wait = await res.text();
-    // setDefaultCode(typeof wait === "string" ? wait : "");
-    setCode(typeof wait === "string" ? wait : problemDetails["Starter Code"]);
+    setCode(wait);
+    setDefaultCode(wait);
   };
 
   const loadProblem = async () => {
@@ -33,9 +33,7 @@ export default function Problem()
     if(res.ok)
     {
       const data = await res.json();
-      console.log(data);
       setProblemDetails(data);
-      setDefaultCode(data["Starter Code"]);
     }
   };
 
@@ -45,7 +43,6 @@ export default function Problem()
   
   useEffect(() => {
     start();
-    // loadCode();
   }, []);
 
   const loadCode = async () => 
@@ -60,11 +57,10 @@ export default function Problem()
     if(res.ok)
     {
       const data = await res.text();
-      setCode(typeof data === "string" ? data : problemDetails.Startercode);
-    }
-    else
-    {
-      setCode(defaultCode);
+      if(data.length >= 1)
+      {
+        setCode(data);
+      }
     }
   };
 
@@ -346,7 +342,16 @@ export default function Problem()
   const totalAttempts = progressData.length;
   const avgTime = totalAttempts > 0 ? Math.round(progressData.reduce((a, b) => a + b.timeSpent, 0) / totalAttempts) : 0;
   const overallSuccess = totalAttempts > 0 ? Math.round(progressData.reduce((a, b) => a + (b.successRate >= 70 ? 1 : 0), 0) * 100 / totalAttempts) : 0;
-
+  var color = "bg-yellow-400";
+  const diff = problemDetails?.Difficulty;
+  if(diff <= 4)
+  {
+    color = "bg-emerald-400";
+  }
+  else if(diff >= 7)
+  {
+    color = "bg-red-400";
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
@@ -365,8 +370,8 @@ export default function Problem()
               </button> */}
             </div>
             <div className="flex items-center space-x-2">
-              <span className="px-3 py-1 bg-yellow-600 rounded-lg text-sm font-medium">
-                Difficulty: {problemDetails?.Difficulty || ""} / 10
+              <span className={`px-3 py-1 ${color} rounded-lg text-sm font-medium text-black`}>
+                Difficulty: {diff || "0"} / 10
               </span>
             </div>
           </div>
