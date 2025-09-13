@@ -21,7 +21,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                     body: JSON.stringify({
                         topic:topic,
                         difficulty:difficulty,
-                        problemName:problemName,
+                        problem:problemName,
                         netId: "sduvv003"
                     })
                 });
@@ -84,20 +84,19 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                 const lastAIAttempt = data.lastAIAttempt || 0;
                 const now = Date.now();
                 const hoursPassed = (now - lastAIAttempt) / (1000 * 60 * 60);
-
                 if(hoursPassed >= 5)
                 {
                     setAIAttempts(0);
-                    await fetch("http://localhost:8080/api/progress/update?topic=${topic}&difficulty=${difficulty}&problem=${problemName}&netId=sduvv003&aiAttempts=0", {
+                    await fetch("http://localhost:8080/api/progress/update", {
                     method: "POST",
                     headers: {"Content-Type" : "application/json"},
-                    // body: JSON.stringify({
-                    //     topic,
-                    //     difficulty,
-                    //     problemName,
-                    //     netId: "sduvv003",
-                    //     aiAttempts: 0,
-                    // })
+                    body: JSON.stringify({
+                        topic:topic,
+                        difficulty:difficulty,
+                        problem:problemName,
+                        aiAttempts: 0,
+                        netId: "sduvv003",
+                    })
                     });
                 }
                 else
@@ -131,9 +130,9 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
             body: JSON.stringify({
                 topic,
                 difficulty,
-                problemName,
-                netId: "sduvv003",
+                problem:problemName,
                 aiAttempts: aiAttempts + 1,
+                netId: "sduvv003"
             })
         });
         setAIAttempts(aiAttempts + 1);
@@ -156,7 +155,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                 body: JSON.stringify({
                     topic,
                     difficulty,
-                    problemName,
+                    problem:problemName,
                     prompt:input,
                     netId:"sduvv003"
                 }),
@@ -190,7 +189,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                     role: 'system',
                     content: 'Error processing request.',
                     timestamp: new Date()
-                }]);
+            }]);
         }
     };
 

@@ -32,7 +32,7 @@ public class CompileController
     public String grade(@RequestBody CompileRequest req) throws Exception
     {
         fireStore.updateCode(req.getTopic(), req.getDifficulty(), req.getProblem(), req.getCode(),req.getNetId());
-        chatSample.getChat(" ", req.getTopic(), req.getDifficulty(), req.getProblem(),req.getNetId());
+        chatSample.getChat(req.getTopic(), req.getDifficulty(), req.getProblem()," ", req.getNetId());
         List<Map<String,String>> testCases = fireStore.getTests(req.getTopic(), req.getDifficulty(), req.getProblem());
         return compileService.compileCode(req.getCode(), testCases);
         
@@ -43,6 +43,7 @@ public class CompileController
     {
         fireStore.updateCode(req.getTopic(), req.getDifficulty(), req.getProblem(), req.getCode(),req.getNetId());
     }
+    
     
 
     @GetMapping("/code")

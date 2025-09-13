@@ -41,11 +41,10 @@ public final class BasicChatSample
     // }
 
 
-    public String getChat(String userPrompt, String topic, String difficulty, String problem, String netId) throws Exception
+    public String getChat(String topic, String difficulty, String problem, String userPrompt, String netId) throws Exception
     {
         Map<String,Object> details = firestore.getProblem(topic,difficulty,problem);
         String problemDesc = (String)details.get("Description");
-        System.out.println(problemDesc);
         StringBuilder sys = new StringBuilder();
         sys.append("You're an assistant helping students learn C++ programming on their own without using AI ");
         sys.append("for an introductory C++ college level course. Take a look at this problem " + problemDesc + "and provide helpful guidance but don't write complete solutions.");
@@ -115,7 +114,7 @@ public final class BasicChatSample
         
         try
         {
-            firestore.logMessage(netId, topic,difficulty,problem, userPrompt, response);
+            firestore.logMessage(topic,difficulty,problem,userPrompt,response,netId);
         }
         catch(Exception e)
         {

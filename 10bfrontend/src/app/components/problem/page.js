@@ -15,19 +15,23 @@ export default function Problem()
   const difficulty = search.get("difficulty");
   const problemName = search.get("problem");
   const [defaultCode, setDefaultCode] = useState("");
-  const [testcases,setTestcases] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  // const [testcases,setTestcases] = useState([]);
   const[aiAttempts,setAIAttempts] = useState(0);
+  const [code, setCode] = useState(""); 
   // const [problem, setProblem] = useState(null);
   const MAX_ATTEMPTS = 4;
   const start = async () => {
     const res = await fetch (`http://localhost:8080/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
     const wait = await res.text();
     setDefaultCode(typeof wait === "string" ? wait : "");
-    setCode(typeof wait === "string" ? wait : "");
+    setCode(typeof wait === "string" ? wait : defaultCode);
+
   };
   
   useEffect(() => {
     start();
+    loadCode();
   }, []);
 
   const loadCode = async () => 
@@ -38,11 +42,12 @@ export default function Problem()
         "Content-Type":"application/json"
       }
     });
-
+    
     if(res.ok)
     {
       const data = await res.text();
-      setCode(typeof data === "string" ? data : "");
+      
+      setCode(typeof data === "string" ? data : defaultCode);
     }
     else
     {
@@ -55,18 +60,62 @@ export default function Problem()
       const chatRes = await fetch ("http://localhost:8080/api/grade/update", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({topic,difficulty,problemName,code:code,netId: "sduvv003"}),
+        body: JSON.stringify({topic,difficulty,problem:problemName,code:code,netId: "sduvv003"}),
     });
   }
+  const fetchAttempts = async () => 
+  {
+    const res = await fetch(`http://localhost:8080/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
+    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
 
-  const [code, setCode] = useState(""); 
-  const [results, setResults] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [isLoading, setLoading] = useState(false);
-  const [showGraph, setShowGraph] = useState(false);
-  const [progressData, setProgressData] = useState([]);
-  const [startTime, setStartTime] = useState(null);
-  const [latestScore, setLatestScore] = useState(null);
+    if(res.ok && resTwo.ok)
+    {
+      const data = await res.json(); // last AI Attempt time
+      const dataTwo = await resTwo.json(); // last attempt number
+      const lastAIAttempt = data;
+      const now = Date.now();
+      const hoursPassed = (now - lastAIAttempt) / (1000 * 60 * 60);
+
+      if(hoursPassed >= 5)
+      {
+        setAIAttempts(0);
+        await fetch("http://localhost:8080/api/progress/update", {
+          method: "POST",
+          headers: {"Content-Type" : "application/json"},
+          body: JSON.stringify({
+            topic,
+            difficulty,
+            problem:problemName,
+            aiAttempts: 0,
+            netId: "sduvv003"
+          })
+        });
+      }
+      else
+      {
+        console.log("AI attempts from backend:", dataTwo);
+        setAIAttempts(dataTwo);
+      }
+    }
+  }
+
+  const fetchScore = async () => 
+  {
+    const res = await fetch(`http://localhost:8080/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
+    if (res.ok) 
+    {
+      const data = await res.json();
+      console.log(data);
+      setLatestScore(data);
+    }
+  };
+
+  const refreshAll = async () => 
+  {
+    await fetchAttempts(),
+    await fetchProgress(),
+    await fetchScore()
+};
 
   const handleRun = async () =>
   {
@@ -79,7 +128,7 @@ export default function Problem()
       headers: {
         "Content-Type":"application/json"
       },
-      body: JSON.stringify({topic,difficulty,problemName,code: code, netId: "sduvv003"}),
+      body: JSON.stringify({topic,difficulty,problem:problemName,code: code, netId: "sduvv003"}),
     });
     const result = await res.json();
     const runEnd = Date.now();
@@ -87,11 +136,11 @@ export default function Problem()
     setStartTime(null); 
     if(result.status === "error")
     {
-        console.log(result);
         setMessages(prev => [
           ...prev,
           {role: "system",content:result.details}
         ]);
+        await refreshAll();
         setLoading(false);
         return;
     }
@@ -107,13 +156,13 @@ export default function Problem()
           "Content-Type":"application/json"
         },
         body: JSON.stringify({
-          topic,difficulty,problemName,passed,total,timeSpent,netId:"sduvv003"
+          topic,difficulty,problem:problemName,passed,total,timeSpent,testResults:result, netId:"sduvv003"
         })
       });
 
       setTimeout(fetchScore, 100);
 
-      fetchProgress();
+      await fetchProgress();
     }
 
 
@@ -125,8 +174,8 @@ export default function Problem()
             body: JSON.stringify({
               topic,
               difficulty,
-              problemName,
-              prompt: "Can you give me feedback on my code?",
+              problem:problemName,
+              prompt: "Can you give me feedback on my code? This is a system prompt",
               netId: "sduvv003"
           }),
         });
@@ -142,12 +191,13 @@ export default function Problem()
             };
 
             setMessages(prev => [...prev,res]);
+            await refreshAll();
             setLoading(false);
         }
         await fetch("http://localhost:8080/api/progress/update", {
           method: "POST",
           headers: {"Content-Type" : "application/json"},
-          body: JSON.stringify({topic,difficulty,problemName,aiAttempts:aiAttempts+1,netId:"sduvv003"})
+          body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId:"sduvv003"})
         });
         setAIAttempts(aiAttempts + 1);
     }
@@ -165,8 +215,8 @@ export default function Problem()
               body: JSON.stringify({
                 topic,
                 difficulty,
-                problemName,
-                prompt: "Can you give me feedback on my code?",
+                problem:problemName,
+                prompt: "Can you give me feedback on my code? This is a system prompt.",
                 netId: "sduvv003"
             }),
           });
@@ -182,13 +232,13 @@ export default function Problem()
               };
 
               setMessages(prev => [...prev,res]);
+              await refreshAll();
               setLoading(false);
           }
-
           await fetch("http://localhost:8080/api/progress/update", {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
-            body: JSON.stringify({topic,difficulty,problemName,aiAttempts:aiAttempts+1,netId: "sduvv003"})
+            body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId: "sduvv003"})
           });
           setAIAttempts(aiAttempts + 1);
        }
@@ -198,6 +248,7 @@ export default function Problem()
             ...prev,
             {role: "system", content: "Pass at least 80% of test cases to unlock final feedback."}
           ]);
+          await refreshAll();
           setLoading(false);
           setAIAttempts(aiAttempts + 1);
           return;
@@ -209,10 +260,21 @@ export default function Problem()
         ...prev,
         {role: "system", content: "AI attempts exceeded. Your attempts will reset in 5 hours but do rely on test cases."}
       ]);
+      await refreshAll();
       setLoading(false);
     }
-   
   }
+
+  useEffect(() => {
+    refreshAll();
+  }, [problemName]);
+
+  const [results, setResults] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [showGraph, setShowGraph] = useState(false);
+  const [progressData, setProgressData] = useState([]);
+  const [startTime, setStartTime] = useState(null);
+  const [latestScore, setLatestScore] = useState(null);
 
    useEffect(() => {
     const chatCont = document.querySelector('.overflow-y-auto');
@@ -223,8 +285,7 @@ export default function Problem()
   },[messages,isLoading]);
 
   const fetchProgress = async () => {
-    const progressRes = await fetch(`http://localhost:8080/api/progress?${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
-
+    const progressRes = await fetch(`http://localhost:8080/api/progress?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
     if(progressRes.ok)
     {
       const data = await progressRes.json();
@@ -234,69 +295,28 @@ export default function Problem()
         duration: run.timeSpent,
         successRate:run.successRate
       })))
-    }
-  }
-
-  const fetchAttempts = async () => 
-  {
-    const res = await fetch(`http://localhost:8080/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
-    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
-
-    if(res.ok && resTwo.ok)
-    {
-      const data = await res.json(); // last AI Attempt time
-      const dataTwo = await resTwo.json(); // last attempt number
-      const lastAIAttempt = data;
-      const now = Date.now();
-      console.log(now);
-      const hoursPassed = (now - lastAIAttempt) / (1000 * 60 * 60);
-
-      if(hoursPassed >= 5)
+      if (Array.isArray(data) && data.length > 0 && data[data.length - 1].testResults) 
       {
-        // console.log(hoursPassed);
-        setAIAttempts(0);
-        await fetch("http://localhost:8080/api/progress/update", {
-          method: "POST",
-          headers: {"Content-Type" : "application/json"},
-          body: JSON.stringify({
-            topic,
-            difficulty,
-            problemName,
-            aiAttempts: 0,
-            netId: "sduvv003"
-          })
-        });
-      }
-      else
-      {
-        setAIAttempts(dataTwo);
+        setResults(data[data.length - 1].testResults);
       }
     }
   }
 
-  const fetchScore = async () => 
-  {
-    const res = await fetch(`http://localhost:8080/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
-    if (res.ok) 
-    {
-      const data = await res.json();
-      setLatestScore(data);
-    }
-  };
 
   useEffect(() => {
     fetchScore();
   }, [problemName]);
 
-  useEffect(() => {
-    if(showGraph)
-    {
-      fetchProgress();
-    }
-  }, [showGraph]);
+  // useEffect(() => {
+  //   if(showGraph)
+  //   {
+  //     fetchProgress();
+  //   }
+  // }, [showGraph]);
 
   useEffect(() => {
     fetchAttempts();
+    fetchProgress();
   },[problemName]);
 
   const toggle = () => 

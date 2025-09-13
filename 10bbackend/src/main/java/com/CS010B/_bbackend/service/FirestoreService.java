@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -143,15 +144,16 @@ public class FirestoreService
     {
         // String difficulty = problem.startsWith("Easy") ? "easy" : problem.startsWith("Medium") ? "medium" : "hard";
         DocumentReference docRef = firestore.collection("problems").document(topic);
-        // DocumentSnapshot doc = docRef.get().get();
-        // Map<String, Object> difficultyMap = (Map<String, Object>) doc.get(difficulty);
-        // Map<String, Object> probMap = (Map<String, Object>) doc.get(problem);
         Map<String, Object> problemMap = new HashMap<>();
         problemMap.put("Testcases", testCases);
         problemMap.put("Solution", solution);
-        
+
+        Map<String, Object> difficultyMap = new HashMap<>();
+        difficultyMap.put(problem, problemMap);
+
         Map<String, Object> updates = new HashMap<>();
-        updates.put(problem, problemMap);
+        updates.put(difficulty, difficultyMap);
+
         docRef.set(updates, SetOptions.merge());
     }
 
@@ -309,7 +311,7 @@ public class FirestoreService
         docRef.update("Problems." + topic + "." + difficulty + "." + problem + ".Latest Code", code);
     }
 
-    public void logAttempt(String topic, String difficulty, String problem, int passed, int total, long timeSpent,String netId)
+    public void logAttempt(String topic, String difficulty, String problem, int passed, int total, long timeSpent,List<Map<String, Object>>  testResults, String netId)
     {
         DocumentReference docRef = firestore.collection("section").document(netId);
         // String difficulty = problem.startsWith("Easy") ? "Easy" :
@@ -322,6 +324,7 @@ public class FirestoreService
         run.put("total", total);
         run.put("successRate", total > 0 ? (passed * 100.0 / total) : 0);
         run.put("timeSpent", timeSpent / 1000);
+        run.put("testResults", testResults);
         docRef.update("Problems." + topic + "." + difficulty + "." + problem  + ".Runs", FieldValue.arrayUnion(run));
         docRef.update("Problems." + topic + "." + difficulty + "." + problem  + ".Latest Score", latestScore);
 
@@ -344,14 +347,14 @@ public class FirestoreService
                 Map<String, Object> topics = (Map<String, Object>) problems.get(topic);
                 if(topics != null)
                 {
-                    Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
-
+                    Map<String, Object> diff = (Map<String, Object>) topics.get(difficulty);
                     if (diff != null) 
                     {
                         Map<String, Object> probMap = (Map<String, Object>) diff.get(problem);
+
                         if (probMap != null)
-                        {
-                            return (List<Map<String, Object>>) probMap;
+                        {   
+                            return (List<Map<String, Object>>) probMap.get("Runs");
                         }
                     }
                 }
@@ -369,7 +372,7 @@ public class FirestoreService
         return new ArrayList<>();
     }
 
-    public int getAttempts(String netId, String topic, String difficulty, String problem) throws Exception
+    public int getAttempts(String topic, String difficulty, String problem,String netId) throws Exception
     {
         DocumentReference docRef =  firestore.collection("section").document(netId);
         DocumentSnapshot doc = docRef.get().get();
@@ -393,15 +396,16 @@ public class FirestoreService
                     {
                         int attempts = probMap.containsKey("# of AI Attempts") ? ((Number) probMap.get("# of AI Attempts")).intValue() : 0;
                         long lastAttempt = probMap.containsKey("lastAIAttempt") ? ((Number) probMap.get("lastAIAttempt")).longValue() : 0L;
+                        // System.out.println(attempts);
                         // System.out.println(lastAttempt);
                         long now = System.currentTimeMillis();
                         long hours = (now-lastAttempt) / (1000*3600);
 
-                        if(attempts > 0 && lastAttempt > 0 && hours >= 5)
-                        {
-                            setAIAttempts(topic,difficulty,problem, 0,now,netId);
-                            return 0;
-                        }
+                        // if(attempts > 0 && lastAttempt > 0 && hours >= 5)
+                        // {
+                        //     setAIAttempts(topic,difficulty,problem, 0,now,netId);
+                        //     return 0;
+                        // }
                         return attempts;
                     }
                 // }
@@ -438,7 +442,7 @@ public class FirestoreService
                 
             // }
         }
-        return System.currentTimeMillis();
+        return 0;
     }
 
     public void setAIAttempts(String topic, String difficulty, String problem, int aiAttempts, long lastAttempt, String netId) throws Exception

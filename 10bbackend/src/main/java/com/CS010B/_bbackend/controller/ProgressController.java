@@ -24,14 +24,14 @@ public class ProgressController
     private FirestoreService fireStore;
 
     @GetMapping
-    public List<Map<String,Object>> getRuns(@RequestParam String topic, @RequestParam String difficulty, @RequestParam String problemName, @RequestParam String netId) throws Exception
+    public List<Map<String,Object>> getRuns(@RequestParam String topic, @RequestParam String difficulty, @RequestParam String problem, @RequestParam String netId) throws Exception
     {
-        return fireStore.getRuns(topic,difficulty,problemName,netId);
+        return fireStore.getRuns(topic,difficulty,problem,netId);
     }
 
     @PostMapping
     public void setRuns(@RequestBody Progress entity) {
-        fireStore.logAttempt(entity.getTopic(), entity.getDifficulty(), entity.getProblem(), entity.getPassed(), entity.getTotal(), entity.getTimeSpent(), entity.getNetId());
+        fireStore.logAttempt(entity.getTopic(), entity.getDifficulty(), entity.getProblem(), entity.getPassed(), entity.getTotal(), entity.getTimeSpent(), entity.getTestResults(), entity.getNetId());
     }
 
     @GetMapping("/attempts")
@@ -43,14 +43,18 @@ public class ProgressController
     @PostMapping("/update")
     public void setAttempts(@RequestBody Progress entity) throws Exception
     {
-        System.out.println(entity.getProblem());
-        fireStore.setAIAttempts(entity.getTopic(), entity.getDifficulty(), entity.getProblem(), entity.getAiAttempts(), System.currentTimeMillis(),entity.getNetId());
+        long now = 0;
+        if(entity.getAiAttempts() > 0)
+        {
+            now = System.currentTimeMillis();
+        }
+        fireStore.setAIAttempts(entity.getTopic(), entity.getDifficulty(), entity.getProblem(), entity.getAiAttempts(), now,entity.getNetId());
     }
 
     @GetMapping("/latestScore")
     public int getLatestScore(@RequestParam String topic, @RequestParam String difficulty, @RequestParam String problem, @RequestParam String netId) throws Exception 
     {
-        return fireStore.getScore(netId,topic,difficulty,problem);
+        return fireStore.getScore(topic,difficulty,problem,netId);
     }
 
     @GetMapping("/lastTime")
@@ -76,11 +80,17 @@ class Progress
     private int total;
     private long timeSpent;
     private int aiAttempts;
-    private long lastAttempt;
+    private List<Map<String, Object>>  testResults;
+    // private long lastAttempt;
 
     public String getProblem()
     {
         return problem;
+    }
+
+    public void setProblem(String problem) 
+    { 
+        this.problem = problem; 
     }
 
     public String getNetId() 
@@ -145,5 +155,15 @@ class Progress
     public void setDifficulty(String difficulty)
     {
         this.difficulty = difficulty;
+    }
+
+    public List<Map<String, Object>>  getTestResults()
+    {
+        return testResults;
+    }
+
+    public void setTestResults(List<Map<String, Object>>  testResults)
+    {
+        this.testResults = testResults;
     }
 }

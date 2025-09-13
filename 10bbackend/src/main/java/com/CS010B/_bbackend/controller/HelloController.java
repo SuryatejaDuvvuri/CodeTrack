@@ -39,7 +39,7 @@ public class HelloController
     public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest request) throws Exception
     {
         
-        String response = chatSample.getChat(request.getPrompt(), request.getTopic(), request.getDifficulty(), request.getProblem(), request.getNetId());
+        String response = chatSample.getChat(request.getTopic(), request.getDifficulty(), request.getProblem(), request.getPrompt(), request.getNetId());
         return ResponseEntity.ok(new ChatResponse(response));
     }
 
