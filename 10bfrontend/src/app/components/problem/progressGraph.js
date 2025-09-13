@@ -18,14 +18,20 @@ function AnimatedBar({success, successRate})
     }
   }, [success, successRate]);
 
+  const getBarColor = (successRate) => {
+    if (successRate === 100) return "#22c55e";
+    if (successRate >= 60) return "#eab308";
+    return "#ef4444";
+  };
+
   return (
     <div
       ref={ref}
       className="rounded"
       style={{
         width: '48px',
-        height: '0px',
-        background: success ? '#22c55e' : '#ef4444',
+        height: `0px`,
+        background: getBarColor(successRate),
         border: '2px solid white',
         transition: 'height 0.8s cubic-bezier(.17,.67,.83,.67)'
       }}
