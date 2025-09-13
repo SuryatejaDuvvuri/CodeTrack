@@ -19,15 +19,28 @@ export default function Problem()
   // const [testcases,setTestcases] = useState([]);
   const[aiAttempts,setAIAttempts] = useState(0);
   const [code, setCode] = useState(""); 
-  // const [problem, setProblem] = useState(null);
+  const [problemDetails, setProblemDetails] = useState(null);
   const MAX_ATTEMPTS = 4;
   const start = async () => {
     const res = await fetch (`http://localhost:8080/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
     const wait = await res.text();
     setDefaultCode(typeof wait === "string" ? wait : "");
     setCode(typeof wait === "string" ? wait : defaultCode);
-
   };
+
+  const loadProblem = async () => {
+    const res = await fetch (`http://localhost:8080/api/chat/loadProblem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
+    if(res.ok)
+    {
+      const data = await res.json();
+      console.log(data);
+      setProblemDetails(data);
+    }
+  };
+
+  useEffect(() => {
+    loadProblem();
+  },[topic,difficulty,problemName]);
   
   useEffect(() => {
     start();
@@ -341,10 +354,10 @@ export default function Problem()
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-4">
             <div className="flex space-x-3">
-              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+              <button className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer w-full">
                 Prev
               </button>
-              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+              <button className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer w-full">
                 Next
               </button>
               {/* <button className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
@@ -353,39 +366,46 @@ export default function Problem()
             </div>
             <div className="flex items-center space-x-2">
               <span className="px-3 py-1 bg-yellow-600 rounded-lg text-sm font-medium">
-                Difficulty: 3/4
+                Difficulty: {problemDetails?.Difficulty || ""} / 10
               </span>
             </div>
           </div>
           
           <div>
-            <h1 className="text-3xl font-bold mb-4 text-blue-400">
-              Warm Up
+            <h1 className="text-3xl font-bold mb-2 text-blue-400">
+              {problemDetails?.Problem || "Loading..."}
             </h1>
-            <p className="text-gray-300 text-lg leading-relaxed">
-              The parameter weekdays is true if it is a weekday, 
-              and the parameter vacation is true if we are on vacation. 
-              We sleep in if it is not a weekday or we're on vacation. 
-              Return true if we sleep in.
+            <p className="text-gray-300 text-lg mb-4 leading-relaxed">
+              {problemDetails?.Description || " "}
             </p>
+            <h2 className="text-xl font-bold mb-2 text-blue-400">
+              Examples
+            </h2>
+            <div className="text-gray-200 text-base space-y-2">
+              {problemDetails?.Examples
+                ? problemDetails.Examples.split('\n').map((ex, i) => (
+                    <div key={i} className="font-mono">{ex}</div>
+                  ))
+                : ""}
+            </div>
+
           </div>
         </div>
       </header>
 
       <main className="flex-1 py-6">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div className="bg-gray-800 rounded-xl border border-gray-700">
+          <div className="bg-gray-800 rounded-xl border border-gray-700 w-full mx-auto mb-8">
               <div className="p-4 border-b border-gray-700">
                 <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
               </div>
-              <div className="p-4">
+              <div className="bg-gray-800 rounded-xl border border-gray-700">
                 <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph} setStartTime={setStartTime}/>
               </div>
-            </div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div className="bg-gray-800 rounded-xl border border-gray-700">
-              
-              <div className="p-4 border-b border-gray-700">
+              <div className="p-4 border-b border-gray-700 h">
                 <h2 className="text-xl font-semibold text-gray-200 mb-4">Test Results</h2>
                 <div className="mb-2">
                   <span className="text-gray-200 font-medium mr-2">Latest Score:</span>
@@ -406,7 +426,7 @@ export default function Problem()
                     </thead>
                     <tbody className="divide-y divide-gray-600">
                       {results.length > 0 ? (results.map((test, index) => (
-                        <tr key={index} className="hover:bg-gray-700/50">
+                        <tr key={index} className="hover:bg-gray-700/50S">
                           <td className="py-3 px-4">Case {index + 1}</td>
                           <td>{test.input}</td>
                           <td className="py-3 px-4 font-mono text-blue-400">{test.expectedOutput}</td>
@@ -434,11 +454,10 @@ export default function Problem()
                   </table>
                 </div>
               </div>
-
-              <div className="p-4">
+            </div>
+            <div className="p-4 bg-gray-800 rounded-xl border border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-200 mb-4">AI Assistant</h3>
                 <ChatHistory topic={topic} difficulty={difficulty} problemName={problemName} messages = {messages} setMessages = {setMessages} isLoading = {isLoading} aiAttempts={aiAttempts} setAIAttempts={setAIAttempts} />
-              </div>
             </div>
           </div>
 

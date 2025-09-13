@@ -139,8 +139,8 @@ public final class BasicChatSample
 
     public List<Map<String,String>> createTests(String problem, String code)
     {
-        String prompt = "You are an autograder for C++. For the following problem, generate 7 unit test cases. " +
-        "Each Each test case should have:\n" + //
+        String prompt = "You are an autograder for C++. For the following problem, generate 7 unique unit test cases. If not 7, generate as many unique cases as you can which includes testing edge cases " +
+        "Each test case should have:\n" + //
                         "- input: the raw values that would be entered via cin (e.g., \"false false\")\n" + //
                         "- expectedOutput: the output value (e.g., \"true\")\n" + //
         "Format your response as a JSON array of objects with keys 'input', 'expectedOutput', 'userOutput'.\n" +

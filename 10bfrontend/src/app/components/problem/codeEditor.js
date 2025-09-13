@@ -1,8 +1,8 @@
 "use client"
 import {useEffect, useState, useRef} from 'react';
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-c_cpp";
-import "ace-builds/src-noconflict/theme-monokai";
+import CodeMirror from '@uiw/react-codemirror';
+import { cpp } from '@codemirror/lang-cpp';
+import { dracula } from '@uiw/codemirror-theme-dracula';
 import ProgressGraph from "./progressGraph.js";
 
 export default function CodeEditor({defaultCode, code,setCode,handleRun, saveCode, toggle, showGraph, setStartTime})
@@ -58,17 +58,14 @@ export default function CodeEditor({defaultCode, code,setCode,handleRun, saveCod
     
 
     return (
-        <div className = "flex-1 bg-gray-800 rounded-lg p-4 flex flex-col h-full">
-            <div className = "flex-1 mb-4 min-h-[400px]">
-                <AceEditor
-                mode="c_cpp"
-                theme="monokai"
-                value={typeof code === "string" ? code : (typeof defaultCode === "string" ? defaultCode : "")}
-                onChange={setCode}
-                name="code-editor"
-                editorProps={{ $blockScrolling: true }}
-                width="100%"
-                height="400px"
+        <div className = "flex-1 bg-gray-800 rounded-lg p-4 flex flex-col h-full w-full mx-auto">
+            <div className = "flex-1 mb-4 min-h-[600px]">
+                <CodeMirror
+                value={code}
+                height="600px"
+                theme={dracula}
+                extensions={[cpp()]}
+                onChange={(value) => setCode(value)}
                 />
             </div>
             <div className = "space-x-2">

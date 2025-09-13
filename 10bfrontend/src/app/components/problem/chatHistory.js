@@ -201,10 +201,12 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
         }
     }
 
+    const filtered = messages.flat().filter(msg => !(msg.content && msg.content.includes("Can you give me feedback on my code?")));
+
    return (
      <div className = 'flex-1 rounded-lg p-3 flex flex-col h-full'>
         <div className = "flex-1 mb-3 overflow-y-auto max-h-[600px]">
-            {messages.flat().map((msg,i) => (
+            {filtered.map((msg,i) => (
                 <div key = {i} className={`mb-3 ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'} max-w-[70%]`}>
                     <div className = {`p-3 rounded-lg ${
                         msg.role === 'user' 

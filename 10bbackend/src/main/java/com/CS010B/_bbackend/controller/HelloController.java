@@ -1,6 +1,7 @@
 package com.CS010B._bbackend.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,12 @@ public class HelloController
         return (String)fireStore.getStarterCode(topic,difficulty,problem);
     }
 
+    @GetMapping("/loadProblem")
+    public Map<String,Object> loadProblem(@RequestParam String topic, @RequestParam String difficulty, @RequestParam String problem) throws Exception
+    {
+        return (Map<String,Object>)fireStore.getProblem(topic, difficulty, problem);
+    }
+
     @PostMapping("/create")
     public void createStudentProblems(@RequestBody ChatRequest request)
     {
@@ -68,4 +75,43 @@ public class HelloController
     //     String response = chatSample.getResponse();
     //     return ResponseEntity.ok(new ChatResponse(response));
     // }
+}
+
+class Problem
+{
+    private String name;
+    private String desc;
+    private String diff;
+    private String examples;
+
+    public String getExamples() {
+        return examples;
+    }
+    public void setExamples(String examples) {
+        this.examples = examples;
+    }
+    public String getName() 
+    {
+        return name;
+    }
+    public void setName(String name) 
+    {
+        this.name = name;
+    }
+    public String getDesc() 
+    {
+        return desc;
+    }
+    public void setDesc(String desc) 
+    {
+        this.desc = desc;
+    }
+    public String getDiff() 
+    {
+        return diff;
+    }
+    public void setDiff(String diff) 
+    {
+        this.diff = diff;
+    }
 }
