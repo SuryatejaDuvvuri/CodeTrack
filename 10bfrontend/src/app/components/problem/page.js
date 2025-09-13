@@ -24,8 +24,8 @@ export default function Problem()
   const start = async () => {
     const res = await fetch (`http://localhost:8080/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
     const wait = await res.text();
-    setDefaultCode(typeof wait === "string" ? wait : "");
-    setCode(typeof wait === "string" ? wait : defaultCode);
+    // setDefaultCode(typeof wait === "string" ? wait : "");
+    setCode(typeof wait === "string" ? wait : problemDetails["Starter Code"]);
   };
 
   const loadProblem = async () => {
@@ -35,6 +35,7 @@ export default function Problem()
       const data = await res.json();
       console.log(data);
       setProblemDetails(data);
+      setDefaultCode(data["Starter Code"]);
     }
   };
 
@@ -44,7 +45,7 @@ export default function Problem()
   
   useEffect(() => {
     start();
-    loadCode();
+    // loadCode();
   }, []);
 
   const loadCode = async () => 
@@ -59,8 +60,7 @@ export default function Problem()
     if(res.ok)
     {
       const data = await res.text();
-      
-      setCode(typeof data === "string" ? data : defaultCode);
+      setCode(typeof data === "string" ? data : problemDetails.Startercode);
     }
     else
     {
@@ -118,7 +118,6 @@ export default function Problem()
     if (res.ok) 
     {
       const data = await res.json();
-      console.log(data);
       setLatestScore(data);
     }
   };
@@ -127,7 +126,8 @@ export default function Problem()
   {
     await fetchAttempts(),
     await fetchProgress(),
-    await fetchScore()
+    await fetchScore(),
+    await loadCode()
 };
 
   const handleRun = async () =>

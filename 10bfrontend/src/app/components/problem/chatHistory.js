@@ -233,7 +233,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                 </div>
             )}
         </div>
-        <div className = "flex items-center gap-2 mt-2">
+        <div className = "flex items-center gap-2 mb-8">
             <input value= {input} onChange = {(e) => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { handleSend();}}}
                 className = "w-full px-4 py-3 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-blue-500" placeholder="Ask for help(E.G Syntax Help)"/>  
             <button onClick = {handleSend} disabled = {isLoading || !input.trim()} className = {`${isLoading || !input.trim() ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 cursor-pointer hover:bg-blue-700'} text-white px-5 py-3 rounded-md transition-colors`}>
