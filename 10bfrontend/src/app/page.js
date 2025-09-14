@@ -3,10 +3,20 @@ import Image from "next/image";
 import Link from "next/link"
 import {useState,useEffect} from "react";
 
+
+function canGetPasscode(problems)
+{
+  const now = new Date();
+  return problems.length > 0 && problems.every(
+    p => p.completed && new Date(p.dueDate) >= now
+  );
+}
+
 export default function Home() 
 {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topTopics, setTopTopics] = useState([]);
+  const[assignedProblems, setAssignedProblems] = useState([])
   const topics = [
     { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!", route: "easy"},
     { name: "Warm up 2", color: "bg-emerald-400", description: "More warm up problems to challenge yourself", route: "easy" },
@@ -35,14 +45,26 @@ export default function Home()
     fetchRankings();
   },[]);
 
+  useEffect(() => {
+    const fetchAssigned= async () => {
+      const res = await fetch('http://localhost:8080/api/chat/assigned?netId=sduvv003');
+      if(res.ok)
+      {
+        const data = await res.json();
+        setAssignedProblems(data);
+      }
+    };
+    fetchAssigned();
+  },[]);
+
   return (
-    <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
-      <nav className = "bg-black">
+    <div className="container mx-auto min h-screen font-sans m-4">
+      <nav className = "bg-black space-y-3 mb-4">
         <div className = "flex flex-wrap justify-between items-center p-4">
           <div className="flex space-x-4">
-            <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a>
-            <a href = "/" className = "text-white hover:text-lg transition-all">Home</a>
-            <button className = "text-white hover:text-lg transition-all">Logout</button>
+            {/* <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a> */}
+            <a href = "/components/login" className = "text-white hover:text-lg transition-all cursor-pointer">Home</a>
+            <button className = "text-white hover:text-lg transition-all cursor-pointer">Logout</button>
           </div>
         </div>
       </nav>
@@ -76,52 +98,43 @@ export default function Home()
               </div>
             </div>
           ))}
-          {/* <div className = "mb-2 font-medium text-green-300">
-            Linked List
-          </div>
-          <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
-            <div className = "bg-green-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"60%"}}>60%</div>
-          </div>
-          <div className = "mb-2 font-medium text-red-300">
-            Arrays
-          </div>
-          <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
-            <div className = "bg-red-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"50%"}}>50%</div>
-          </div>
-          <div className = "mb-2 font-medium text-blue-300">
-            Strings
-          </div>
-          <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
-            <div className = "bg-blue-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"43%"}}>43%</div>
-          </div>
-          <div className = "mb-2 font-medium text-yellow-300">
-            Pointers
-          </div>
-          <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
-            <div className = "bg-yellow-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"25%"}}>25%</div>
-          </div>
-          <div className = "mb-2 font-medium text-emerald-300">
-            Recursion
-          </div>
-          <div className = "w-full bg-gray-700 rounded-full h-5 mb-4">
-            <div className = "bg-emerald-300 text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full" style={{width:"20%"}}>20%</div>
-          </div> */}
+         
         </div>
-        <div className="flex-1 block p-4 rounded-lg border-2 border-amber-300 shadow-sm">
+        <div className="flex-1 block p-4 rounded-lg shadow-sm">
           <h3 className = "text-lg mb-3 font-bold">Assignments bulletin board</h3>
-          <div className = "p-2 bg-black rounded border-l-4 border-l-blue-500 shadow-sm">
+          <div className = "p-2 bg-black rounded border-l-4 border-l-emerald-300 shadow-sm">
             <div className = "flex justify-between items-center">
-              <span className = "font-medium">Linked List Problems</span>
-              <span className = "text-xs bg-red-300 text-red-800 px-2 py-1 rounded">Due: September 22nd, 2025</span>
+              <span className = "font-medium mb-4">Assigned Problems</span>
             </div>
-            <ul>
-              <li>Finish 5 easy problems</li>
-              <li>Finish 2 medium problems</li>
-              <li>Finish 1 hard problem</li>
+            <ul className = "space-y-2">
+             {assignedProblems.length === 0 ? (
+              <li className = "text-gray-400">No assigned yet! But it doesn't hurt to practice right?</li>
+             ) : (
+              assignedProblems.map((problem,index) => (
+                <li key = {index} className = "mb-2 flex justify-between items-center bg-gray-800 rounded px-4 py-3">
+                  <div className="flex items-center space-x-3">
+                    <input
+                        type="checkbox"
+                        checked={problem.completed}
+                        readOnly
+                        className={`form-checkbox h-5 w-5 ${problem.completed ? "text-green-500" : "text-red-500"} border-gray-400`}
+                    />
+                    <span className = {`text-lg ${problem.completed ? "line-through text-gray-400" : "text-white"}`}>
+                      Finish the {problem.Name} problem
+                    </span>
+                  </div>
+                  <div className = "flex items-center space-x-2">
+                    <span className = "text-xs bg-gray-700 text-gray-200 px-2 py-1 rounded">
+                      Due: {problem.dueDate ? new Date(problem.dueDate).toLocaleDateString() : "TBA"}
+                    </span>
+                  </div>
+                </li>
+              ))
+             )}
             </ul>
           </div>
           
-          <button disabled className = "text-md mt-4 bg-gray-400 px-4 py-2 rounded disabled:opacity-50">
+          <button disabled={!canGetPasscode(assignedProblems)} className = "text-md mt-4 bg-gray-400 px-4 py-2 rounded disabled:opacity-50">
             Get Passcode
           </button>
         </div>

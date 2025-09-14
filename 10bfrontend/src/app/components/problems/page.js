@@ -10,6 +10,7 @@ export default function ProblemList()
     const topic = search.get("topic");
     const difficulty = search.get("difficulty");
     const [progress, setProgress] = useState(0);
+    // const [problems, setProblems] = useState([]);
     
     var color = "bg-emerald-400";
 
@@ -33,6 +34,19 @@ export default function ProblemList()
         };
         fetchProgress();  
     }, [topic,difficulty]);
+
+    // useEffect(() => {
+    //     const fetchProblems = async () => {
+    //         const res = await fetch(`http://localhost:8080/api/chat/problems?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}`);
+    //         if (res.ok) 
+    //         {
+    //             const data = await res.json();
+    //             console.log(data);
+    //             setProblems(data); 
+    //         }
+    //     };
+    //     fetchProblems();
+    // }, [topic, difficulty]);
     
 
 
@@ -55,10 +69,10 @@ export default function ProblemList()
             
                 </nav>
             <div className = "grid grid-cols-3 gap-4 mb-auto">
-                {problems.map((problemName,index) => (
+                {problems.map((problem,index) => (
                     <Link key = {index} className = {`block ${color} rounded-lg shadow-sm p-6 hover:scale-110 transition-all`}
-                    href = {`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`}>
-                        <h1 className="mb-2 text-xl font-bold tracking-tight">{problemName}</h1>
+                    href = {`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problem)}`}>
+                        <h1 className="mb-2 text-xl font-bold tracking-tight">{problem}</h1>
                         <div className="font-normal text-sm">This is a description of a problem</div>
                     </Link>
                 ))}

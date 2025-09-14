@@ -656,4 +656,54 @@ public class FirestoreService
         return data;
     }
 
+    public List<Map<String, Object>> getAssignedProblems(String netId) throws Exception
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = docRef.get().get();
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (doc.exists()) 
+        {
+            List<Map<String, Object>> assigned = (List<Map<String, Object>>) doc.get("Assigned Problems");
+            
+            if(assigned != null)
+            {
+                for(Map<String,Object> item: assigned)
+                {
+                    Map<String,Object> docPath = new HashMap<>(item);
+                    Object ref = docPath.get("problemRef");
+                    docPath.put("problemRef", ((DocumentReference)ref).getPath());
+                    result.add(docPath);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<Map<String, Object>> getProblems(String topic, String difficulty) throws Exception
+    {
+        DocumentReference topicRef = firestore.collection("problems").document(topic);
+        DocumentSnapshot topicDoc = topicRef.get().get();
+        List<Map<String, Object>> result = new ArrayList<>();
+        if(topicDoc.exists())
+        {
+            Map<String,Object> diffMap = (Map<String,Object>)topicDoc.get(difficulty);
+            if(diffMap != null)
+            {
+                for(String prob: diffMap.keySet())
+                {
+                    Map<String,Object> details = (Map<String,Object>)diffMap.get(prob);
+                    if(details != null)
+                    {
+                        Map<String,Object> info = new HashMap<>();
+                        info.put("Name", details.get(prob));
+                        info.put("Description", details.get("Description"));
+                        result.add(info);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
 }
