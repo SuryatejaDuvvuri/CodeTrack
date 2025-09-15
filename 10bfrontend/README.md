@@ -1,38 +1,104 @@
-# CS-CodingLab
+# CodeTrack - An Interactive Coding Assignment Platform
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+> Author: [Suryateja Duvvuri](https://github.com/SuryatejaDuvvuri)
 
-## Getting Started
+## **Note**
 
-First, run the development server:
+- This project is still work in progress because I still have more components to work on but feel free to contact me for questions, or suggestions to improve this application. 
+
+---
+
+#### Motivation
+> Huge thanks to websites like leetcode, codingbat and codesignal as they gave them inspiration for me to make my version of a coding website. Thanks to my professor for motivating me to do this project as he was opening up to his thoughts about AI in education. This application is like any other Traditional coding practice platforms but this is driven by AI to assist students into solving problems rather than relying on AI. Additionally, this application also restricts students from accessing other websites or LLM to prevent them from skipping the foundations and encourage them to struggle through coding problems. Besides, CodeTrack provides dynamic progress results, assignment list to students, and instructor tools to assign or create problems relevant to their course content. 
+
+---
+
+#### General Description
+> CodeTrack is a full-stack web application that enables students to practice coding problems, track their progress, and manage assignments. Instructors can assign problems, monitor student achievement, and generate passcodes for verified completion. The platform features interactive dashboards, real-time progress bars, and a to-do list to motivate students. 
+
+---
+
+### Demo
+TBD
+
+---
+
+#### Languages/Tools/Technologies Used
+
+- **Frontend:** React.js, Next.js, Tailwind CSS
+- **Backend:** Spring Boot, Java, REST API, Microsoft Azure(For AI and virtual machines)
+- **Database:** Google Firestore (Firebase)
+
+---
+
+#### Key Features
+
+# Dynamic Progress Tracking
+> Students can view topic-wise progress bars and rankings based on their performance and attempts.
+
+# Assignment Management
+> Interactive to-do list assignment board with checkboxes, due dates, and completion status.
+
+# Instructor Tools
+> Instructors can assign problems, create new coding problems, generate passcodes, and manage student rosters.
+
+# RESTful API Integration
+> Robust backend endpoints for problem retrieval, assignment validation, and classroom management.
+
+---
+
+<!-- ## Screenshots -->
+
+<!-- Add screenshots here -->
+<!-- Example: -->
+<!-- <img width="1500" alt="dashboard" src="https://github.com/user-attachments/assets/demo-dashboard.png" /> -->
+
+---
+
+<!-- ## **Installation and Usage**
+
+### **Prerequisites**
+
+- **Java 17 or higher** (for backend)
+- **Node.js/NPM** (for frontend)
+- **Firebase project with Firestore enabled** -->
+
+<!-- ### **1. Clone the Repository**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/SuryatejaDuvvuri/CodeTrack.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### **2. Backend Setup (Spring Boot)**
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+cd 10bbackend
+./mvnw clean install
+./mvnw spring-boot:run
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### **3. Frontend Setup**
 
-## Learn More
+```bash
+cd 10bfrontend
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+### **4. Firebase Setup**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Add your Firebase service account key to `10bbackend/src/main/resources/serviceAccountKey.json`
+- Configure Firestore rules as needed
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+--- -->
 
-## Deploy on Vercel
+## **Usage**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Students: Log in, view assignments, track progress, and complete coding problems.
+- Instructors: Assign problems, create new challenges, generate passcodes, and manage classroom roster.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+
+**Contact:**  
+For questions or support, please reach out to the project maintainer or open an issue.
