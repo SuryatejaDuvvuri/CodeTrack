@@ -706,4 +706,52 @@ public class FirestoreService
         return result;
     }
 
+    public List<Map<String, Object>> getStudents() throws Exception
+    {
+        List<Map<String, Object>> students = new ArrayList<>();
+        for(DocumentSnapshot doc : firestore.collection("section").get().get().getDocuments())
+        {
+            Map<String, Object> data = doc.getData();
+            
+            if(data != null)
+            {
+                Map<String,Object> student = new HashMap<>();
+                student.put("netId", doc.getId());
+                student.put("name", data.get("Name"));
+                student.put("progress", getCompletions(doc.getId()));
+                students.add(student);
+            }
+        }
+
+        return students;
+    }
+
+    public int getCompletions(String netId) throws Exception
+    {
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = docRef.get().get();
+
+        if(doc.exists())
+        {
+            List<Map<String,Object>> assigned = (List<Map<String,Object>>) doc.get("Assigned Problems");
+            if(assigned != null && !assigned.isEmpty())
+            {
+                int completed = 0;
+                for(Map<String,Object> p : assigned)
+                {
+                    Object val = p.get("completed");
+                    if(val != null && val.equals(Boolean.TRUE))
+                    {
+                        completed++;
+                    }
+                }
+
+                return (int)Math.round((completed * 100.0) / assigned.size());
+            }
+        }
+
+        return 0;
+    }
+       
+
 }
