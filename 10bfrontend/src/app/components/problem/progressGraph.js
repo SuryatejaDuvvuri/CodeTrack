@@ -65,7 +65,7 @@ export default function progressGraph({attemptData = [],totalAttempts,avgTime,ov
           <div className = "relative h-64">
             <div className = "absolute left-0 right-0 flex items-end justify-start w-full h-full pb-2 gap-6">
                 {attemptData.map((attempt,index) => (
-                    <div key = {index} className = "flex flex-col items-center mx-px cursor-pointer group" onCLick = {() => barClick && barClick(index)} title={`Attempt ${index + 1}`}>
+                    <div key = {index} className = "flex flex-col items-center mx-px cursor-pointer group" onClick = {() => barClick && barClick(index)} title={`Attempt ${index + 1}`}>
                         <AnimatedBar success={attempt.success} successRate={attempt.successRate} />
                          <div className="text-xs text-gray-300 mt-1 group-hover:text-cyan-400 transition-colors">
                             {format(attempt.timestamp, 'hh:mm:ss a')}
