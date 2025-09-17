@@ -434,7 +434,7 @@ public class FirestoreService
         docRef.update("Problems." + topic + "." + difficulty + "." + problem + ".Latest Code", code);
     }
 
-    public void logAttempt(String topic, String difficulty, String problem, int passed, int total, long timeSpent,List<Map<String, Object>>  testResults, String netId)
+    public void logAttempt(String topic, String difficulty, String problem, int passed, int total, long timeSpent,List<Map<String, Object>> testResults, String code, String netId)
     {
         DocumentReference docRef = firestore.collection("section").document(netId);
         // String difficulty = problem.startsWith("Easy") ? "Easy" :
@@ -448,6 +448,7 @@ public class FirestoreService
         run.put("successRate", total > 0 ? (passed * 100.0 / total) : 0);
         run.put("timeSpent", timeSpent / 1000);
         run.put("testResults", testResults);
+        run.put("Code", code);
         docRef.update("Problems." + topic + "." + difficulty + "." + problem  + ".Runs", FieldValue.arrayUnion(run));
         docRef.update("Problems." + topic + "." + difficulty + "." + problem  + ".Latest Score", latestScore);
 
@@ -618,29 +619,29 @@ public class FirestoreService
 
     public void createProblems(String t) 
     {
-        DocumentReference docRef = firestore
-            .collection("section")
-            .document("sduvv003");
+            // DocumentReference docRef = firestore
+            //     .collection("section")
+            //     .document("sduvv003");
 
-        String[] difficulties = {"Easy", "Medium", "Hard"};
-        Map<String, Object> problemsMap = new HashMap<>();
-        Map<String, Object> topicMap = new HashMap<>();
-        String topic = "Linked List 2";
+            // String[] difficulties = {"Easy", "Medium", "Hard"};
+            // Map<String, Object> problemsMap = new HashMap<>();
+            // Map<String, Object> topicMap = new HashMap<>();
+            // String topic = "Linked List 2";
 
-        for (String difficulty : difficulties) {
-            Map<String, Object> difficultyMap = new HashMap<>();
-            for (int i = 1; i <= 15; i++) 
-            {
-                String problem = difficulty + " " + i;
-                difficultyMap.put(problem, createProblemData());
-            }
-            topicMap.put(difficulty, difficultyMap);
-        }
+            // for (String difficulty : difficulties) {
+            //     Map<String, Object> difficultyMap = new HashMap<>();
+            //     for (int i = 1; i <= 15; i++) 
+            //     {
+            //         String problem = difficulty + " " + i;
+            //         difficultyMap.put(problem, createProblemData());
+            //     }
+            //     topicMap.put(difficulty, difficultyMap);
+            // }
 
-        problemsMap.put(topic, topicMap);
-        Map<String, Object> update = new HashMap<>();
-        update.put("Problems", problemsMap);
-        docRef.set(update, SetOptions.merge());
+            // problemsMap.put(topic, topicMap);
+            // Map<String, Object> update = new HashMap<>();
+            // update.put("Problems", problemsMap);
+            // docRef.set(update, SetOptions.merge());
     }
 
     public Map<String, Object> createProblemData() 
@@ -752,6 +753,62 @@ public class FirestoreService
 
         return 0;
     }
-       
+    
+    public Map<String,Object> getStudentDetails(String netId) throws Exception
+    {
+        Map<String, Object> result = new HashMap<>();
+        DocumentReference docRef = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = docRef.get().get();
+
+        if(doc.exists())
+        {
+            result.put("name",doc.getString("Name"));
+            result.put("netId",netId);
+
+            List<Map<String,Object>> assigned = (List<Map<String,Object>>)doc.get("Assigned Problems");
+            int completed = 0;
+            int total = 0;
+            if(assigned != null)
+            {
+                total = assigned.size();
+                for(Map<String,Object> p : assigned)
+                {
+                    if(Boolean.TRUE.equals(p.get("completed")))
+                    {
+                        completed++;
+                    }
+                }
+            }
+            int progress = 0;
+
+            if(total > 0)
+            {
+                progress = (int) Math.round((completed * 100.0)/total);
+            }
+
+            result.put("progress",progress);
+            result.put("completedProblems",completed);
+            result.put("totalProblems",total);
+            List<Map<String, Object>> rankings = getRankings(netId);
+            List<Map<String, Object>> topTopics = new ArrayList<>();
+            String[] textColors = {"text-green-300", "text-red-300", "text-blue-300", "text-yellow-300", "text-emerald-500"};
+            String[] barColors = {"bg-green-300", "bg-red-300", "bg-blue-300", "bg-yellow-300", "bg-emerald-500"};
+            
+            for(int i = 0; i < Math.min(5,rankings.size()); i++)
+            {
+                Map<String,Object> topic = rankings.get(i);
+                Map<String,Object> format = new HashMap<>();
+                format.put("name",topic.get("topic"));
+                format.put("percent",((Number)topic.get("strength")).intValue());
+                format.put("textColor", textColors[i%textColors.length]);
+                format.put("barColor", barColors[i%barColors.length]);
+                topTopics.add(format);
+            }
+            result.put("topTopics",topTopics);
+
+        }
+
+        return result;
+    }
 
 }

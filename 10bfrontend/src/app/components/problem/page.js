@@ -20,6 +20,7 @@ export default function Problem()
   const[aiAttempts,setAIAttempts] = useState(0);
   const [code, setCode] = useState(""); 
   const [problemDetails, setProblemDetails] = useState(null);
+  const [selectedAttempt, setSelectedAttempt] = useState(null);
   const MAX_ATTEMPTS = 4;
   const start = async () => {
     const res = await fetch (`http://localhost:8080/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
@@ -79,8 +80,8 @@ export default function Problem()
 
     if(res.ok && resTwo.ok)
     {
-      const data = await res.json(); // last AI Attempt time
-      const dataTwo = await resTwo.json(); // last attempt number
+      const data = await res.json();
+      const dataTwo = await resTwo.json(); 
       const lastAIAttempt = data;
       const now = Date.now();
       const hoursPassed = (now - lastAIAttempt) / (1000 * 60 * 60);
@@ -166,7 +167,7 @@ export default function Problem()
           "Content-Type":"application/json"
         },
         body: JSON.stringify({
-          topic,difficulty,problem:problemName,passed,total,timeSpent,testResults:result, netId:"sduvv003"
+          topic,difficulty,problem:problemName,passed,total,timeSpent,testResults:result, code:code,netId:"sduvv003"
         })
       });
 
@@ -470,7 +471,7 @@ export default function Problem()
          {showGraph && (
               <div className="bg-gray-800 rounded-xl border border-gray-700 p-11 mb-6">
                   <h3 className="text-xl font-semibold text-gray-200 mb-4">Progress Overview</h3>
-                  <ProgressGraph attemptData = {progressData} totalAttempts={totalAttempts} avgTime = {avgTime} overallSuccess={overallSuccess}/>
+                  <ProgressGraph attemptData = {progressData} totalAttempts={totalAttempts} avgTime = {avgTime} overallSuccess={overallSuccess} barClick={setSelectedAttempt}/>
               </div>
           )}
 

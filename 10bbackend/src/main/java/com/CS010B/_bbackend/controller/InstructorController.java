@@ -39,4 +39,16 @@ public class InstructorController
     {
         return fireStore.getStudents();
     }    
+
+    @GetMapping("/studentDetails")
+    public Map<String, Object> getStudentDetails(@RequestParam String netId) throws Exception 
+    {
+        return fireStore.getStudentDetails(netId);
+    }
+
+    @GetMapping("/assigned")
+    public List<Map<String, Object>> getAssignedProblems(@RequestParam String netId) throws Exception 
+    {
+        return fireStore.getAssignedProblems(netId);
+    }
 }

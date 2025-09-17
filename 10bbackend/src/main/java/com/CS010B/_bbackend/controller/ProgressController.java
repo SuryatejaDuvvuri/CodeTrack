@@ -31,7 +31,7 @@ public class ProgressController
 
     @PostMapping
     public void setRuns(@RequestBody Progress entity) {
-        fireStore.logAttempt(entity.getTopic(), entity.getDifficulty(), entity.getProblem(), entity.getPassed(), entity.getTotal(), entity.getTimeSpent(), entity.getTestResults(), entity.getNetId());
+        fireStore.logAttempt(entity.getTopic(), entity.getDifficulty(), entity.getProblem(), entity.getPassed(), entity.getTotal(), entity.getTimeSpent(), entity.getTestResults(), entity.getCode(), entity.getNetId());
     }
 
     @GetMapping("/attempts")
@@ -90,6 +90,7 @@ class Progress
     private String topic;
     private String difficulty;
     private int passed;
+    private String code;
     private int total;
     private long timeSpent;
     private int aiAttempts;
@@ -131,6 +132,15 @@ class Progress
     public void setTotal(int total) 
     { 
         this.total = total; 
+    }
+
+    public String getCode() 
+    { 
+        return code; 
+    }
+    public void setCode(String code) 
+    { 
+        this.code = code;
     }
 
     public long getTimeSpent() 

@@ -39,27 +39,12 @@ function AnimatedBar({success, successRate})
   );
 }
 
-export default function progressGraph({attemptData = [],totalAttempts,avgTime,overrallSuccess})
+export default function progressGraph({attemptData = [],totalAttempts,avgTime,overrallSuccess, barClick})
 {
-  // const barRefs = useRef([]);
-
-  // useEffect(() => {
-  //   barRefs.current.forEach((e,index) => {
-  //     if(e) 
-  //     {
-  //       e.style.height = '0px'; 
-  //       setTimeout(() => {
-  //         const height = attemptData[index].success ? 160 : Math.max(attemptData[index].successRate * 1.6, 32);
-  //         e.style.height = `${height}px`;
-  //       }, 100);
-  //     }
-  //   });
-  // },[attemptData]);
   
   return (
     <div className = "rounded-lg p-4 relative">
         <div className = "absolute right-0 top-0 flex items-end space-x-2">
-            {/* <h3 className='text-lg'>Progress Graph</h3> */}
             <div className = "flex items-end space-x-2 ">
                 <div className = "flex items-center">
                     <div className = "w-3 h-3 bg-red-500 mr-1"></div>
@@ -80,9 +65,9 @@ export default function progressGraph({attemptData = [],totalAttempts,avgTime,ov
           <div className = "relative h-64">
             <div className = "absolute left-0 right-0 flex items-end justify-start w-full h-full pb-2 gap-6">
                 {attemptData.map((attempt,index) => (
-                    <div key = {index} className = "flex flex-col items-center mx-px">
+                    <div key = {index} className = "flex flex-col items-center mx-px cursor-pointer group" onCLick = {() => barClick && barClick(index)} title={`Attempt ${index + 1}`}>
                         <AnimatedBar success={attempt.success} successRate={attempt.successRate} />
-                         <div className="text-xs text-gray-300 mt-1">
+                         <div className="text-xs text-gray-300 mt-1 group-hover:text-cyan-400 transition-colors">
                             {format(attempt.timestamp, 'hh:mm:ss a')}
                         </div>
                     </div>
