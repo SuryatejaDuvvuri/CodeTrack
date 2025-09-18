@@ -448,7 +448,7 @@ public class FirestoreService
         run.put("successRate", total > 0 ? (passed * 100.0 / total) : 0);
         run.put("timeSpent", timeSpent / 1000);
         run.put("testResults", testResults);
-        run.put("Code", code);
+        run.put("code", code);
         docRef.update("Problems." + topic + "." + difficulty + "." + problem  + ".Runs", FieldValue.arrayUnion(run));
         docRef.update("Problems." + topic + "." + difficulty + "." + problem  + ".Latest Score", latestScore);
 

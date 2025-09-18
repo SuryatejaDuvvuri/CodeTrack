@@ -58,10 +58,11 @@ export default function Problem()
     if(res.ok)
     {
       const data = await res.text();
-      if(data.length >= 1)
+      if(data.length > 1)
       {
         setCode(data);
       }
+     
     }
   };
 
@@ -304,7 +305,9 @@ export default function Problem()
         timestamp:new Date(run.timestamp),
         success:run.successRate >= 80,
         duration: run.timeSpent,
-        successRate:run.successRate
+        successRate:run.successRate,
+        code: run.code,
+        testResults: run.testResults
       })))
       if (Array.isArray(data) && data.length > 0 && data[data.length - 1].testResults) 
       {
@@ -354,6 +357,10 @@ export default function Problem()
   {
     color = "bg-orange-600";
   }
+
+  const latestAttemptIndex = progressData.length > 0 ? progressData.length - 1 : null;
+  const currentAttemptIndex = selectedAttempt !== null ? selectedAttempt : latestAttemptIndex;
+  const currentAttempt = progressData[currentAttemptIndex] || {};
 
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
@@ -407,7 +414,7 @@ export default function Problem()
                 <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
               </div>
               <div className="bg-gray-800 rounded-xl border border-gray-700">
-                <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph} setStartTime={setStartTime}/>
+                <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph} setStartTime={setStartTime} readOnly={false}/>
               </div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -473,6 +480,64 @@ export default function Problem()
                   <h3 className="text-xl font-semibold text-gray-200 mb-4">Progress Overview</h3>
                   <ProgressGraph attemptData = {progressData} totalAttempts={totalAttempts} avgTime = {avgTime} overallSuccess={overallSuccess} barClick={setSelectedAttempt}/>
               </div>
+          )}
+
+          {showGraph && selectedAttempt !== null && currentAttempt && (
+            <div className = "bg-gray-900 rounded-xl p-6 mb-6 mt-4">
+                <h3 className = "text-lg font-semibold mb-4">
+                  Attempt {currentAttemptIndex + 1} Details
+                </h3>
+                <div className = "mb-4">
+                  <h4 className = "text-md font-bold text-gray-200 mb-2"> Code</h4>
+                  <CodeEditor code = {currentAttempt.code || code} readOnly = {true}/>
+                </div>
+                <div>
+                  <div className="overflow-x-auto">
+                    <h4 className = "text-md font-bold text-gray-200 mb-2"> Test Results </h4>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-600">
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Test Case</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Input</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Expected</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Your Output</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-600">
+                        {currentAttempt.testResults && currentAttempt.testResults.length > 0 ? (currentAttempt.testResults.map((test, index) => (
+                          <tr key={index} className="hover:bg-gray-700/50S">
+                            <td className="py-3 px-4">Case {index + 1}</td>
+                            <td>{test.input}</td>
+                            <td className="py-3 px-4 font-mono text-blue-400">{test.expectedOutput}</td>
+                            <td className="py-3 px-4 font-mono text-gray-300">{test.userOutput}</td>
+                            <td className="py-3 px-4">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                test.result === "PASS"
+                                  ? 'bg-green-900 text-green-300' 
+                                  : 'bg-red-900 text-red-300'
+                              }`}>
+                                {test.result === "PASS" ? '✓ Pass' : '✗ Fail'}
+                              </span>
+                            </td>
+                          </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={5} className="py-3 px-4 text-center text-gray-400">
+                              No test results for this attempt.
+                            </td>
+                          </tr>
+                        )
+                      }
+                      </tbody>
+                    </table>
+                </div>
+              </div>
+              <button className = "mt-4 px-4 py-2 rounded text-white bg-gray-600 cursor-pointer" onClick = {() => setSelectedAttempt(null)} style = {{dispaly: selectedAttempt !== null ? "block" : "none"}}>
+                Close
+              </button>
+            </div>
           )}
 
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">

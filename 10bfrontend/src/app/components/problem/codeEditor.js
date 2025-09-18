@@ -5,7 +5,7 @@ import { cpp } from '@codemirror/lang-cpp';
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import ProgressGraph from "./progressGraph.js";
 
-export default function CodeEditor({defaultCode, code,setCode,handleRun, saveCode, toggle, showGraph, setStartTime})
+export default function CodeEditor({defaultCode, code,setCode,handleRun, saveCode, toggle, showGraph, setStartTime, readOnly})
 {
     const editorRef = useRef(null);
 
@@ -68,12 +68,15 @@ export default function CodeEditor({defaultCode, code,setCode,handleRun, saveCod
                 onChange={(value) => setCode(value)}
                 />
             </div>
-            <div className = "space-x-2">
-                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {saveCode}>Save</button>
-                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {handleRun}>Run</button>
-                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {handleReset}>Reset</button>
-                <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {toggle}>{showGraph ? "Hide Graph" : "Show Graph"}</button>
-            </div>
+            {!readOnly && (
+                <div className = "space-x-2">
+                    <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {saveCode}>Save</button>
+                    <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {handleRun}>Run</button>
+                    <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {handleReset}>Reset</button>
+                    <button className = "px-3 py-1 bg-gray-300 text-black rounded transition-colors" onClick = {toggle}>{showGraph ? "Hide Graph" : "Show Graph"}</button>
+                </div>
+            )}
+           
         </div>
     )
 }
