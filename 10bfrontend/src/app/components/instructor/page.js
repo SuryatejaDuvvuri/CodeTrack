@@ -11,6 +11,7 @@ export default function Instructor() {
   const [studentDetails, setStudentDetails] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState(null);
+  const [dueDate, setDueDate] = useState("");
   const topics = [
     { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!", route: "easy"},
     { name: "Warm up 2", color: "bg-emerald-400", description: "More warm up problems to challenge yourself", route: "easy" },
@@ -31,6 +32,30 @@ export default function Instructor() {
     //   headers: {"Content-Type": "application/json"},
     //   body: JSON.stringify({topic:"Arrays and Strings", difficulty: "Easy"})
     // })
+  };
+
+  const problems = [];
+  for (let i = 1; i <= 15; i++) 
+  {
+      problems.push(`${selectedDifficulty} ${i}`);
+  }
+
+  const handleDifficultySelect = (difficulty) => {
+    const probs = problems.filter(p=>p.startsWith(difficulty));
+    const allSelected = probs.every(p=>selectedProblems.includes(p));
+
+    if(allSelected)
+    {
+      setSelectedProblems(selectedProblems.filter(p => !probs.includes(p)));
+    }
+    else
+    {
+      setSelectedProblems([...new Set([...selectedProblems,...probs])]);
+    }
+  };
+
+  const handleSelect = (problem) => {
+    setSelectedProblems(selectedProblems.includes(problem) ? selectedProblems.filter(p => p !== problem) : [...selectedProblems,problem]);
   };
 
   useEffect(() => {
@@ -58,21 +83,21 @@ export default function Instructor() {
       fetchStudent();
     }
 
-  },[selectedStudent])
+  },[selectedStudent]);
+
+  useEffect(() => {
+    setSelectedProblems([]);
+  }, [selectedTopic, selectedDifficulty]);
 
   
 
-  const handleSelect = (problemName) => {
+  const handleSelectProblem = (problemName) => {
     setSelectedProblems((p) =>
       p.includes(problemName) ? p.filter((pr) => pr !== problemName) : [...p, problemName]
     );
   };
 
-  const problems = [];
-  for (let i = 1; i <= 15; i++) 
-  {
-      problems.push(`${selectedDifficulty} ${i}`);
-  }
+  
 
   return (
     <div className="container mx-auto min h-screen font-sans m-4 flex flex-col">
@@ -105,6 +130,10 @@ export default function Instructor() {
               </div>
             ))}
           </div>
+      <button className="w-full  bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer">+ Add Student</button>
+      <button className="w-full bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer" onClick={createProblem}>
+        + Create Problem
+      </button>
         </div>
         {selectedStudent && studentDetails && (
           <>
@@ -205,8 +234,16 @@ export default function Instructor() {
                     </div> */}
                   </div>
                 </div>
+
+                <label className="block text-gray-200 mb-1">Due Date:</label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={e => setDueDate(e.target.value)}
+                  className="rounded px-2 py-1 bg-gray-700 text-white"
+                />
                 <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer">Assign Problems</button>
-                <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer">Generate Passcode</button>
+                {/* <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer">Generate Passcode</button> */}
                 <button className="bg-red-400 text-white px-4 py-1 rounded cursor-pointer">Remove</button>
               </div>
             </div>
@@ -277,9 +314,10 @@ export default function Instructor() {
                   {["Easy","Medium","Hard"].map((diff) => (
                     <div
                       key={diff}
-                      className={`flex justify-between items-center bg-gray-800 p-2 rounded mb-2 cursor-pointer ${selectedDifficulty === diff ? "bg-gray-600" : ""}`}
-                      onClick={() => setSelectedDifficulty(diff)}>
-                      <span>{diff}</span>
+                      className={`flex justify-between items-center bg-gray-800 p-2 rounded mb-2 cursor-pointer ${selectedDifficulty === diff ? "bg-gray-600" : ""}`} onClick={() => setSelectedDifficulty(diff)}>
+                      <span className = "ml-2">{diff}</span>
+                      <input type = "checkbox" checked={Array.from({length: 15}, (_, i) => `${diff} ${i+1}`).every(p => selectedProblems.includes(p))}
+                      onChange={() => { setSelectedDifficulty(diff); handleDifficultySelect(diff);}} />
                     </div>
                   ))}
                   {/* <div className="flex justify-between items-center bg-gray-800 p-2 rounded">
@@ -300,6 +338,11 @@ export default function Instructor() {
                   <div className="space-y-2">
                     {problems.map((problem,index) => (
                       <div key = {index} className = "flex justify-between items-center bg-gray-800 p-2 rounded">
+                        <input
+                          type="checkbox"
+                          checked={selectedProblems.includes(problem)}
+                          onChange={() => handleSelectProblem(problem)}
+                        />
                         <span>{problem}</span>
                         <button className="text-xs bg-gray-600 px-2 py-1 cursor-pointer rounded" onClick = {() =>{
                           router.push(
@@ -379,17 +422,14 @@ export default function Instructor() {
           </>
         )}
       </div>
-      <button className="w-1/4 bg-cyan-400 text-white py-2 rounded mt-4">+ Add Student</button>
-      <button className="w-1/4 bg-cyan-400 text-white py-2 rounded mt-4" onClick={createProblem}>
-        + Create Problem
-      </button>
+  
 
       <footer className="w-full mt-8 mb-4 px-4 rounded-lg shadow-sm">
         <div className="flex justify-center space-x-4">
-          <a href="#" className="text-gray-300">
+          <a href="#" className="text-gray-300 cursor-pointer">
             Home
           </a>
-          <a href="#" className="text-gray-300">
+          <a href="#" className="text-gray-300 cursor-pointer">
             Contact
           </a>
         </div>
