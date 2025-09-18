@@ -51,4 +51,48 @@ public class InstructorController
     {
         return fireStore.getAssignedProblems(netId);
     }
+
+    @PostMapping("/assignProblems")
+    public void assignProblems(@RequestBody AssignedProblems problemsAssigned)
+    {
+
+    }
+
+    @PostMapping("/addStudent")
+    public void addStudent(@RequestBody Map<String,String> req)
+    {
+        
+    }
+}
+
+class AssignedProblems
+{
+    private String netId;
+    private String problems;
+    private String dueDate;
+
+    public String getNetId() 
+    {
+        return netId;
+    }
+    public void setNetId(String netId) 
+    {
+        this.netId = netId;
+    }
+    public String getProblems() 
+    {
+        return problems;
+    }
+    public void setProblems(String problems) 
+    {
+        this.problems = problems;
+    }
+    public String getDueDate() 
+    {
+        return dueDate;
+    }
+    public void setDueDate(String dueDate) 
+    {
+        this.dueDate = dueDate;
+    }
 }
