@@ -48,7 +48,7 @@ export default function Problem()
 
   const loadCode = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`, {
+    const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=jdoe008`, {
       method: "GET",
       headers: {
         "Content-Type":"application/json"
@@ -71,13 +71,13 @@ export default function Problem()
       const chatRes = await fetch ("http://localhost:8080/api/grade/update", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({topic,difficulty,problem:problemName,code:code,netId: "sduvv003"}),
+        body: JSON.stringify({topic,difficulty,problem:problemName,code:code,netId: "jdoe008"}),
     });
   }
   const fetchAttempts = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
-    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
+    const res = await fetch(`http://localhost:8080/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=jdoe008`);
+    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=jdoe008`);
 
     if(res.ok && resTwo.ok)
     {
@@ -98,7 +98,7 @@ export default function Problem()
             difficulty,
             problem:problemName,
             aiAttempts: 0,
-            netId: "sduvv003"
+            netId: "jdoe008"
           })
         });
       }
@@ -112,7 +112,7 @@ export default function Problem()
 
   const fetchScore = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
+    const res = await fetch(`http://localhost:8080/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=jdoe008`);
     if (res.ok) 
     {
       const data = await res.json();
@@ -139,7 +139,7 @@ export default function Problem()
       headers: {
         "Content-Type":"application/json"
       },
-      body: JSON.stringify({topic,difficulty,problem:problemName,code: code, netId: "sduvv003"}),
+      body: JSON.stringify({topic,difficulty,problem:problemName,code: code, netId: "jdoe008"}),
     });
     const result = await res.json();
     console.log(result);
@@ -168,7 +168,7 @@ export default function Problem()
           "Content-Type":"application/json"
         },
         body: JSON.stringify({
-          topic,difficulty,problem:problemName,passed,total,timeSpent,testResults:result, code:code,netId:"sduvv003"
+          topic,difficulty,problem:problemName,passed,total,timeSpent,testResults:result, code:code,netId:"jdoe008"
         })
       });
 
@@ -188,7 +188,7 @@ export default function Problem()
               difficulty,
               problem:problemName,
               prompt: "Can you give me feedback on my code? This is a system prompt",
-              netId: "sduvv003"
+              netId: "jdoe008"
           }),
         });
 
@@ -209,7 +209,7 @@ export default function Problem()
         await fetch("http://localhost:8080/api/progress/update", {
           method: "POST",
           headers: {"Content-Type" : "application/json"},
-          body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId:"sduvv003"})
+          body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId:"jdoe008"})
         });
         setAIAttempts(aiAttempts + 1);
     }
@@ -229,7 +229,7 @@ export default function Problem()
                 difficulty,
                 problem:problemName,
                 prompt: "Can you give me feedback on my code? This is a system prompt.",
-                netId: "sduvv003"
+                netId: "jdoe008"
             }),
           });
 
@@ -250,7 +250,7 @@ export default function Problem()
           await fetch("http://localhost:8080/api/progress/update", {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
-            body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId: "sduvv003"})
+            body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId: "jdoe008"})
           });
           setAIAttempts(aiAttempts + 1);
        }
@@ -297,7 +297,7 @@ export default function Problem()
   },[messages,isLoading]);
 
   const fetchProgress = async () => {
-    const progressRes = await fetch(`http://localhost:8080/api/progress?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=sduvv003`);
+    const progressRes = await fetch(`http://localhost:8080/api/progress?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=jdoe008`);
     if(progressRes.ok)
     {
       const data = await progressRes.json();

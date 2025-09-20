@@ -69,6 +69,12 @@ public class InstructorController
     {
         fireStore.removeStudent(req.get("netId"));
     }
+
+    @PostMapping("/create")
+    public void createProblem(@RequestBody Map<String,Object> req) throws Exception
+    {
+        fireStore.createProblems(req);
+    }
 }
 
 class AssignedProblems

@@ -22,7 +22,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                         topic:topic,
                         difficulty:difficulty,
                         problem:problemName,
-                        netId: "sduvv003"
+                        netId: "jdoe008"
                     })
                 });
 
@@ -77,7 +77,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
     useEffect(() => {
         async function fetchAttempts() 
         {
-            const res = await fetch(`http://localhost:8080/api/progress/attempts?topic=${topic}&difficulty=${difficulty}&problem=${problemName}&netId=sduvv003`);
+            const res = await fetch(`http://localhost:8080/api/progress/attempts?topic=${topic}&difficulty=${difficulty}&problem=${problemName}&netId=jdoe008`);
             if(res.ok)
             {
                 const data = await res.json();
@@ -95,7 +95,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                         difficulty:difficulty,
                         problem:problemName,
                         aiAttempts: 0,
-                        netId: "sduvv003",
+                        netId: "jdoe008",
                     })
                     });
                 }
@@ -132,7 +132,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                 difficulty,
                 problem:problemName,
                 aiAttempts: aiAttempts + 1,
-                netId: "sduvv003"
+                netId: "jdoe008"
             })
         });
         setAIAttempts(aiAttempts + 1);
@@ -157,7 +157,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                     difficulty,
                     problem:problemName,
                     prompt:input,
-                    netId:"sduvv003"
+                    netId:"jdoe008"
                 }),
             });
 

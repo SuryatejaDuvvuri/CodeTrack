@@ -75,12 +75,6 @@ public class ProgressController
         List<Map<String, Object>> ranking = fireStore.getRankings(netId);
         return ranking;
     }
-    
-    
-    
-    
-    
-    
 }
 
 class Progress

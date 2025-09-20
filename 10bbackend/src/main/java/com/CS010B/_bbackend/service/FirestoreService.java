@@ -617,8 +617,36 @@ public class FirestoreService
         return 0;
     }
 
-    public void createProblems(String t) 
+    public void createProblems(Map<String,Object> req) throws Exception 
     {
+        String topic = (String)req.get("topic");
+        String difficulty = (String) req.get("difficulty");
+        String name = (String) req.get("name");
+        String description = (String) req.get("description");
+        String starterCode = (String) req.get("starterCode");
+
+        Map<String,Object> data = new HashMap<>();
+        data.put("Description", description);
+        data.put("Starter Code", starterCode);
+        
+        DocumentReference docRef = firestore.collection("problems").document(topic);
+        Map<String,Object> diffMap = new HashMap<>();
+        diffMap.put(name,data);
+        Map<String,Object> update = new HashMap<>();
+        update.put(difficulty, diffMap);
+        docRef.set(update,SetOptions.merge()).get();
+
+        // Map<String,Object> studentData = createProblemData();
+
+        // for(DocumentSnapshot student : firestore.collection("section").get().get().getDocuments())
+        // {
+        //     String netId = student.getId();
+        //     DocumentReference studentRef = firestore.collection("section").document(netId);
+        //     String path = String.format("Problems.%s.%s.%s",topic,difficulty,difficulty + 1);
+        // }
+        
+        
+
             // DocumentReference docRef = firestore
             //     .collection("section")
             //     .document("sduvv003");

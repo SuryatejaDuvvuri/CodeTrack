@@ -3,6 +3,17 @@ import Image from "next/image";
 import Link from "next/link"
 import {useEffect, useState} from 'react';
 import {useRouter} from "next/navigation";
+
+
+function filterDifficulties(topic)
+{
+  if(topic === "Warm up 1" || topic === "Warm up 2")
+  {
+    return ["Easy"];
+  }
+    return ["Easy","Medium","Hard"];
+}
+
 export default function Instructor() {
   const router = useRouter();
   const [roster, setRoster] = useState([]);
@@ -16,6 +27,13 @@ export default function Instructor() {
   const [newName, setNewName] = useState("");
   const [newNetId, setNewNetId] = useState("");
   const [adding, setAdding] = useState(false);
+  const [createModal, setCreateModal] = useState(false);
+  const [problemName, setProblemName] = useState("");
+  const [description, setDescription] = useState("");
+  const [examples, setExamples] = useState("");
+  const [starterCode, setStarterCode] = useState("");
+  const [difficulty, setDifficulty] = useState(1);
+  const [creating, setCreating] = useState(false);
   const topics = [
     { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!", route: "easy"},
     { name: "Warm up 2", color: "bg-emerald-400", description: "More warm up problems to challenge yourself", route: "easy" },
@@ -30,12 +48,27 @@ export default function Instructor() {
     { name: "Linked List 1", color: "bg-orange-600", description: "Basic Linked List for getting started", route: "choices"},
     { name: "Linked List 2", color: "bg-orange-600", description: "More Linked List problems to challenge yourself!", route: "choices" },
   ];
-  const createProblem = async () => {
-    // await fetch("http://localhost:8080/api/chat/create", {
-    //   method: "POST",
-    //   headers: {"Content-Type": "application/json"},
-    //   body: JSON.stringify({topic:"Arrays and Strings", difficulty: "Easy"})
-    // })
+  const createProblem = async (e) => {
+    e.preventDefault();
+    setCreating(true);
+    await fetch("http://localhost:8080/api/instructor/create", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        topic: selectedTopic,
+        difficulty: selectedDifficulty,
+        name: problemName,
+        description,
+        starterCode,
+      }),
+    });
+    setCreating(false);
+    setCreateModal(false);
+    setProblemName("");
+    setDescription("");
+    setStarterCode("");
+    setSelectedTopic("");
+    setSelectedDifficulty("");
   };
 
   const handleAddStudent = async (e) => {
@@ -50,6 +83,8 @@ export default function Instructor() {
     setModal(false);
     setNewName("")
     setNewNetId("");
+    setSelectedStudent(null);
+    setStudentDetails(null);
 
     const res = await fetch("http://localhost:8080/api/instructor/roster")
     if(res.ok)
@@ -57,7 +92,7 @@ export default function Instructor() {
       const data = await res.json();
       setRoster(data);
     }
-  }
+  };
 
   const problems = [];  
   for (let i = 1; i <= 15; i++) 
@@ -162,6 +197,13 @@ export default function Instructor() {
     alert(`Problems assigned to ${selectedStudent.name}!`);
   }
 
+  useEffect(() => {
+    if(!modal)
+    {
+      fetch("http://localhost:8080/api/instructor/roster").then(res => res.ok ? res.json() : []).then(data => setRoster(data));
+    }
+  },[modal]);
+
   
 
   return (
@@ -196,7 +238,7 @@ export default function Instructor() {
             ))}
           </div>
       <button className="w-full  bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer" onClick={() => setModal(true)}>+ Add Student</button>
-      <button className="w-full bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer" onClick={createProblem}>
+      <button className="w-full bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer" onClick={() => setCreateModal(true)}>
         + Create Problem
       </button>
 
@@ -213,6 +255,58 @@ export default function Instructor() {
 
           </form>
         
+        </div>
+      )}
+
+      {createModal && (
+        <div className = "fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"> 
+            <form className ="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col gap-4 min-w-[350px]" onSubmit={createProblem}>
+              <h2 className = "text-xl font-bold text-white mb-2">Create Problem</h2>
+              <div>
+                <label className = "block text-gray-200 mb-1">Topic: </label>
+                <div className = "flex flex-wrap gap-2">
+                  {topics.map(topic => (
+                    <button type = "button" key={topic.name} className = {`px-3 py-1 rounded ${selectedTopic === topic.name ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-200"}`} onClick={() => setSelectedTopic(topic.name)}>
+                      {topic.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className = "block text-gray-200 mb-1">Difficulty:</label>
+                <div className = "flex gap-2">
+                  {filterDifficulties(selectedTopic).map(diff => (
+                    <button type = "button" key={diff} className ={`px-3 py-1 rounded ${selectedDifficulty === diff ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-200"}`} onClick={() => setSelectedDifficulty(diff)}>
+                      {diff}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <input className = "rounded px-2 py-1 bg-gray-700 text-white" placeholder="Problem Name" value={problemName} onChange={e => setProblemName(e.target.value)} required/>
+              <textarea
+                className="rounded px-2 py-1 bg-gray-700 text-white"
+                placeholder="Description"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                required
+              />
+              <textarea
+                className="rounded px-2 py-1 bg-gray-700 text-white"
+                placeholder="Starter Code"
+                value={starterCode}
+                onChange={e => setStarterCode(e.target.value)}
+                required
+              />
+              <div className="flex gap-2 mt-2">
+                <button type="submit" className="bg-blue-500 text-white px-4 py-1 rounded" disabled={creating}>
+                  {creating ? "Creating..." : "Create"}
+                </button>
+                <button type="button" className="bg-gray-600 text-white px-4 py-1 rounded" onClick={() => setCreateModal(false)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
         </div>
       )}
         </div>

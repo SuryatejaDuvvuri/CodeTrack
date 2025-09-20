@@ -25,7 +25,7 @@ export default function ProblemList()
 
     useEffect(() => {
       const fetchProgress = async () => {
-            const res = await fetch(`http://localhost:8080/api/progress/getTotal?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&netId=sduvv003`);
+            const res = await fetch(`http://localhost:8080/api/progress/getTotal?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&netId=jdoe008`);
             if(res.ok)
             {
                 const data = await res.json();

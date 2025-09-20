@@ -44,8 +44,6 @@ public class CompileController
         fireStore.updateCode(req.getTopic(), req.getDifficulty(), req.getProblem(), req.getCode(),req.getNetId());
     }
     
-    
-
     @GetMapping("/code")
     public String loadCode(@RequestParam String topic, @RequestParam String difficulty, @RequestParam String problem, @RequestParam String netId) throws Exception
     {
