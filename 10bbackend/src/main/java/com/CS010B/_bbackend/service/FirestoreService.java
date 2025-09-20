@@ -671,8 +671,8 @@ public class FirestoreService
                 for(Map<String,Object> item: assigned)
                 {
                     Map<String,Object> docPath = new HashMap<>(item);
-                    Object ref = docPath.get("problemRef");
-                    docPath.put("problemRef", ((DocumentReference)ref).getPath());
+                    // Object ref = docPath.get("problemRef");
+                    // docPath.put("problemRef", ((DocumentReference)ref).getPath());
                     result.add(docPath);
                 }
             }
@@ -829,6 +829,14 @@ public class FirestoreService
     public void removeStudent(String netId) throws Exception
     {
         firestore.collection("section").document(netId).delete().get();
+    }
+
+    public void assignProblems(String netId, List<Map<String, Object>> problems) throws Exception
+    {
+        DocumentReference ref = firestore.collection("section").document(netId);
+        Map<String,Object> updates = new HashMap<>();
+        updates.put("Assigned Problems", problems);
+        ref.update(updates).get();
     }
 
 }

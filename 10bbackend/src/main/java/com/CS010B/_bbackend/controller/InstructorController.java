@@ -53,9 +53,9 @@ public class InstructorController
     }
 
     @PostMapping("/assignProblems")
-    public void assignProblems(@RequestBody AssignedProblems problemsAssigned)
+    public void assignProblems(@RequestBody AssignedProblems req) throws Exception
     {
-
+        fireStore.assignProblems(req.getNetId(), req.getProblems());
     }
 
     @PostMapping("/addStudent")
@@ -74,7 +74,7 @@ public class InstructorController
 class AssignedProblems
 {
     private String netId;
-    private String problems;
+    private List<Map<String, Object>>  problems;
     private String dueDate;
 
     public String getNetId() 
@@ -85,11 +85,11 @@ class AssignedProblems
     {
         this.netId = netId;
     }
-    public String getProblems() 
+    public List<Map<String, Object>>  getProblems() 
     {
         return problems;
     }
-    public void setProblems(String problems) 
+    public void setProblems(List<Map<String, Object>> problems) 
     {
         this.problems = problems;
     }

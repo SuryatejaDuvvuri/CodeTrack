@@ -47,7 +47,7 @@ export default function Home()
 
   useEffect(() => {
     const fetchAssigned= async () => {
-      const res = await fetch('http://localhost:8080/api/chat/assigned?netId=sduvv003');
+      const res = await fetch('http://localhost:8080/api/chat/assigned?netId=akami006');
       if(res.ok)
       {
         const data = await res.json();

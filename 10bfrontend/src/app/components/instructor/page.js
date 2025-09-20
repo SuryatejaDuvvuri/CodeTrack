@@ -114,16 +114,6 @@ export default function Instructor() {
     setSelectedProblems([]);
   }, [selectedTopic, selectedDifficulty]);
 
-  // await fetch("/api/instructor/assignProblems", {
-  //   method: "POST",
-  //   headers: {"Content-Type": "application/json"},
-  //   body: JSON.stringify({
-  //     netId: selectedStudent.netId,
-  //     problems: selectedProblems,
-  //     dueDate
-  //   })
-  // })
-
   const handleSelectProblem = (problemName) => {
     setSelectedProblems((p) =>
       p.includes(problemName) ? p.filter((pr) => pr !== problemName) : [...p, problemName]
@@ -147,6 +137,29 @@ export default function Instructor() {
       const data = await res.json();
       setRoster(data);
     }
+  }
+
+  const assignedProblems = selectedProblems.map(p => ({
+    problem: p,
+    completed: false,
+    dueDate:dueDate
+  }));
+
+  const handleAssignProblems = async () => {
+    if (!selectedStudent || selectedProblems.length === 0 || !dueDate)
+    {
+      alert("Please select a student, at least one problem, and a due date.");
+      return
+    }
+     await fetch("http://localhost:8080/api/instructor/assignProblems", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          netId: selectedStudent.netId,
+          problems: assignedProblems,
+        }),
+      });
+    alert(`Problems assigned to ${selectedStudent.name}!`);
   }
 
   
@@ -310,7 +323,7 @@ export default function Instructor() {
                   onChange={e => setDueDate(e.target.value)}
                   className="rounded px-2 py-1 bg-gray-700 text-white"
                 />
-                <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer">Assign Problems</button>
+                <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer" onClick={handleAssignProblems}>Assign Problems</button>
                 {/* <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer">Generate Passcode</button> */}
                 <button className="bg-red-400 text-white px-4 py-1 rounded cursor-pointer" onClick={handleRemoveStudent}>Remove</button>
               </div>
