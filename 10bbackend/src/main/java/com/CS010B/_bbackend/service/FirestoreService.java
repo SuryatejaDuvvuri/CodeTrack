@@ -811,4 +811,24 @@ public class FirestoreService
         return result;
     }
 
+    public void addStudent(String tempNetId, String userNetId, String newName) throws Exception
+    {
+        DocumentReference tempRef = firestore.collection("section").document(tempNetId);
+        DocumentSnapshot tempSnap = tempRef.get().get();
+        if (!tempSnap.exists())
+        {
+            throw new Exception("Temp student not found");
+        }
+
+        Map<String,Object> data = new HashMap<>(tempSnap.getData());
+        data.put("Name", newName);
+        data.put("Assigned Problems", new ArrayList<>());
+        firestore.collection("section").document(userNetId).set(data);
+    }
+
+    public void removeStudent(String netId) throws Exception
+    {
+        firestore.collection("section").document(netId).delete().get();
+    }
+
 }

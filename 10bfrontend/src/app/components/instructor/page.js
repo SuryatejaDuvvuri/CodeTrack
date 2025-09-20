@@ -12,6 +12,10 @@ export default function Instructor() {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState(null);
   const [dueDate, setDueDate] = useState("");
+  const [modal,setModal] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newNetId, setNewNetId] = useState("");
+  const [adding, setAdding] = useState(false);
   const topics = [
     { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!", route: "easy"},
     { name: "Warm up 2", color: "bg-emerald-400", description: "More warm up problems to challenge yourself", route: "easy" },
@@ -34,7 +38,28 @@ export default function Instructor() {
     // })
   };
 
-  const problems = [];
+  const handleAddStudent = async (e) => {
+    e.preventDefault();
+    setAdding(true);
+    await fetch("http://localhost:8080/api/instructor/addStudent", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({name: newName, netId: newNetId}),
+    });
+    setAdding(false);
+    setModal(false);
+    setNewName("")
+    setNewNetId("");
+
+    const res = await fetch("http://localhost:8080/api/instructor/roster")
+    if(res.ok)
+    {
+      const data = await res.json();
+      setRoster(data);
+    }
+  }
+
+  const problems = [];  
   for (let i = 1; i <= 15; i++) 
   {
       problems.push(`${selectedDifficulty} ${i}`);
@@ -89,13 +114,40 @@ export default function Instructor() {
     setSelectedProblems([]);
   }, [selectedTopic, selectedDifficulty]);
 
-  
+  // await fetch("/api/instructor/assignProblems", {
+  //   method: "POST",
+  //   headers: {"Content-Type": "application/json"},
+  //   body: JSON.stringify({
+  //     netId: selectedStudent.netId,
+  //     problems: selectedProblems,
+  //     dueDate
+  //   })
+  // })
 
   const handleSelectProblem = (problemName) => {
     setSelectedProblems((p) =>
       p.includes(problemName) ? p.filter((pr) => pr !== problemName) : [...p, problemName]
     );
   };
+
+  const handleRemoveStudent = async () => {
+    if (!selectedStudent){return;}
+    if(!window.confirm(`Remove Student ${selectedStudent.name}?`)) return;
+    await fetch("http://localhost:8080/api/instructor/removeStudent", {
+      method:"POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({netId: selectedStudent.netId}),
+    });
+    setSelectedStudent(null);
+    setStudentDetails(null);
+
+    const res = await fetch("http://localhost:8080/api/instructor/roster")
+    if(res.ok)
+    {
+      const data = await res.json();
+      setRoster(data);
+    }
+  }
 
   
 
@@ -130,10 +182,26 @@ export default function Instructor() {
               </div>
             ))}
           </div>
-      <button className="w-full  bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer">+ Add Student</button>
+      <button className="w-full  bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer" onClick={() => setModal(true)}>+ Add Student</button>
       <button className="w-full bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer" onClick={createProblem}>
         + Create Problem
       </button>
+
+      {modal && (
+        <div className = "fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <form className = "bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col gap-4 min-w-[300px]" onSubmit={handleAddStudent}>
+              <h2 className = "text-xl font-bold text-white mb-2">Add Student</h2>
+              <input className = "rounded px-2 py-1 bg-gray-700 text-white" placeholder="Name" value={newName} onChange={e => setNewName(e.target.value)} required/>
+              <input className = "rounded px-2 py-1 bg-gray-700 text-white" placeholder="NetID" value={newNetId} onChange={e => setNewNetId(e.target.value)} required/>
+              <div className = "flex gap-2 mt-2">
+                <button type = "submit" className = "bg-blue-500 text-white px-4 py-1 rounded" disabled={adding}>{adding ? "Adding..." : "Add"}</button>
+                <button type = "button" className = "bg-gray-600 text-white px-4 py-1 rounded" onClick={() => setModal(false)}>Cancel</button>
+              </div>
+
+          </form>
+        
+        </div>
+      )}
         </div>
         {selectedStudent && studentDetails && (
           <>
@@ -244,7 +312,7 @@ export default function Instructor() {
                 />
                 <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer">Assign Problems</button>
                 {/* <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer">Generate Passcode</button> */}
-                <button className="bg-red-400 text-white px-4 py-1 rounded cursor-pointer">Remove</button>
+                <button className="bg-red-400 text-white px-4 py-1 rounded cursor-pointer" onClick={handleRemoveStudent}>Remove</button>
               </div>
             </div>
             <div className = "">
