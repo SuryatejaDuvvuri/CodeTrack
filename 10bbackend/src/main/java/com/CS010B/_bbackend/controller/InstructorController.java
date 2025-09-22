@@ -58,6 +58,12 @@ public class InstructorController
         fireStore.assignProblems(req.getNetId(), req.getProblems());
     }
 
+    @PostMapping("/assignProblemsAll")
+    public void assignProblemsAll(@RequestBody Map<String, Object> req) throws Exception
+    {
+        fireStore.assignProblemsAll((List<Map<String, Object>>)req.get("problems"));
+    }
+
     @PostMapping("/addStudent")
     public void addStudent(@RequestBody Map<String,String> req) throws Exception
     {

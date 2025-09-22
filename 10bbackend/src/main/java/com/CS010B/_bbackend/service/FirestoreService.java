@@ -621,29 +621,76 @@ public class FirestoreService
     {
         String topic = (String)req.get("topic");
         String difficulty = (String) req.get("difficulty");
+        int difficultyVal = 0;
         String name = (String) req.get("name");
         String description = (String) req.get("description");
         String starterCode = (String) req.get("starterCode");
+        String examples = (String) req.get("examples");
+
+        switch(difficulty)
+        {
+            case "Easy": difficultyVal = 2;
+            case "Medium": difficultyVal = 5;
+            case "Hard": difficultyVal = 9;
+            default: difficultyVal = 1;
+        }
 
         Map<String,Object> data = new HashMap<>();
         data.put("Description", description);
         data.put("Starter Code", starterCode);
+        data.put("Examples", examples);
+        data.put("Difficulty", difficultyVal);
+        data.put("Problem", name);
         
         DocumentReference docRef = firestore.collection("problems").document(topic);
+        DocumentSnapshot snap = docRef.get().get();
+        Map<String,Object> probData = snap.getData();
+        int val = 1;
+        if(probData != null && probData.containsKey(difficulty))
+        {
+            Map<String, Object> diffMap = (Map<String, Object>) probData.get(difficulty);
+            if (diffMap != null) 
+            {
+                val = diffMap.size() + 1;
+            }
+        }
+
+        String problemId = difficulty + " " + val;
         Map<String,Object> diffMap = new HashMap<>();
-        diffMap.put(name,data);
+        diffMap.put(problemId,data);
         Map<String,Object> update = new HashMap<>();
         update.put(difficulty, diffMap);
         docRef.set(update,SetOptions.merge()).get();
 
-        // Map<String,Object> studentData = createProblemData();
 
-        // for(DocumentSnapshot student : firestore.collection("section").get().get().getDocuments())
-        // {
-        //     String netId = student.getId();
-        //     DocumentReference studentRef = firestore.collection("section").document(netId);
-        //     String path = String.format("Problems.%s.%s.%s",topic,difficulty,difficulty + 1);
-        // }
+        for(DocumentSnapshot student : firestore.collection("section").get().get().getDocuments())
+        {
+            String netId = student.getId();
+            DocumentReference studentRef = firestore.collection("section").document(netId);
+            
+            DocumentSnapshot studentDoc = studentRef.get().get();
+            Map<String,Object> problemsMap = (Map<String,Object>)studentDoc.get("Problems");
+            int nextVal = 1;
+            if(problemsMap != null && problemsMap.containsKey(topic))
+            {
+                Map<String,Object> topicMap = (Map<String,Object>)problemsMap.get(topic);
+                if(topicMap != null && topicMap.containsKey(difficulty))
+                {
+                    Map<String,Object> diffMapStudent = (Map<String,Object>) topicMap.get(difficulty);
+                    if(diffMapStudent != null)
+                    {
+                        nextVal = diffMapStudent.size() + 1;
+                    }
+                }
+            }
+            String probName = difficulty + " " + nextVal;
+            Map<String,Object> studentData = createProblemData();
+
+            String path = String.format("Problems.%s.%s.%s",topic,difficulty,probName);
+            Map<String, Object> updates = new HashMap<>();
+            updates.put(path, studentData);
+            studentRef.set(updates, SetOptions.merge()).get();
+        }
         
         
 
@@ -867,4 +914,15 @@ public class FirestoreService
         ref.update(updates).get();
     }
 
+    public void assignProblemsAll(List<Map<String,Object>> problems) throws Exception
+    {
+        for(DocumentSnapshot student : firestore.collection("section").get().get().getDocuments())
+        {
+            String netId = student.getId();
+            DocumentReference studentRef = firestore.collection("section").document(netId);
+            Map<String,Object> updates = new HashMap<>();
+            updates.put("Assigned Problems",problems);
+            studentRef.update(updates).get();
+        }
+    }
 }
