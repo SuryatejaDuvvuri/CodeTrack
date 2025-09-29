@@ -1,6 +1,7 @@
 package com.CS010B._bbackend.service;
 
 import com.CS010B._bbackend.model.ChatMessage;
+import com.CS010B._bbackend.model.User;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -886,7 +887,7 @@ public class FirestoreService
         return result;
     }
 
-    public void addStudent(String tempNetId, String userNetId, String newName) throws Exception
+    public void addStudent(String tempNetId, String userNetId, String newName, String email, String password, String role) throws Exception
     {
         DocumentReference tempRef = firestore.collection("section").document(tempNetId);
         DocumentSnapshot tempSnap = tempRef.get().get();
@@ -895,8 +896,17 @@ public class FirestoreService
             throw new Exception("Temp student not found");
         }
 
+        DocumentSnapshot doc = firestore.collection("users").document(userNetId).get().get();
+        if (doc.exists()) 
+        {
+           throw new Exception("Student already exists");
+        }
+
         Map<String,Object> data = new HashMap<>(tempSnap.getData());
         data.put("Name", newName);
+        data.put("Email", email);
+        data.put("Password", password);
+        data.put("Role", role);
         data.put("Assigned Problems", new ArrayList<>());
         firestore.collection("section").document(userNetId).set(data);
     }
@@ -924,5 +934,20 @@ public class FirestoreService
             updates.put("Assigned Problems",problems);
             studentRef.update(updates).get();
         }
+    }
+
+    // public void saveUser(User user) throws Exception 
+    // {
+    //     firestore.collection("section").document(user.getEmail()).set(user).get();
+    // }
+
+    public User getUser(String email) throws Exception 
+    {
+        DocumentSnapshot doc = firestore.collection("section").document(email.substring(0,email.indexOf("@"))).get().get();
+        if(doc.exists())
+        {
+            return new User(doc.getString("Name"), doc.getString("Email"), doc.getString("Password"), doc.getString("Role"));
+        }
+        return null;
     }
 }

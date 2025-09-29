@@ -68,7 +68,7 @@ public class InstructorController
     @PostMapping("/addStudent")
     public void addStudent(@RequestBody Map<String,String> req) throws Exception
     {
-        fireStore.addStudent("sduvv003", req.get("netId"), req.get("name"));
+        fireStore.addStudent("sduvv003", req.get("netId"), req.get("name"), req.get("email"), req.get("password"), req.get("role"));
     }
 
     @PostMapping("/removeStudent")

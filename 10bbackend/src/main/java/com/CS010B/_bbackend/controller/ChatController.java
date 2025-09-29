@@ -3,7 +3,6 @@ package com.CS010B._bbackend.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,7 +16,6 @@ import com.CS010B._bbackend.model.ChatResponse;
 import com.CS010B._bbackend.service.BasicChatSample;
 import com.CS010B._bbackend.service.FirestoreService;
 
-import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

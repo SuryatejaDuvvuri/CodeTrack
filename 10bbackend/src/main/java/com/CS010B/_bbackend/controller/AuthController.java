@@ -28,30 +28,29 @@ public class AuthController
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody Map<String,String> req) throws Exception
     {
-       String email = req.get("email");
-       String password = req.get("password");
+       String email = req.get("Email");
+       String password = req.get("Password");
+       String name = req.get("Name");
        
        if(!email.endsWith("@ucr.edu"))
        {
             return ResponseEntity.badRequest().body("Email must end with @ucr.edu");
        }
 
-       User user = new User();
-       user.setEmail(email);
-       user.setPassword(password);
-       user.setRole("STUDENT");
-       firestore.saveUser(user);
+      //  User user = new User(name,email,password,"STUDENT");
+       firestore.addStudent("sduvv003",email.substring(0,email.indexOf("@")), name, email,password,"STUDENT");
        return ResponseEntity.ok("Signup success!");
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String,String> req) throws Exception
     {
-         String email = req.get("email");
-         String password = req.get("password");
+         String email = req.get("Email");
+         String password = req.get("Password");
          User user = firestore.getUser(email);
+         System.out.print(user.getPassword());
 
-         if(user == null || !user.getPassword().equals(password))
+         if(user == null || user.getPassword() == null || !user.getPassword().equals(password))
          {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid login credentials");
          }
