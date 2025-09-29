@@ -1,0 +1,63 @@
+package com.CS010B._bbackend.controller;
+
+import java.util.Map;
+
+import com.CS010B._bbackend.model.JwtUtil;
+import com.CS010B._bbackend.model.User;
+// import com.CS010B._bbackend.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.CS010B._bbackend.service.FirestoreService;
+import com.google.rpc.context.AttributeContext.Response;
+
+@RestController
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+public class AuthController 
+{
+    @Autowired
+    private FirestoreService firestore;
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signUp(@RequestBody Map<String,String> req) throws Exception
+    {
+       String email = req.get("email");
+       String password = req.get("password");
+       
+       if(!email.endsWith("@ucr.edu"))
+       {
+            return ResponseEntity.badRequest().body("Email must end with @ucr.edu");
+       }
+
+       User user = new User();
+       user.setEmail(email);
+       user.setPassword(password);
+       user.setRole("STUDENT");
+       firestore.saveUser(user);
+       return ResponseEntity.ok("Signup success!");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String,String> req) throws Exception
+    {
+         String email = req.get("email");
+         String password = req.get("password");
+         User user = firestore.getUser(email);
+
+         if(user == null || !user.getPassword().equals(password))
+         {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid login credentials");
+         }
+
+         String token = JwtUtil.generateToken(email, user.getRole());
+         return ResponseEntity.ok(Map.of("token",token,"role",user.getRole()));
+
+    } 
+}
