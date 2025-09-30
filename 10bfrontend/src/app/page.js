@@ -16,7 +16,8 @@ export default function Home()
 {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topTopics, setTopTopics] = useState([]);
-  const[assignedProblems, setAssignedProblems] = useState([])
+  const[assignedProblems, setAssignedProblems] = useState([]);
+  const netid = localStorage.getItem('netid');
   const topics = [
     { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!", route: "easy"},
     { name: "Warm up 2", color: "bg-emerald-400", description: "More warm up problems to challenge yourself", route: "easy" },
@@ -35,7 +36,7 @@ export default function Home()
 
   useEffect(() => {
     const fetchRankings = async () => {
-      const res = await fetch('http://localhost:8080/api/progress/ranks?netId=jdoe008');
+      const res = await fetch(`http://localhost:8080/api/progress/ranks?netId=${netid}`);
       if(res.ok)
       {
         const data = await res.json();
@@ -47,7 +48,7 @@ export default function Home()
 
   useEffect(() => {
     const fetchAssigned= async () => {
-      const res = await fetch('http://localhost:8080/api/chat/assigned?netId=jdoe008');
+      const res = await fetch(`http://localhost:8080/api/chat/assigned?netId=${netid}`);
       if(res.ok)
       {
         const data = await res.json();
@@ -64,7 +65,10 @@ export default function Home()
           <div className="flex space-x-4">
             {/* <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a> */}
             <a href = "/components/login" className = "text-white hover:text-lg transition-all cursor-pointer">Home</a>
-            <button className = "text-white hover:text-lg transition-all cursor-pointer">Logout</button>
+            <button onClick = {() => {
+              localStorage.removeItem('token');
+              localStorage.removeItem('role');
+              window.location.href = '/components/login';}} className = "text-white hover:text-lg transition-all cursor-pointer">Logout</button>
           </div>
         </div>
       </nav>
@@ -134,9 +138,9 @@ export default function Home()
             </ul>
           </div>
           
-          <button disabled={!canGetPasscode(assignedProblems)} className = "text-md mt-4 bg-gray-400 px-4 py-2 rounded disabled:opacity-50">
+          {/* <button disabled={!canGetPasscode(assignedProblems)} className = "text-md mt-4 bg-gray-400 px-4 py-2 rounded disabled:opacity-50">
             Get Passcode
-          </button>
+          </button> */}
         </div>
       </div>
        <footer className = "w-full mt-8 mb-4 px-4 rounded-lg shadow-sm">

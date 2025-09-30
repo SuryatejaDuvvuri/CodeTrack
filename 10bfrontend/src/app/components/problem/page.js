@@ -5,15 +5,20 @@ import Link from "next/link"
 import CodeEditor from './codeEditor.js'
 import ProgressGraph from "./progressGraph.js";
 import ChatHistory from "./chatHistory.js";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams,useRouter } from "next/navigation";
 // import EmbeddedViewer from "./EmbeddedViewer.js";
 
 export default function Problem() 
 {
+  const router = useRouter();
   const search = useSearchParams();
   const topic = search.get("topic");
+  const netid = localStorage.getItem('netid');
   const difficulty = search.get("difficulty");
   const problemName = search.get("problem");
+  const maxProblems = 15;
+  const match = problemName?.match(/(\d+)$/);
+  const problemNum = match ? parseInt(match[1],10) : 1;
   const [defaultCode, setDefaultCode] = useState("");
   const [isLoading, setLoading] = useState(false);
   // const [testcases,setTestcases] = useState([]);
@@ -38,6 +43,18 @@ export default function Problem()
     }
   };
 
+  const handlePrev = () => {
+    const prevNum = problemNum === 1 ? maxProblems : problemNum - 1;
+    const newProblem = `${difficulty} ${prevNum}`;
+    router.push(`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(newProblem)}`);
+  }
+
+  const handleNext = () => {
+    const prevNum = problemNum === maxProblems ? 1 : problemNum + 1;
+    const newProblem = `${difficulty} ${prevNum}`;
+    router.push(`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(newProblem)}`);
+  }
+
   useEffect(() => {
     loadProblem();
   },[topic,difficulty,problemName]);
@@ -48,7 +65,7 @@ export default function Problem()
 
   const loadCode = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=jdoe008`, {
+    const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${netid}`, {
       method: "GET",
       headers: {
         "Content-Type":"application/json"
@@ -71,13 +88,13 @@ export default function Problem()
       const chatRes = await fetch ("http://localhost:8080/api/grade/update", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({topic,difficulty,problem:problemName,code:code,netId: "jdoe008"}),
+        body: JSON.stringify({topic,difficulty,problem:problemName,code:code,netId: netid}),
     });
   }
   const fetchAttempts = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=jdoe008`);
-    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=jdoe008`);
+    const res = await fetch(`http://localhost:8080/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${netid}`);
+    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${netid}`);
 
     if(res.ok && resTwo.ok)
     {
@@ -98,7 +115,7 @@ export default function Problem()
             difficulty,
             problem:problemName,
             aiAttempts: 0,
-            netId: "jdoe008"
+            netId: netid
           })
         });
       }
@@ -112,7 +129,7 @@ export default function Problem()
 
   const fetchScore = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=jdoe008`);
+    const res = await fetch(`http://localhost:8080/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${netid}`);
     if (res.ok) 
     {
       const data = await res.json();
@@ -139,7 +156,7 @@ export default function Problem()
       headers: {
         "Content-Type":"application/json"
       },
-      body: JSON.stringify({topic,difficulty,problem:problemName,code: code, netId: "jdoe008"}),
+      body: JSON.stringify({topic,difficulty,problem:problemName,code: code, netId: netid}),
     });
     const result = await res.json();
     console.log(result);
@@ -168,7 +185,7 @@ export default function Problem()
           "Content-Type":"application/json"
         },
         body: JSON.stringify({
-          topic,difficulty,problem:problemName,passed,total,timeSpent,testResults:result, code:code,netId:"jdoe008"
+          topic,difficulty,problem:problemName,passed,total,timeSpent,testResults:result, code:code,netId:netid
         })
       });
 
@@ -188,7 +205,7 @@ export default function Problem()
               difficulty,
               problem:problemName,
               prompt: "Can you give me feedback on my code? This is a system prompt",
-              netId: "jdoe008"
+              netId: netid
           }),
         });
 
@@ -209,7 +226,7 @@ export default function Problem()
         await fetch("http://localhost:8080/api/progress/update", {
           method: "POST",
           headers: {"Content-Type" : "application/json"},
-          body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId:"jdoe008"})
+          body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId:netid})
         });
         setAIAttempts(aiAttempts + 1);
     }
@@ -229,7 +246,7 @@ export default function Problem()
                 difficulty,
                 problem:problemName,
                 prompt: "Can you give me feedback on my code? This is a system prompt.",
-                netId: "jdoe008"
+                netId: netid
             }),
           });
 
@@ -250,7 +267,7 @@ export default function Problem()
           await fetch("http://localhost:8080/api/progress/update", {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
-            body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId: "jdoe008"})
+            body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId: netid})
           });
           setAIAttempts(aiAttempts + 1);
        }
@@ -297,7 +314,7 @@ export default function Problem()
   },[messages,isLoading]);
 
   const fetchProgress = async () => {
-    const progressRes = await fetch(`http://localhost:8080/api/progress?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=jdoe008`);
+    const progressRes = await fetch(`http://localhost:8080/api/progress?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${netid}`);
     if(progressRes.ok)
     {
       const data = await progressRes.json();
@@ -368,10 +385,10 @@ export default function Problem()
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-4">
             <div className="flex space-x-3">
-              <button className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer w-full">
+              <button onClick = {handlePrev} className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer w-full">
                 Prev
               </button>
-              <button className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer w-full">
+              <button onClick = {handleNext} className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer w-full">
                 Next
               </button>
               {/* <button className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
@@ -544,8 +561,8 @@ export default function Problem()
             <h3 className="text-lg font-semibold text-gray-200 mb-4">Learning Resources</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
-                { name: "C++ Reference", url: "https://www.w3schools.com/cpp/cpp_ref_reference.asp" },
-                { name: "Zybooks", url: "https://learn.zybooks.com/zybook/UCRCS010BMillerSummer2025?selectedPanel=view-activity" },
+                { name: "Ascii Chart", url: "https://www.asciitable.com/" },
+                { name: "Cheatsheet", url: "https://www.codewithharry.com/blogpost/cpp-cheatsheet" },
                 { name: "LearnCpp.com", url: "https://www.learncpp.com/" },
                 { name: "Tutorial Videos", url: "https://www.youtube.com/watch?v=cec5DV42wjI&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS&index=14" }
               ].map((resource, index) => (

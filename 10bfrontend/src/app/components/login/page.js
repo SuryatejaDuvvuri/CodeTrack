@@ -1,6 +1,37 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link"
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [msg, setMsg] = useState('');
+  const router = useRouter();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch("http://localhost:8080/api/auth/login", {
+      method: "POST",
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({Email:email, Password:password}),
+    });
+
+    if(res.ok)
+    {
+      const {token,role} = await res.json();
+      localStorage.setItem('token',token);
+      localStorage.setItem('role',role);
+      const netid = email.split('@')[0];
+      localStorage.setItem('netid', netid);
+      router.push("/");
+    }
+    else
+    {
+      setMsg("Invalid credentials");
+    }
+  }
+
   return (
     <div className="container flex flex-col m-auto min h-screen px-4 font-sans justify-center items-center">
         <div className = "mb-8">
@@ -17,6 +48,28 @@ export default function Login() {
               </button>
             </div>
           </div>
+          <form onSubmit={handleSubmit}>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="your@ucr.edu"
+                required
+                className="w-full px-4 py-2 rounded bg-gray-800 text-white"
+              />
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+                className="w-full px-4 py-2 rounded bg-gray-800 text-white"
+              />
+              <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm w-full">
+                Login
+              </button>
+              <div className="text-red-400">{msg}</div>
+          </form>
            <div className = "grid grid-rows-1 gap-4">
                 <div className = "flex items-center mx-4">
                   <div className = "flex-grow border-t border-gray-600"></div>
@@ -29,7 +82,7 @@ export default function Login() {
                 <Link href = "/" className = "text-white mb-auto px-6 py-3 rounded-lg shadow-sm bg-gray-700">
                       Student
                 </Link>
-              </div>
+            </div>
         </div>
        
       

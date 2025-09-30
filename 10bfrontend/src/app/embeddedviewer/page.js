@@ -12,8 +12,8 @@ function EmbeddedContent()
 
     const resources = 
     [
-        'w3schools.com',
-        'learn.zybooks.com',
+        'asciitable.com',
+        'codewithharry.com',
         'learncpp.com',
         'stackoverflow.com',
         'youtube.com',
@@ -110,7 +110,9 @@ function EmbeddedContent()
                 referrerPolicy="no-referrer"
                 loading="lazy"
                 sandbox="allow-scripts allow-same-origin"
-                style={{ height: 'calc(100vh - 80px)',userSelect: 'none'}}/>
+                style={{ height: 'calc(100vh - 80px)',userSelect: 'none'}}
+                onError={() => setIsValid(false)}
+                />
             
             </main>
         </div>

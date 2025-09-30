@@ -7,6 +7,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
     const [input, setInput] = useState('');
     const MAX_ATTEMPTS = 4;
     const URL = process.env.NEXT_PUBLIC_API_URL;
+    const netid = localStorage.getItem('netid');
 
     useEffect(() => {
         async function loadChat()
@@ -22,7 +23,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                         topic:topic,
                         difficulty:difficulty,
                         problem:problemName,
-                        netId: "jdoe008"
+                        netId: netid
                     })
                 });
 
@@ -77,7 +78,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
     useEffect(() => {
         async function fetchAttempts() 
         {
-            const res = await fetch(`http://localhost:8080/api/progress/attempts?topic=${topic}&difficulty=${difficulty}&problem=${problemName}&netId=jdoe008`);
+            const res = await fetch(`http://localhost:8080/api/progress/attempts?topic=${topic}&difficulty=${difficulty}&problem=${problemName}&netId=${netid}`);
             if(res.ok)
             {
                 const data = await res.json();
@@ -95,7 +96,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                         difficulty:difficulty,
                         problem:problemName,
                         aiAttempts: 0,
-                        netId: "jdoe008",
+                        netId: netid,
                     })
                     });
                 }
@@ -132,7 +133,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                 difficulty,
                 problem:problemName,
                 aiAttempts: aiAttempts + 1,
-                netId: "jdoe008"
+                netId: netid
             })
         });
         setAIAttempts(aiAttempts + 1);
@@ -157,7 +158,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                     difficulty,
                     problem:problemName,
                     prompt:input,
-                    netId:"jdoe008"
+                    netId:netid
                 }),
             });
 

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 export default function Easy() {
   const search = useSearchParams();
   const topic = search.get("topic");
+  const netid = localStorage.getItem('netid');
   return (
     <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
       <nav className = "bg-black">
@@ -12,7 +13,10 @@ export default function Easy() {
           <div className="flex space-x-4">
             <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a>
             <a href = "/" className = "text-white hover:text-lg transition-all">Home</a>
-            <a href = "#" className = "text-white hover:text-lg transition-all">Logout</a>
+            <a nClick = {() => {
+              localStorage.removeItem('token');
+              localStorage.removeItem('role');
+              window.location.href = '/components/login';}} className = "text-white hover:text-lg transition-all">Logout</a>
           </div>
         </div>
 

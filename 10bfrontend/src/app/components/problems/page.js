@@ -10,6 +10,7 @@ export default function ProblemList()
     const topic = search.get("topic");
     const difficulty = search.get("difficulty");
     const [progress, setProgress] = useState(0);
+    
     // const [problems, setProblems] = useState([]);
     
     var color = "bg-emerald-400";
@@ -24,8 +25,9 @@ export default function ProblemList()
     }
 
     useEffect(() => {
+      const netid = localStorage.getItem('netid');
       const fetchProgress = async () => {
-            const res = await fetch(`http://localhost:8080/api/progress/getTotal?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&netId=jdoe008`);
+            const res = await fetch(`http://localhost:8080/api/progress/getTotal?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&netId=${netid}`);
             if(res.ok)
             {
                 const data = await res.json();
@@ -63,7 +65,10 @@ export default function ProblemList()
                     <div className="flex space-x-4">
                         <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a>
                         <a href = "/" className = "text-white hover:text-lg transition-all">Home</a>
-                        <a href = "#" className = "text-white hover:text-lg transition-all">Logout</a>
+                        <a onClick = {() => {
+              localStorage.removeItem('token');
+              localStorage.removeItem('role');
+              window.location.href = '/components/login';}}className = "text-white hover:text-lg transition-all">Logout</a>
                     </div>
                     </div>
             
