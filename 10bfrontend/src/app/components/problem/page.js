@@ -13,7 +13,7 @@ export default function Problem()
   const router = useRouter();
   const search = useSearchParams();
   const topic = search.get("topic");
-  const netid = localStorage.getItem('netid');
+  const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
   const difficulty = search.get("difficulty");
   const problemName = search.get("problem");
   const maxProblems = 15;
@@ -26,6 +26,9 @@ export default function Problem()
   const [code, setCode] = useState(""); 
   const [problemDetails, setProblemDetails] = useState(null);
   const [selectedAttempt, setSelectedAttempt] = useState(null);
+  const role = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+  const viewingStudent = search.get("viewingStudent");
+  const readOnly = role === "INSTRUCTOR" && viewingStudent;
   const MAX_ATTEMPTS = 4;
   const start = async () => {
     const res = await fetch (`http://localhost:8080/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
@@ -431,7 +434,7 @@ export default function Problem()
                 <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
               </div>
               <div className="bg-gray-800 rounded-xl border border-gray-700">
-                <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph} setStartTime={setStartTime} readOnly={false}/>
+                <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph} setStartTime={setStartTime} readOnly={readOnly}/>
               </div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">

@@ -91,8 +91,11 @@ public class FirestoreService
         if(doc.exists())
         {
             Map<String,Object> problemsMap = (Map<String, Object>)doc.get("Problems");
+            if (problemsMap == null) return 0;
             Map<String,Object> topicMap = (Map<String, Object>)problemsMap.get(topic);
+            if (topicMap == null) return 0;
             Map<String,Object> diffMap = (Map<String, Object>)topicMap.get(difficulty);
+            if (diffMap == null) return 0;
 
             double totalProg = 0.0;
             int count = 0;
@@ -684,12 +687,28 @@ public class FirestoreService
                     }
                 }
             }
+
             String probName = difficulty + " " + nextVal;
             Map<String,Object> studentData = createProblemData();
 
-            String path = String.format("Problems.%s.%s.%s",topic,difficulty,probName);
+            if (problemsMap == null) 
+            {
+                problemsMap = new HashMap<>();
+            }
+
+            Map<String,Object> topicMap = problemsMap.containsKey(topic) ?
+            (Map<String,Object>)problemsMap.get(topic) : new HashMap<>();
+
+            Map<String,Object> diffMapStudent = topicMap.containsKey(difficulty) ?
+            (Map<String,Object>)topicMap.get(difficulty) : new HashMap<>();
+
+
+            diffMapStudent.put(probName, studentData);
+            topicMap.put(difficulty,diffMapStudent);
+            problemsMap.put(topic,topicMap);
+        
             Map<String, Object> updates = new HashMap<>();
-            updates.put(path, studentData);
+            updates.put("Problems",problemsMap);
             studentRef.set(updates, SetOptions.merge()).get();
         }
         
@@ -731,6 +750,32 @@ public class FirestoreService
         data.put("Runs", new ArrayList<Map<String, Object>>());
         data.put("lastAIAttempt", 0);
         return data;
+    }
+
+    public void addWarmUpProblemsForStudent(String netId) throws Exception {
+        // String[] warmUps = {"Warm Up 1", "Warm Up 2"};
+        // String difficulty = "Easy";
+        // DocumentReference studentRef = firestore.collection("section").document(netId);
+        // DocumentSnapshot doc = studentRef.get().get();
+        // Map<String, Object> problems = (Map<String, Object>) doc.get("Problems");
+        // if (problems == null) problems = new HashMap<>();
+
+        // for (String warmUp : warmUps) {
+        //     Map<String, Object> problemsMap = new HashMap<>();
+        //     Map<String, Object> diffMap = new HashMap<>();
+        //     for (int i = 1; i <= 15; i++) {
+        //         String probName = difficulty + " " + i;
+        //         diffMap.put(probName, createProblemData());
+        //     }
+        //     problemsMap.put(difficulty, diffMap);
+
+        //     problems.put(warmUp, problemsMap);
+
+        // // Save back to Firestore
+        // Map<String, Object> update = new HashMap<>();
+        // update.put("Problems", problems);
+        //     studentRef.set(update, SetOptions.merge()).get();
+        // }
     }
 
     public List<Map<String, Object>> getAssignedProblems(String netId) throws Exception

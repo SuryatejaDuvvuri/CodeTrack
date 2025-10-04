@@ -7,11 +7,14 @@ import {useRouter} from "next/navigation";
 
 function filterDifficulties(topic)
 {
-  if(topic === "Warm up 1" || topic === "Warm up 2")
+  if(topic.name === "Warm up 1" || topic.name === "Warm up 2")
   {
     return ["Easy"];
   }
-    return ["Easy","Medium","Hard"];
+  else
+  {
+      return ["Easy","Medium","Hard"];
+  }
 }
 
 export default function Instructor() {
@@ -60,18 +63,6 @@ export default function Instructor() {
       router.push('/');
     }
   }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMsg('Adding...');
-    const res = await fetch('http://localhost:8080/api/instructor/addWarmups', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ netId: netid }),
-    });
-    const text = await res.text();
-    setMsg(text);
-  };
   
   const createProblem = async (e) => {
     e.preventDefault();
@@ -543,7 +534,7 @@ export default function Instructor() {
                   <>
                   <div className="bg-gray-900 p-3">
                     <div className="space-y-2">
-                      {["Easy","Medium","Hard"].map((diff) => (
+                      {filterDifficulties(selectedTopic).map((diff) => (
                         <div
                           key={diff}
                           className={`flex justify-between items-center bg-gray-800 p-2 rounded mb-2 cursor-pointer ${selectedDifficulty === diff ? "bg-gray-600" : ""}`} onClick={() => setSelectedDifficulty(diff)}>

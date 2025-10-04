@@ -7,7 +7,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
     const [input, setInput] = useState('');
     const MAX_ATTEMPTS = 4;
     const URL = process.env.NEXT_PUBLIC_API_URL;
-    const netid = localStorage.getItem('netid');
+    const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
 
     useEffect(() => {
         async function loadChat()

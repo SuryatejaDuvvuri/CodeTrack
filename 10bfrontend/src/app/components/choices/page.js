@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 export default function Easy() {
   const search = useSearchParams();
   const topic = search.get("topic");
-  const netid = localStorage.getItem('netid');
+  const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
   return (
     <div className="container mx-auto min h-screen font-sans m-4 flex flex-col justify-center items-center">
       <nav className = "bg-black">

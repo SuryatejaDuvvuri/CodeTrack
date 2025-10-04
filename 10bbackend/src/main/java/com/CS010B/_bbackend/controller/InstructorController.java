@@ -70,7 +70,6 @@ public class InstructorController
     {
         fireStore.addStudent("sduvv003", req.get("netId"), req.get("name"), req.get("email"), req.get("password"), req.get("role"));
     }
-
     @PostMapping("/removeStudent")
     public void removeStudent(@RequestBody Map<String,String> req) throws Exception
     {

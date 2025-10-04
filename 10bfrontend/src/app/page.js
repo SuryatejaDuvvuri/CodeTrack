@@ -17,7 +17,7 @@ export default function Home()
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topTopics, setTopTopics] = useState([]);
   const[assignedProblems, setAssignedProblems] = useState([]);
-  const netid = localStorage.getItem('netid');
+  const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
   const topics = [
     { name: "Warm up 1", color: "bg-emerald-400", description: "Get started by warming up!", route: "easy"},
     { name: "Warm up 2", color: "bg-emerald-400", description: "More warm up problems to challenge yourself", route: "easy" },

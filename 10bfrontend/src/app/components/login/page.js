@@ -24,7 +24,14 @@ export default function Login() {
       localStorage.setItem('role',role);
       const netid = email.split('@')[0];
       localStorage.setItem('netid', netid);
-      router.push("/");
+      if (role === "INSTRUCTOR")
+      {
+        router.push("/components/instructor");
+      }
+      else
+      {
+          router.push("/");
+      }
     }
     else
     {
@@ -40,14 +47,6 @@ export default function Login() {
 
         <div className = "rounded-xl p-8 w-full">
           <h2 className = "text-2xl font-semibold text-white text-center">Welcome!</h2>
-
-          <div className = "space-y-4">
-            <div className = "flex items-center justify-center w-full">
-               <button className = "bg-blue-600 mb-auto text-white px-6 py-3 rounded-lg shadow-sm hover:font-bold">
-                Sign in with Google
-              </button>
-            </div>
-          </div>
           <form onSubmit={handleSubmit}>
               <input
                 type="email"
@@ -68,9 +67,17 @@ export default function Login() {
               <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm w-full">
                 Login
               </button>
+              <div className = "space-y-4">
+          </div>
               <div className="text-red-400">{msg}</div>
           </form>
-           <div className = "grid grid-rows-1 gap-4">
+
+          <div className = "flex items-center justify-center w-full mt-5">
+               <button onClick = {router.push('/components/signup')}className = "bg-blue-600 mb-auto text-white px-6 py-3 rounded-lg shadow-sm hover:font-bold">
+                Sign up
+              </button>
+          </div>
+           {/* <div className = "grid grid-rows-1 gap-4">
                 <div className = "flex items-center mx-4">
                   <div className = "flex-grow border-t border-gray-600"></div>
                       <span className = "px-3 text-gray-400 text-sm">Continue as</span>
@@ -82,7 +89,7 @@ export default function Login() {
                 <Link href = "/" className = "text-white mb-auto px-6 py-3 rounded-lg shadow-sm bg-gray-700">
                       Student
                 </Link>
-            </div>
+            </div> */}
         </div>
        
       

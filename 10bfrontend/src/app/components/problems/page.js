@@ -25,7 +25,7 @@ export default function ProblemList()
     }
 
     useEffect(() => {
-      const netid = localStorage.getItem('netid');
+      const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
       const fetchProgress = async () => {
             const res = await fetch(`http://localhost:8080/api/progress/getTotal?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&netId=${netid}`);
             if(res.ok)
