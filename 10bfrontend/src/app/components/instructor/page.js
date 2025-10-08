@@ -7,7 +7,8 @@ import {useRouter} from "next/navigation";
 
 function filterDifficulties(topic)
 {
-  if(topic.name === "Warm up 1" || topic.name === "Warm up 2")
+  console.log(topic);
+  if(topic != null && (topic === "Warm up 1" || topic === "Warm up 2"))
   {
     return ["Easy"];
   }
@@ -83,6 +84,7 @@ export default function Instructor() {
     setCreateModal(false);
     setProblemName("");
     setDescription("");
+    setExamples("");
     setStarterCode("");
     setSelectedTopic("");
     setSelectedDifficulty("");
@@ -276,7 +278,7 @@ export default function Instructor() {
                   </div>
                 ))}
               </div>
-          <button className="w-full  bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer" onClick={() => setModal(true)}>+ Add Student</button>
+          {/* <button className="w-full  bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer" onClick={() => setModal(true)}>+ Add Student</button> */}
           <button className="w-full bg-amber-500 text-white py-2 rounded mt-4 cursor-pointer" onClick={() => setCreateModal(true)}>
             + Create Problem
           </button>
@@ -345,6 +347,14 @@ export default function Instructor() {
                     onChange={e => setStarterCode(e.target.value)}
                     required
                   />
+                  <input type = "file" accept=".txt,.cpp,.py,.java,.js" className = "mt-2 text-white" onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (file)
+                    {
+                      const text = await file.text();
+                      setStarterCode(text);
+                    }
+                  }}/>
                   <div className="flex gap-2 mt-2">
                     <button type="submit" className="bg-blue-500 text-white px-4 py-1 rounded" disabled={creating}>
                       {creating ? "Creating..." : "Create"}

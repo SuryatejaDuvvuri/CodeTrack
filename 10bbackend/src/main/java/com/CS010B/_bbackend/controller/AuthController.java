@@ -48,7 +48,6 @@ public class AuthController
          String email = req.get("Email");
          String password = req.get("Password");
          User user = firestore.getUser(email);
-         System.out.print(user.getPassword());
 
          if(user == null || user.getPassword() == null || !user.getPassword().equals(password))
          {

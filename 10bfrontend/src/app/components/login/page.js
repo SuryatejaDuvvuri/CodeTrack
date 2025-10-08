@@ -73,7 +73,7 @@ export default function Login() {
           </form>
 
           <div className = "flex items-center justify-center w-full mt-5">
-               <button onClick = {router.push('/components/signup')}className = "bg-blue-600 mb-auto text-white px-6 py-3 rounded-lg shadow-sm hover:font-bold">
+               <button onClick = {() => router.push('/components/signup')}className = "bg-blue-600 mb-auto text-white px-6 py-3 rounded-lg shadow-sm hover:font-bold">
                 Sign up
               </button>
           </div>
