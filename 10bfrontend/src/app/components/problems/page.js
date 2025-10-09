@@ -53,7 +53,7 @@ export default function ProblemList()
 
 
     const problems = [];
-    for (let i = 1; i <= 15; i++) 
+    for (let i = 1; i <= 5; i++) 
     {
         problems.push(`${difficulty} ${i}`);
     }
@@ -63,7 +63,7 @@ export default function ProblemList()
             <nav className = "bg-black">
                     <div className = "flex flex-wrap justify-between items-center p-4">
                     <div className="flex space-x-4">
-                        <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a>
+                        {/* <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a> */}
                         <a href = "/" className = "text-white hover:text-lg transition-all">Home</a>
                         <a onClick = {() => {
               localStorage.removeItem('token');

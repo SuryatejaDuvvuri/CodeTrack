@@ -16,7 +16,7 @@ export default function Problem()
   const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
   const difficulty = search.get("difficulty");
   const problemName = search.get("problem");
-  const maxProblems = 15;
+  const maxProblems = 5;
   const match = problemName?.match(/(\d+)$/);
   const problemNum = match ? parseInt(match[1],10) : 1;
   const [defaultCode, setDefaultCode] = useState("");
@@ -30,11 +30,32 @@ export default function Problem()
   const viewingStudent = search.get("viewingStudent");
   const readOnly = role === "INSTRUCTOR" && viewingStudent;
   const MAX_ATTEMPTS = 4;
+
+  useEffect(() => {
+    if ( role === "STUDENT" && viewingStudent && viewingStudent !== netid) 
+    {
+      router.replace("/components/login");
+    }
+  }, [role, viewingStudent, netid, router]);
+
   const start = async () => {
-    const res = await fetch (`http://localhost:8080/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
-    const wait = await res.text();
-    setCode(wait);
-    setDefaultCode(wait);
+    if(role === "INSTRUCTOR" && viewingStudent)
+    {
+        const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${viewingStudent}`);
+        if (res.ok) {
+          const data = await res.text();
+          setCode(data);
+          setDefaultCode(data);
+          return;
+        }
+    }
+    else
+    {
+      const res = await fetch (`http://localhost:8080/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
+      const wait = await res.text();
+      setCode(wait);
+      setDefaultCode(wait);
+    }
   };
 
   const loadProblem = async () => {
@@ -64,7 +85,7 @@ export default function Problem()
   
   useEffect(() => {
     start();
-  }, []);
+  }, [topic, difficulty, problemName]);
 
   const loadCode = async () => 
   {
@@ -381,10 +402,13 @@ export default function Problem()
   const latestAttemptIndex = progressData.length > 0 ? progressData.length - 1 : null;
   const currentAttemptIndex = selectedAttempt !== null ? selectedAttempt : latestAttemptIndex;
   const currentAttempt = progressData[currentAttemptIndex] || {};
+  
 
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
-      <header className="w-full py-6 px-6 border-b border-gray-700">
+      {(problemDetails) ? ( 
+        <>
+        <header className="w-full py-6 px-6 border-b border-gray-700">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-4">
             <div className="flex space-x-3">
@@ -581,6 +605,10 @@ export default function Problem()
           </div>
         </div>
       </main>
+      </>
+    ) : (<div className="text-yellow-400 text-xl font-bold py-8 text-center">
+            This problem is still a work in progress. Please check back later.
+          </div>)}
 
       <footer className="w-full mt-8 py-6 px-6 border-t border-gray-700">
         <div className="max-w-7xl mx-auto">

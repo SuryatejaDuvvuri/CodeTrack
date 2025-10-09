@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link"
@@ -8,6 +8,13 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+  localStorage.removeItem('netid');
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+}, []);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

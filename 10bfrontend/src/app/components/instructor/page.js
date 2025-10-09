@@ -114,7 +114,7 @@ export default function Instructor() {
   };
 
   const problems = [];  
-  for (let i = 1; i <= 15; i++) 
+  for (let i = 1; i <= 5; i++) 
   {
       problems.push(`${selectedDifficulty} ${i}`);
   }
@@ -273,7 +273,7 @@ export default function Instructor() {
                     >
                       <div className="font-medium">{student.name}</div>
                       <div className="text-sm text-gray-300">NetId: {student.netId}</div>
-                      <div className="text-xs">Progress: {student.progress}</div>
+                      <div className="text-xs">Progress: {student.progress}%</div>
                     </div>
                   </div>
                 ))}
@@ -385,7 +385,9 @@ export default function Instructor() {
                       </div>
                       <div className="flex justify-between items-center text-sm mt-1">
                         <span>{studentDetails.progress}%</span>
-                        <span>{studentDetails.completedProblems}/{studentDetails.totalProblems} problems</span>
+                        {studentDetails.totalProblems > 0 && (
+                          <span>{studentDetails.completedProblems}/{studentDetails.totalProblems} problems</span>
+                        )}
                       </div>
                     </div>
                     <div>
@@ -579,7 +581,7 @@ export default function Instructor() {
                             <span>{problem}</span>
                             <button className="text-xs bg-gray-600 px-2 py-1 cursor-pointer rounded" onClick = {() =>{
                               router.push(
-                                `/components/problem?netId=${selectedStudent.netId}&topic=${encodeURIComponent(selectedTopic.name)}&difficulty=${encodeURIComponent(selectedDifficulty)}&problem=${encodeURIComponent(problem)}`
+                                `/components/problem?netId=${selectedStudent.netId}&topic=${encodeURIComponent(selectedTopic.name)}&difficulty=${encodeURIComponent(selectedDifficulty)}&problem=${encodeURIComponent(problem)}&viewingStudent=${selectedStudent.netId}`
                               );
                             }}>See Graph</button>
                           </div>

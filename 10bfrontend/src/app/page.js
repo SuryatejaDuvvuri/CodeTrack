@@ -2,6 +2,8 @@
 import Image from "next/image";
 import Link from "next/link"
 import {useState,useEffect} from "react";
+import { useRouter } from "next/navigation";
+
 
 
 function canGetPasscode(problems)
@@ -14,6 +16,7 @@ function canGetPasscode(problems)
 
 export default function Home() 
 {
+  const router = useRouter();
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topTopics, setTopTopics] = useState([]);
   const[assignedProblems, setAssignedProblems] = useState([]);
@@ -34,6 +37,12 @@ export default function Home()
   ];
   const progressColors = ["green-300", "red-300", "blue-300", "yellow-300", "indigo-300"]
 
+  useEffect(() => {
+    const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
+    if (!netid) {
+      router.replace("/components/login");
+    }
+  }, [router]);
   useEffect(() => {
     const fetchRankings = async () => {
       const res = await fetch(`http://localhost:8080/api/progress/ranks?netId=${netid}`);
@@ -66,9 +75,10 @@ export default function Home()
             {/* <a href = "#" className = "text-white hover:text-lg transition-all">Profile</a> */}
             <a href = "/components/login" className = "text-white hover:text-lg transition-all cursor-pointer">Home</a>
             <button onClick = {() => {
+              localStorage.removeItem('netid');
               localStorage.removeItem('token');
               localStorage.removeItem('role');
-              window.location.href = '/components/login';}} className = "text-white hover:text-lg transition-all cursor-pointer">Logout</button>
+              router.replace('/components/login');}} className = "text-white hover:text-lg transition-all cursor-pointer">Logout</button>
           </div>
         </div>
       </nav>
@@ -124,7 +134,7 @@ export default function Home()
                         className={`form-checkbox h-5 w-5 ${problem.completed ? "text-green-500" : "text-red-500"} border-gray-400`}
                     />
                     <span className = {`text-lg ${problem.completed ? "line-through text-gray-400" : "text-white"}`}>
-                      Finish the {problem.Name} problem
+                      Finish the {problem.problem} problem
                     </span>
                   </div>
                   <div className = "flex items-center space-x-2">

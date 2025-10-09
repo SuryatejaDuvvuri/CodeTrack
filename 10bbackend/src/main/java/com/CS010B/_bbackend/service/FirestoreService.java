@@ -100,7 +100,7 @@ public class FirestoreService
             double totalProg = 0.0;
             int count = 0;
 
-            for(int i = 1; i <= 15; i++)
+            for(int i = 1; i <= 5; i++)
             {
                 String probName = difficulty + " " + i;
                 Map<String,Object> details = (Map<String, Object>)diffMap.get(probName);
@@ -169,8 +169,18 @@ public class FirestoreService
                                     Map<String, Object> details = (Map<String, Object>)obj;
                                     if(details != null)
                                     {
-                                        double score = ((Number)details.get("Latest Score")).doubleValue();
-                                        int attempts =  ((List<Map<String,Object>>)details.get("Runs")).size();
+                                        Object scoreObj = details.get("Latest Score");
+                                        double score = 0.0;
+                                        if (scoreObj instanceof Number) 
+                                        {
+                                            score = ((Number)scoreObj).doubleValue();
+                                        }
+                                        int attempts = 0;
+                                        Object runsObj = details.get("Runs");
+                                        if (runsObj instanceof List) 
+                                        {
+                                            attempts = ((List<?>) runsObj).size();
+                                        }
                                         totalScore += score;
                                         totalAttempts += attempts;
                                         count++;
@@ -311,6 +321,10 @@ public class FirestoreService
 
     public List<ChatMessage> loadChats(String topic, String difficulty, String problem, String netId) throws ExecutionException, InterruptedException 
     {
+        if(netId == null)
+        {
+            throw new IllegalArgumentException("Must have netid.");
+        }
         DocumentReference docRef = firestore.collection("section").document(netId);
         DocumentSnapshot doc = docRef.get().get();
 
@@ -575,6 +589,10 @@ public class FirestoreService
 
     public void setAIAttempts(String topic, String difficulty, String problem, int aiAttempts, long lastAttempt, String netId) throws Exception
     {
+        if(netId == null)
+        {
+            throw new IllegalArgumentException("Must have netid.");
+        }
         DocumentReference docRef = firestore.collection("section").document(netId);
         // String difficulty = problem.startsWith("Easy") ? "Easy" :
         //                 problem.startsWith("Medium") ? "Medium" : "Hard";
@@ -630,13 +648,20 @@ public class FirestoreService
         String description = (String) req.get("description");
         String starterCode = (String) req.get("starterCode");
         String examples = (String) req.get("examples");
-
         switch(difficulty)
         {
-            case "Easy": difficultyVal = 2;
-            case "Medium": difficultyVal = 5;
-            case "Hard": difficultyVal = 9;
-            default: difficultyVal = 1;
+            case "Easy": 
+                difficultyVal = 2;
+                break;
+            case "Medium": 
+                difficultyVal = 5;
+                break;
+            case "Hard": 
+                difficultyVal = 9;
+                break;
+            default: 
+                difficultyVal = 1;
+                break;
         }
 
         Map<String,Object> data = new HashMap<>();
