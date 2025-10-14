@@ -172,7 +172,6 @@ export default function Problem()
   const handleRun = async () =>
   {
     setLoading(true);
-    // await fetchAttempts();
     setTimeout(fetchAttempts,100);
     const runStart = Date.now();
     const res = await fetch("http://localhost:8080/api/grade", {
@@ -362,13 +361,6 @@ export default function Problem()
     fetchScore();
   }, [problemName]);
 
-  // useEffect(() => {
-  //   if(showGraph)
-  //   {
-  //     fetchProgress();
-  //   }
-  // }, [showGraph]);
-
   useEffect(() => {
     fetchAttempts();
     fetchProgress();
@@ -405,40 +397,30 @@ export default function Problem()
   
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white font-sans">
-      {(problemDetails) ? ( 
-        <>
-        <header className="w-full py-6 px-6 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex space-x-3">
-              <button onClick = {handlePrev} className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer w-full">
-                Prev
-              </button>
-              <button onClick = {handleNext} className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer w-full">
-                Next
-              </button>
-              {/* <button className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
-                Random
-              </button> */}
-            </div>
-            <div className="flex items-center space-x-2">
+    <div className="min-h-screen w-full font-sans flex flex-col bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800">
+      <nav className="w-full rounded-lg shadow-lg mb-8">
+        <div className="flex flex-wrap justify-between items-center p-4">
+          <div className="flex space-x-4">
+            <Link href="/" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">Home</Link>
+            <Link href="/components/login" className="text-blue-300 hover:text-white text-lg font-semibold transition-all cursor-pointer transform hover:scale-110">Logout</Link>
+          </div>
+        </div>
+      </nav>
+      <main className="flex-1 flex flex-col items-center justify-center w-full px-4">
+        <div className="max-w-7xl w-full">
+          <header className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex space-x-3">
+                <button onClick={handlePrev} className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer">Prev</button>
+                <button onClick={handleNext} className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer">Next</button>
+              </div>
               <span className={`px-3 py-1 ${color} rounded-lg text-sm font-medium text-black`}>
                 Difficulty: {diff || "0"} / 10
               </span>
             </div>
-          </div>
-          
-          <div>
-            <h1 className="text-3xl font-bold mb-2 text-blue-400">
-              {problemDetails?.Problem || "Loading..."}
-            </h1>
-            <p className="text-gray-300 text-lg mb-4 leading-relaxed">
-              {problemDetails?.Description || " "}
-            </p>
-            <h2 className="text-xl font-bold mb-2 text-blue-400">
-              Examples
-            </h2>
+            <h1 className="text-3xl font-bold mb-2 text-blue-400">{problemDetails?.Problem || "Loading..."}</h1>
+            <p className="text-gray-300 text-lg mb-4 leading-relaxed">{problemDetails?.Description || " "}</p>
+            <h2 className="text-xl font-bold mb-2 text-blue-400">Examples</h2>
             <div className="text-gray-200 text-base space-y-2">
               {problemDetails?.Examples
                 ? problemDetails.Examples.split('\n').map((ex, i) => (
@@ -446,30 +428,32 @@ export default function Problem()
                   ))
                 : ""}
             </div>
-
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-1 py-6">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="bg-gray-800 rounded-xl border border-gray-700 w-full mx-auto mb-8">
-              <div className="p-4 border-b border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
-              </div>
-              <div className="bg-gray-800 rounded-xl border border-gray-700">
-                <CodeEditor defaultCode = {defaultCode} code = {code} setCode = {setCode} handleRun = {handleRun} saveCode={saveCode} toggle={toggle} showGraph={showGraph} setStartTime={setStartTime} readOnly={readOnly}/>
-              </div>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          </header>
+          <section className="bg-gray-800 rounded-xl border border-gray-700 w-full mx-auto mb-8">
+            <div className="p-4 border-b border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
+            </div>
             <div className="bg-gray-800 rounded-xl border border-gray-700">
-              <div className="p-4 border-b border-gray-700 h">
+              <CodeEditor
+                defaultCode={defaultCode}
+                code={code}
+                setCode={setCode}
+                handleRun={handleRun}
+                saveCode={saveCode}
+                toggle={toggle}
+                showGraph={showGraph}
+                setStartTime={setStartTime}
+                readOnly={readOnly}
+              />
+            </div>
+          </section>
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="bg-gray-800 rounded-xl border border-gray-700">
+              <div className="p-4 border-b border-gray-700">
                 <h2 className="text-xl font-semibold text-gray-200 mb-4">Test Results</h2>
                 <div className="mb-2">
                   <span className="text-gray-200 font-medium mr-2">Latest Score:</span>
-                  <span className="text-xl font-bold text-blue-400">
-                    {latestScore !== null ? `${Math.round(latestScore)}%` : "0"}
-                  </span>
+                  <span className="text-xl font-bold text-blue-400">{latestScore !== null ? `${Math.round(latestScore)}%` : "0"}</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -484,7 +468,7 @@ export default function Problem()
                     </thead>
                     <tbody className="divide-y divide-gray-600">
                       {results.length > 0 ? (results.map((test, index) => (
-                        <tr key={index} className="hover:bg-gray-700/50S">
+                        <tr key={index} className="hover:bg-gray-700/50">
                           <td className="py-3 px-4">Case {index + 1}</td>
                           <td>{test.input}</td>
                           <td className="py-3 px-4 font-mono text-blue-400">{test.expectedOutput}</td>
@@ -492,99 +476,109 @@ export default function Problem()
                           <td className="py-3 px-4">
                             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                               test.result === "PASS"
-                                ? 'bg-green-900 text-green-300' 
+                                ? 'bg-green-900 text-green-300'
                                 : 'bg-red-900 text-red-300'
                             }`}>
                               {test.result === "PASS" ? '✓ Pass' : '✗ Fail'}
                             </span>
                           </td>
                         </tr>
-                        ))
+                      ))
                       ) : (
                         <tr>
                           <td colSpan={5} className="py-3 px-4 text-center text-gray-400">
                             Click Run to test your code and see results.
                           </td>
                         </tr>
-                      )
-                    }
+                      )}
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
             <div className="p-4 bg-gray-800 rounded-xl border border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-200 mb-4">AI Assistant</h3>
-                <ChatHistory topic={topic} difficulty={difficulty} problemName={problemName} messages = {messages} setMessages = {setMessages} isLoading = {isLoading} aiAttempts={aiAttempts} setAIAttempts={setAIAttempts} />
+              <h3 className="text-lg font-semibold text-gray-200 mb-1">AI Assistant</h3>
+              <ChatHistory
+                topic={topic}
+                difficulty={difficulty}
+                problemName={problemName}
+                messages={messages}
+                setMessages={setMessages}
+                isLoading={isLoading}
+                aiAttempts={aiAttempts}
+                setAIAttempts={setAIAttempts}
+              />
             </div>
-          </div>
-
-         {showGraph && (
-              <div className="bg-gray-800 rounded-xl border border-gray-700 p-11 mb-6">
-                  <h3 className="text-xl font-semibold text-gray-200 mb-4">Progress Overview</h3>
-                  <ProgressGraph attemptData = {progressData} totalAttempts={totalAttempts} avgTime = {avgTime} overallSuccess={overallSuccess} barClick={setSelectedAttempt}/>
-              </div>
+          </section>
+          {showGraph && (
+            <section className="bg-gray-800 rounded-xl border border-gray-700 p-11 mb-6">
+              <h3 className="text-xl font-semibold text-gray-200 mb-4">Progress Overview</h3>
+              <ProgressGraph
+                attemptData={progressData}
+                totalAttempts={totalAttempts}
+                avgTime={avgTime}
+                overallSuccess={overallSuccess}
+                barClick={setSelectedAttempt}
+              />
+            </section>
           )}
-
           {showGraph && selectedAttempt !== null && currentAttempt && (
-            <div className = "bg-gray-900 rounded-xl p-6 mb-6 mt-4">
-                <h3 className = "text-lg font-semibold mb-4">
-                  Attempt {currentAttemptIndex + 1} Details
-                </h3>
-                <div className = "mb-4">
-                  <h4 className = "text-md font-bold text-gray-200 mb-2"> Code</h4>
-                  <CodeEditor code = {currentAttempt.code || code} readOnly = {true}/>
-                </div>
-                <div>
-                  <div className="overflow-x-auto">
-                    <h4 className = "text-md font-bold text-gray-200 mb-2"> Test Results </h4>
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-gray-600">
-                          <th className="text-left py-3 px-4 font-medium text-gray-300">Test Case</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-300">Input</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-300">Expected</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-300">Your Output</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
+            <section className="bg-gray-900 rounded-xl p-6 mb-6 mt-4">
+              <h3 className="text-lg font-semibold mb-4">
+                Attempt {currentAttemptIndex + 1} Details
+              </h3>
+              <div className="mb-4">
+                <h4 className="text-md font-bold text-gray-200 mb-2">Code</h4>
+                <CodeEditor code={currentAttempt.code || code} readOnly={true} />
+              </div>
+              <div>
+                <div className="overflow-x-auto">
+                  <h4 className="text-md font-bold text-gray-200 mb-2">Test Results</h4>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-600">
+                        <th className="text-left py-3 px-4 font-medium text-gray-300">Test Case</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-300">Input</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-300">Expected</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-300">Your Output</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-600">
+                      {currentAttempt.testResults && currentAttempt.testResults.length > 0 ? (currentAttempt.testResults.map((test, index) => (
+                        <tr key={index} className="hover:bg-gray-700/50">
+                          <td className="py-3 px-4">Case {index + 1}</td>
+                          <td>{test.input}</td>
+                          <td className="py-3 px-4 font-mono text-blue-400">{test.expectedOutput}</td>
+                          <td className="py-3 px-4 font-mono text-gray-300">{test.userOutput}</td>
+                          <td className="py-3 px-4">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              test.result === "PASS"
+                                ? 'bg-green-900 text-green-300'
+                                : 'bg-red-900 text-red-300'
+                            }`}>
+                              {test.result === "PASS" ? '✓ Pass' : '✗ Fail'}
+                            </span>
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-600">
-                        {currentAttempt.testResults && currentAttempt.testResults.length > 0 ? (currentAttempt.testResults.map((test, index) => (
-                          <tr key={index} className="hover:bg-gray-700/50S">
-                            <td className="py-3 px-4">Case {index + 1}</td>
-                            <td>{test.input}</td>
-                            <td className="py-3 px-4 font-mono text-blue-400">{test.expectedOutput}</td>
-                            <td className="py-3 px-4 font-mono text-gray-300">{test.userOutput}</td>
-                            <td className="py-3 px-4">
-                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                test.result === "PASS"
-                                  ? 'bg-green-900 text-green-300' 
-                                  : 'bg-red-900 text-red-300'
-                              }`}>
-                                {test.result === "PASS" ? '✓ Pass' : '✗ Fail'}
-                              </span>
-                            </td>
-                          </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan={5} className="py-3 px-4 text-center text-gray-400">
-                              No test results for this attempt.
-                            </td>
-                          </tr>
-                        )
-                      }
-                      </tbody>
-                    </table>
+                      ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-3 px-4 text-center text-gray-400">
+                            No test results for this attempt.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-              <button className = "mt-4 px-4 py-2 rounded text-white bg-gray-600 cursor-pointer" onClick = {() => setSelectedAttempt(null)} style = {{dispaly: selectedAttempt !== null ? "block" : "none"}}>
+              <button className="mt-4 px-4 py-2 rounded text-white bg-gray-600 cursor-pointer" onClick={() => setSelectedAttempt(null)}>
                 Close
               </button>
-            </div>
+            </section>
           )}
-
-          <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+          <section className="bg-gray-800 rounded-xl border border-gray-700 p-6 mb-8">
             <h3 className="text-lg font-semibold text-gray-200 mb-4">Learning Resources</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
@@ -602,25 +596,16 @@ export default function Problem()
                 </button>
               ))}
             </div>
-          </div>
+          </section>
         </div>
       </main>
-      </>
-    ) : (<div className="text-yellow-400 text-xl font-bold py-8 text-center">
-            This problem is still a work in progress. Please check back later.
-          </div>)}
-
-      <footer className="w-full mt-8 py-6 px-6 border-t border-gray-700">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-center space-x-6">
-            <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-              Home
-            </Link>
-            <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-              Contact
-            </Link>
-          </div>
+      <footer className="w-full mt-8 mb-4 px-4 rounded-lg shadow-lg bg-gray-900 border-t border-gray-800">
+        <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 py-4">
+          <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</Link>
+          <span className="text-gray-500">|</span>
+          <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</Link>
         </div>
+        <div className="text-center text-gray-500 text-xs pb-2">&copy; 2025 CodeTrack</div>
       </footer>
     </div>
   );

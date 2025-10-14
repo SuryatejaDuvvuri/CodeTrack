@@ -86,9 +86,9 @@ export default function ProblemList()
                             className={`block ${color} rounded-xl shadow-lg p-6 hover:scale-105 transition-all cursor-pointer`}
                             href={`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problem.id)}`}
                         >
-                            <h1 className="mb-2 text-xl font-bold tracking-tight text-blue-200">{problem.Name}</h1>
-                            <div className="font-normal text-sm text-gray-300 line-clamp-2">
-                            {problem.Description}
+                            <h1 className="mb-2 text-xl font-bold tracking-tight text-gray-800">{problem.Name}</h1>
+                            <div className="font-normal text-sm line-clamp-2 text-black">
+                                {problem.Description}
                             </div>
                         </Link>
                     ))}
@@ -108,7 +108,7 @@ export default function ProblemList()
                     <span className="text-gray-500">|</span>
                     <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</a>
                 </div>
-                <div className="text-center text-gray-500 text-xs pb-1">&copy; 2025 CS010B Practice Portal</div>
+                <div className="text-center text-gray-500 text-xs pb-1">&copy; 2025 CodeTrack</div>
             </footer>
         </div>
     );

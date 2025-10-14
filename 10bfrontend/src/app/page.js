@@ -170,7 +170,7 @@ export default function Home()
           <span className="text-gray-500">|</span>
           <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</a>
         </div>
-        <div className="text-center text-gray-500 text-xs pb-2">&copy; 2025 CS010B Practice Portal</div>
+        <div className="text-center text-gray-500 text-xs pb-2">&copy; 2025 CodeTrack</div>
       </footer>
     </div>
 

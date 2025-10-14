@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "CS010B Practice Portal - Protected Environment",
+  title: "CodeTrack - Protected Environment",
   description: "Practice programming exercises for CS010B",
 };
 

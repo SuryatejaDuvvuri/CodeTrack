@@ -51,7 +51,7 @@ function EmbeddedContent()
     if(!url)
     {
         return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800 flex items-center justify-center">
             <p className="text-white">No URL provided</p>
         </div>
         );
@@ -59,7 +59,7 @@ function EmbeddedContent()
 
     if (!isValid) {
         return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800 flex items-center justify-center">
             <div className="text-center">
             <p className="text-red-400 mb-4">Access to this resource is not allowed</p>
             <button 
@@ -92,7 +92,7 @@ function EmbeddedContent()
     const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
 
     return (
-        <div className = "min-h-screen bg-gray-900 text-white">
+        <div className = "min-h-screen bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800 text-white">
             <header className = "w-full py-4 px-6 bg-gray-800">
                 <div className = "flex justify-between items-center">
                     <h1 className = "text-xl font-semibold">{title || 'Learning Resource'}</h1>
@@ -123,7 +123,7 @@ export default function EmbeddedViewer()
 {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800 flex items-center justify-center">
         <p className="text-white">Loading...</p>
       </div>
     }>

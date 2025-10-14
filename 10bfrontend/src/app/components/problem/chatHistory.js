@@ -60,7 +60,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                         {
                             setMessages([{
                                 role: 'system',
-                                content: 'Welcome to CS010B Practice Portal! Ask me if you need help with your code.',
+                                content: 'Welcome to CodeTrack! Ask me if you need help with your code.',
                                 timestamp: null
                             }]);
                         }
@@ -116,7 +116,6 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
 
         if (aiAttempts >= MAX_ATTEMPTS) 
         {
-            // console.log(aiAttempts);
             setMessages(prev => [...prev, {
                 role: 'system',
                 content: 'AI attempts exceeded. Please rely on test cases or wait for reset.',
@@ -205,45 +204,52 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
     const filtered = messages.flat().filter(msg => !(msg.content && msg.content.includes("Can you give me feedback on my code?")));
 
    return (
-     <div className = 'flex-1 rounded-lg p-3 flex flex-col h-full'>
-        <div className = "flex-1 mb-3 overflow-y-auto max-h-[600px]">
-            {filtered.map((msg,i) => (
-                <div key = {i} className={`mb-3 ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'} max-w-[70%]`}>
-                    <div className = {`p-3 rounded-lg ${
-                        msg.role === 'user' 
-                        ? 'bg-blue-600 text-white rounded-br-none' 
-                        : 'bg-gray-700 text-white rounded-bl-none'
-                    }`}>
-                        <div className="whitespace-pre-wrap">{msg.content}</div>
-                    </div>
-                     <div className="text-xs text-gray-500 mt-1" suppressHydrationWarning>
-                        {msg.role === 'user' ? 'You' : 'AI Chatbot'} - {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()}
-                    </div>
+        <div className="flex-1 rounded-xl p-4 flex flex-col h-full w-full shadow-lg">
+            <div className="flex-1 mb-3 overflow-y-auto max-h-[600px]">
+            {filtered.map((msg, i) => (
+                <div key={i} className={`mb-3 ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'} max-w-[70%]`}>
+                <div className={`p-3 rounded-lg ${
+                    msg.role === 'user'
+                    ? 'bg-blue-600 text-white rounded-br-none'
+                    : 'bg-gray-700 text-white rounded-bl-none'
+                }`}>
+                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                </div>
+                <div className="text-xs text-gray-400 mt-1" suppressHydrationWarning>
+                    {msg.role === 'user' ? 'You' : 'AI Chatbot'} - {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()}
+                </div>
                 </div>
             ))}
-
             {isLoading && (
                 <div className="mr-auto mb-3">
-                    <div className="p-3 rounded-lg bg-gray-700 text-white rounded-bl-none flex items-center">
-                        <div className="typing-dots">
-                            <span className="dot"></span>
-                            <span className="dot"></span>
-                            <span className="dot"></span>
-                        </div>
+                <div className="p-3 rounded-lg bg-gray-700 text-white rounded-bl-none flex items-center">
+                    <div className="typing-dots">
+                    <span className="dot"></span>
+                    <span className="dot"></span>
+                    <span className="dot"></span>
                     </div>
                 </div>
+                </div>
             )}
-        </div>
-        <div className = "flex items-center gap-2 mb-8">
-            <input value= {input} onChange = {(e) => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { handleSend();}}}
-                className = "w-full px-4 py-3 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-blue-500" placeholder="Ask for help(E.G Syntax Help)"/>  
-            <button onClick = {handleSend} disabled = {isLoading || !input.trim()} className = {`${isLoading || !input.trim() ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 cursor-pointer hover:bg-blue-700'} text-white px-5 py-3 rounded-md transition-colors`}>
+            </div>
+            <div className="flex items-center gap-2 mb-4">
+            <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { handleSend(); } }}
+                className="w-full px-4 py-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-blue-500"
+                placeholder="Ask for help (e.g. Syntax Help)"
+            />
+            <button
+                onClick={handleSend}
+                disabled={isLoading || !input.trim()}
+                className={`${isLoading || !input.trim() ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 cursor-pointer hover:bg-blue-700'} text-white px-5 py-3 rounded-md transition-colors font-semibold shadow`}
+            >
                 {isLoading ? 'Thinking...' : 'Send'}
             </button>
+            </div>
         </div>
-
-    </div>
-   );
+        );
 
 
 }

@@ -95,7 +95,7 @@ export default function Login() {
           </button>
         </div>
         <footer className="mt-8 text-center text-gray-400 text-sm">
-          &copy; 2025 CS010B Practice Portal. Made with Love
+          &copy; 2025 CodeTrack. Made with Love
         </footer>
       </div>
     </div>
