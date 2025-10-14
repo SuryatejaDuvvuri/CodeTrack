@@ -565,13 +565,6 @@ public class FirestoreService
 
         if(doc.exists())
         {
-            // Map<String,Object> data = doc.getData();
-            // Map<String,Object> problems = (Map<String, Object>) data.get("Problems");
-            // if(problems != null && problems.containsKey(difficulty))
-            // {
-                // Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
-                // if (diff != null && diff.containsKey(problem)) 
-            
             Map<String, Object> problemsMap = (Map<String, Object>) doc.get("Problems");
             Map<String, Object> topicMap = (Map<String, Object>) problemsMap.get(topic);
             Map<String, Object> difficultyMap = (Map<String, Object>) topicMap.get(difficulty);
@@ -582,7 +575,6 @@ public class FirestoreService
                 return lastAttempt;
             }
                 
-            // }
         }
         return 0;
     }
@@ -591,7 +583,7 @@ public class FirestoreService
     {
         if(netId == null)
         {
-            throw new IllegalArgumentException("Must have netid.");
+             throw new IllegalArgumentException("Must have netid.");
         }
         DocumentReference docRef = firestore.collection("section").document(netId);
         // String difficulty = problem.startsWith("Easy") ? "Easy" :
@@ -842,7 +834,8 @@ public class FirestoreService
                     if(details != null)
                     {
                         Map<String,Object> info = new HashMap<>();
-                        info.put("Name", details.get(prob));
+                        info.put("id", prob);
+                        info.put("Name", details.get("Problem"));
                         info.put("Description", details.get("Description"));
                         result.add(info);
                     }

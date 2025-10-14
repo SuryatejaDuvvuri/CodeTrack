@@ -47,71 +47,57 @@ export default function Login() {
   }
 
   return (
-    <div className="container flex flex-col m-auto min h-screen px-4 font-sans justify-center items-center">
-        <div className = "mb-8">
-          <h1 className = "text-xl font-bold text-white">CS010B Practice Portal</h1>
+     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800 font-sans">
+      <div className="w-full max-w-md bg-gray-950 rounded-2xl shadow-2xl p-8 border border-gray-800">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-sky-300 mb-2">CodeTrack Portal</h1>
+          <p className="text-gray-200">Sign in to continue</p>
         </div>
-
-        <div className = "rounded-xl p-8 w-full">
-          <h2 className = "text-2xl font-semibold text-white text-center">Welcome!</h2>
-          <form onSubmit={handleSubmit}>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="your@ucr.edu"
-                required
-                className="w-full px-4 py-2 rounded bg-gray-800 text-white"
-              />
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Password"
-                required
-                className="w-full px-4 py-2 rounded bg-gray-800 text-white"
-              />
-              <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm w-full">
-                Login
-              </button>
-              <div className = "space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-gray-200 mb-1" htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="your@ucr.edu"
+              required
+              className="w-full px-4 py-2 rounded-lg bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
-              <div className="text-red-400">{msg}</div>
-          </form>
-
-          <div className = "flex items-center justify-center w-full mt-5">
-               <button onClick = {() => router.push('/components/signup')}className = "bg-blue-600 mb-auto text-white px-6 py-3 rounded-lg shadow-sm hover:font-bold">
-                Sign up
-              </button>
+          <div>
+            <label className="block text-gray-200 mb-1" htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+              className="w-full px-4 py-2 rounded-lg bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
-           {/* <div className = "grid grid-rows-1 gap-4">
-                <div className = "flex items-center mx-4">
-                  <div className = "flex-grow border-t border-gray-600"></div>
-                      <span className = "px-3 text-gray-400 text-sm">Continue as</span>
-                      <div className = "flex-grow border-t border-gray-600"></div>
-                </div>
-                 <Link href = "/components/instructor" className = "text-white mb-auto px-6 py-3 rounded-lg shadow-sm bg-gray-700">
-                      Instructor
-                </Link>
-                <Link href = "/" className = "text-white mb-auto px-6 py-3 rounded-lg shadow-sm bg-gray-700">
-                      Student
-                </Link>
-            </div> */}
+          <button
+            type="submit"
+            className="w-full bg-gray-800 hover:bg-rose-400 text-white font-semibold py-2 rounded-lg shadow transition-all"
+          >
+            Login
+          </button>
+          {msg && <div className="text-red-400 text-center">{msg}</div>}
+        </form>
+        <div className="flex items-center justify-center mt-6">
+          <button
+            onClick={() => router.push('/components/signup')}
+            className="bg-gray-800 hover:bg-rose-400 px-6 py-2 rounded-lg shadow-sm font-medium transition-all"
+          >
+            Sign up
+          </button>
         </div>
-       
-      
-       <footer className = "w-full mt-8 mb-4 px-4 rounded-lg shadow-sm">
-        <div className = "flex justify-center space-x-4">
-          <a href = "#" className = "text-gray-300">Home</a>
-          <a href = "#" className = "text-gray-300">About</a>
-          <a href = "#" className = "text-gray-300">Contact</a>
-          
-        </div>
-        <div className=  "mt-4 text-gray-500 text-sm">
+        <footer className="mt-8 text-center text-gray-400 text-sm">
           &copy; 2025 CS010B Practice Portal. Made with Love
-        </div>
-     </footer>
-      
+        </footer>
+      </div>
     </div>
 
   );

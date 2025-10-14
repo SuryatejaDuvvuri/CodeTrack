@@ -78,13 +78,6 @@ public class ChatController
     {
         return fireStore.getProblems(topic,difficulty);
     }
-
-    // @GetMapping("/test")
-    // public ResponseEntity<ChatResponse> test() 
-    // {
-    //     String response = chatSample.getResponse();
-    //     return ResponseEntity.ok(new ChatResponse(response));
-    // }
 }
 
 class Problem
