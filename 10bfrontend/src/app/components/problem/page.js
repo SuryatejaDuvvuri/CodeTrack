@@ -21,7 +21,6 @@ export default function Problem()
   const problemNum = match ? parseInt(match[1],10) : 1;
   const [defaultCode, setDefaultCode] = useState("");
   const [isLoading, setLoading] = useState(false);
-  // const [testcases,setTestcases] = useState([]);
   const[aiAttempts,setAIAttempts] = useState(0);
   const [code, setCode] = useState(""); 
   const [problemDetails, setProblemDetails] = useState(null);
@@ -227,7 +226,7 @@ export default function Problem()
               topic,
               difficulty,
               problem:problemName,
-              prompt: "Can you give me feedback on my code? This is a system prompt",
+              prompt: "I'm learning programming. Please analyze my code and explain: 1) What I did well, 2) What concepts I might be misunderstanding, 3) Specific improvements with examples, 4) Learning resources for areas I'm struggling with. Keep explanations beginner-friendly.",
               netId: netid
           }),
         });
@@ -268,7 +267,7 @@ export default function Problem()
                 topic,
                 difficulty,
                 problem:problemName,
-                prompt: "Can you give me feedback on my code? This is a system prompt.",
+                prompt: "I'm learning programming. Please analyze my code and explain: 1) What I did well, 2) What concepts I might be misunderstanding, 3) Specific improvements with examples, 4) Learning resources for areas I'm struggling with. Keep explanations beginner-friendly.",
                 netId: netid
             }),
           });

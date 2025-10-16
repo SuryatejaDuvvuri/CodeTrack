@@ -61,12 +61,6 @@ public class ChatController
         return (Map<String,Object>)fireStore.getProblem(topic, difficulty, problem);
     }
 
-    // @PostMapping("/create")
-    // public void createStudentProblems(@RequestBody ChatRequest request)
-    // {
-    //     fireStore.createProblems(null);
-    // }
-
     @GetMapping("/assigned")
     public List<Map<String, Object>> getAssignedProblems(@RequestParam String netId) throws Exception
     {

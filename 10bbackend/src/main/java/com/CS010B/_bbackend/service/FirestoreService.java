@@ -599,24 +599,15 @@ public class FirestoreService
     {
         DocumentReference docRef = firestore.collection("section").document(netId);
         DocumentSnapshot doc = docRef.get().get();
-        // String difficulty = problem.startsWith("Easy") ? "Easy" :
-        //                 problem.startsWith("Medium") ? "Medium" : "Hard";
 
         if(doc.exists())
         {
-            // Map<String,Object> data = doc.getData();
             Map<String, Object> problemsMap = (Map<String, Object>) doc.get("Problems");
             Map<String, Object> topicMap = (Map<String, Object>) problemsMap.get(topic);
             Map<String, Object> difficultyMap = (Map<String, Object>) topicMap.get(difficulty);
             Map<String, Object> problems = (Map<String, Object>) difficultyMap.get(problem);
             if(problems != null)
             {
-                // Map<String, Object> diff = (Map<String, Object>) problems.get(difficulty);
-                // if (diff != null && diff.containsKey(problem)) 
-                // {
-                    // Map<String, Object> probMap = (Map<String, Object>) problems.get(problem);
-                    // if (probMap != null) 
-                    // {
                 int score = 0;
                 Object scoreObj = problems.get("Latest Score");
                 if(scoreObj instanceof Number)
@@ -624,8 +615,6 @@ public class FirestoreService
                     score = ((Number)scoreObj).intValue();
                 }
                 return score;
-                    // }
-                // }
             }
         }
         return 0;
@@ -728,32 +717,6 @@ public class FirestoreService
             updates.put("Problems",problemsMap);
             studentRef.set(updates, SetOptions.merge()).get();
         }
-        
-        
-
-            // DocumentReference docRef = firestore
-            //     .collection("section")
-            //     .document("sduvv003");
-
-            // String[] difficulties = {"Easy", "Medium", "Hard"};
-            // Map<String, Object> problemsMap = new HashMap<>();
-            // Map<String, Object> topicMap = new HashMap<>();
-            // String topic = "Linked List 2";
-
-            // for (String difficulty : difficulties) {
-            //     Map<String, Object> difficultyMap = new HashMap<>();
-            //     for (int i = 1; i <= 15; i++) 
-            //     {
-            //         String problem = difficulty + " " + i;
-            //         difficultyMap.put(problem, createProblemData());
-            //     }
-            //     topicMap.put(difficulty, difficultyMap);
-            // }
-
-            // problemsMap.put(topic, topicMap);
-            // Map<String, Object> update = new HashMap<>();
-            // update.put("Problems", problemsMap);
-            // docRef.set(update, SetOptions.merge());
     }
 
     public Map<String, Object> createProblemData() 
@@ -767,32 +730,6 @@ public class FirestoreService
         data.put("Runs", new ArrayList<Map<String, Object>>());
         data.put("lastAIAttempt", 0);
         return data;
-    }
-
-    public void addWarmUpProblemsForStudent(String netId) throws Exception {
-        // String[] warmUps = {"Warm Up 1", "Warm Up 2"};
-        // String difficulty = "Easy";
-        // DocumentReference studentRef = firestore.collection("section").document(netId);
-        // DocumentSnapshot doc = studentRef.get().get();
-        // Map<String, Object> problems = (Map<String, Object>) doc.get("Problems");
-        // if (problems == null) problems = new HashMap<>();
-
-        // for (String warmUp : warmUps) {
-        //     Map<String, Object> problemsMap = new HashMap<>();
-        //     Map<String, Object> diffMap = new HashMap<>();
-        //     for (int i = 1; i <= 15; i++) {
-        //         String probName = difficulty + " " + i;
-        //         diffMap.put(probName, createProblemData());
-        //     }
-        //     problemsMap.put(difficulty, diffMap);
-
-        //     problems.put(warmUp, problemsMap);
-
-        // // Save back to Firestore
-        // Map<String, Object> update = new HashMap<>();
-        // update.put("Problems", problems);
-        //     studentRef.set(update, SetOptions.merge()).get();
-        // }
     }
 
     public List<Map<String, Object>> getAssignedProblems(String netId) throws Exception
@@ -809,8 +746,6 @@ public class FirestoreService
                 for(Map<String,Object> item: assigned)
                 {
                     Map<String,Object> docPath = new HashMap<>(item);
-                    // Object ref = docPath.get("problemRef");
-                    // docPath.put("problemRef", ((DocumentReference)ref).getPath());
                     result.add(docPath);
                 }
             }
@@ -998,11 +933,6 @@ public class FirestoreService
             studentRef.update(updates).get();
         }
     }
-
-    // public void saveUser(User user) throws Exception 
-    // {
-    //     firestore.collection("section").document(user.getEmail()).set(user).get();
-    // }
 
     public User getUser(String email) throws Exception 
     {

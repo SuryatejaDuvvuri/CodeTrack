@@ -201,7 +201,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
         }
     }
 
-    const filtered = messages.flat().filter(msg => !(msg.content && msg.content.includes("Can you give me feedback on my code?")));
+    const filtered = messages.flat().filter(msg => !(msg.content && msg.content.includes("I'm learning programming. Please analyze my code and explain: 1) What I did well, 2) What concepts I might be misunderstanding, 3) Specific improvements with examples, 4) Learning resources for areas I'm struggling with. Keep explanations beginner-friendly.")));
 
    return (
         <div className="flex-1 rounded-xl p-4 flex flex-col h-full w-full shadow-lg">

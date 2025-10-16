@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.CS010B._bbackend.model.ChatMessage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-// import com.google.cloud.firestore.DocumentReference;
 
 @Service
 public final class BasicChatSample 
@@ -30,36 +29,39 @@ public final class BasicChatSample
         this.chatModel = chatModel;
     }
 
-    // public String getResponse()
-    // {
-    //     Prompt prompt = new Prompt(List.of(
-    //             new SystemMessage("You're an assistant helping students learn C++ programming on their own without using AI for an introductory C++ college level course."),
-    //             new UserMessage("What is an implicit and explicit parameter in simple terms?")
-    //     ));
-    //     String res = chatModel.call(prompt).getResult().getOutput().getText();n
-    //     return res;
-    // }
-
 
     public String getChat(String topic, String difficulty, String problem, String userPrompt, String netId) throws Exception
     {
         Map<String,Object> details = firestore.getProblem(topic,difficulty,problem);
         String problemDesc = (String)details.get("Description");
         StringBuilder sys = new StringBuilder();
-        sys.append("You're an assistant helping students learn C++ programming on their own without using AI ");
-        sys.append("for an introductory C++ college level course. Take a look at this problem " + problemDesc + "and provide helpful guidance but don't write complete solutions.");
-        sys.append("Suggest approaches, explain concepts, and guide students through debugging. Make it short and concise.");
+        sys.append("You are a helpful C++ programming tutor for introductory college students.");
+        sys.append("Take a look at this problem " + problemDesc + "and provide helpful guidance but don't write complete solutions.");
+        sys.append("When analyzing student code, provide feedback in this exact format:\n\n");
+
+
+        sys.append("## What You Did Well\n");
+        sys.append("[List 2-3 specific positive aspects of their code]\n\n");
+
+        sys.append("## Areas for Improvement\n");
+        sys.append("[Identify 2-3 specific issues or misconceptions]\n\n");
+
+        sys.append("## Specific Suggestions\n");
+        sys.append("[Provide concrete, actionable improvements with brief code examples]\n\n");
+
+        sys.append("## Learning Resources\n");
+        sys.append("[Suggest 1-2 specific topics to study based on their code]\n\n");
+
+        sys.append("Keep explanations beginner-friendly, use simple language, and focus on learning rather than just fixing. ");
+        sys.append("Don't provide complete solutions - guide them to discover the answer. ");
+        sys.append("If their code has syntax errors, explain the concept behind the fix rather than just the correction.\n\n");
+        
+        // sys.append("You're an assistant helping students learn C++ programming on their own without using AI ");
+        // sys.append("Take a look at this problem " + problemDesc + "and provide helpful guidance but don't write complete solutions.");
+        // sys.append("Suggest approaches, explain concepts, and guide students through debugging. Make it short and concise.");
 
         try
         {
-            // String diff = problem.startsWith("Easy") ? "easy" : problem.startsWith("Medium") ? "medium" : "hard";
-            // Map<String,Object> details = firestore.getProblem(topic,difficulty,problem);
-            // if(details != null)
-            // {
-                // String desc = (String)details.get("Description");
-                // String diff = String.valueOf(details.get("Difficulty"));
-                // String problemTitle = (String) details.get("Problem");
-                
                 sys.append("\nThe student is working on this problem: \n");
                 sys.append("Title: ").append(problem).append("\n");
                 sys.append("Difficulty: ").append(difficulty).append("\n");
@@ -83,7 +85,6 @@ public final class BasicChatSample
                     return " ";
 
                 }
-            // }
 
             Map<String,Object> studentDetails = firestore.getStudentProblem(topic, difficulty, problem,netId);
             if(studentDetails != null)
@@ -94,10 +95,6 @@ public final class BasicChatSample
                 
                 sys.append("\nStudent Progress: \n");
                 sys.append("Attempts so far: ").append(attempts).append("\n");
-                // if (timeSpent != null) 
-                // {
-                //     sys.append("Time spent: ").append(timeSpent).append(" minutes\n");
-                // }
                 if (latestCode != null && !latestCode.isEmpty()) 
                 {
                     sys.append("Latest code submission: \n```cpp\n").append(latestCode).append("\n```\n");

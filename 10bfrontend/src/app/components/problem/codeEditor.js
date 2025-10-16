@@ -73,11 +73,11 @@ export default function CodeEditor({defaultCode, code,setCode,handleRun, saveCod
                 <button className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-all font-semibold" onClick={saveCode}>Save</button>
                 <button className="px-4 py-2 bg-emerald-500 text-white rounded-lg shadow hover:bg-emerald-600 transition-all font-semibold" onClick={handleRun}>Run</button>
                 <button className="px-4 py-2 bg-amber-500 text-white rounded-lg shadow hover:bg-amber-600 transition-all font-semibold" onClick={handleReset}>Reset</button>
-                <button className="px-4 py-2 bg-gray-700 text-blue-300 rounded-lg shadow hover:bg-gray-600 hover:text-white transition-all font-semibold" onClick={toggle}>
-                {showGraph ? "Hide Graph" : "Show Graph"}
-                </button>
             </div>
             )}
+            <button className="px-4 py-2 bg-gray-700 text-blue-300 rounded-lg shadow hover:bg-gray-600 hover:text-white transition-all font-semibold" onClick={toggle}>
+                {showGraph ? "Hide Graph" : "Show Graph"}
+            </button>
         </div>
     )
 }

@@ -91,7 +91,6 @@ class Progress
     private long timeSpent;
     private int aiAttempts;
     private List<Map<String, Object>>  testResults;
-    // private long lastAttempt;
 
     public String getProblem()
     {

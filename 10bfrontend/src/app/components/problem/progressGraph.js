@@ -43,7 +43,7 @@ export default function progressGraph({attemptData = [],totalAttempts,avgTime,ov
 {
   
   return (
-    <div className="bg-gray-900 rounded-xl p-6 border border-gray-700 shadow-lg relative">
+    <div className="rounded-xl p-6 relative">
       <div className="absolute right-6 top-6 flex items-end space-x-4">
         <div className="flex items-center">
           <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
