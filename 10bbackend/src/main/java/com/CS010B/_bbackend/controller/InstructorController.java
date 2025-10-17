@@ -54,9 +54,18 @@ public class InstructorController
     }
 
     @PostMapping("/assignProblems")
-    public void assignProblems(@RequestBody AssignedProblems req) throws Exception
+    public void assignProblems(@RequestBody Map<String, Object> req) throws Exception
     {
-        fireStore.assignProblems(req.getNetId(), req.getProblems());
+        List<String> netIds = (List<String>) req.get("netIds");
+        
+        List<Map<String, Object>> problems = (List<Map<String, Object>>) req.get("problems");
+        for (String netId : netIds) {
+            // if (netId == null || netId.trim().isEmpty()) {
+            //     throw new IllegalArgumentException("Student netId must be a non-empty string");
+            // }
+            fireStore.assignProblems(netId, problems);
+        }
+
     }
 
     @PostMapping("/assignProblemsAll")

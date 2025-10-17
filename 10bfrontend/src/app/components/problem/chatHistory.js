@@ -1,6 +1,6 @@
 "use client";
 import { useState,useEffect } from 'react';
-
+import ReactMarkdown from 'react-markdown';
 export default function chatHistory({topic,difficulty,problemName, messages = [], setMessages, isLoading, aiAttempts, setAIAttempts})
 {
     
@@ -213,7 +213,15 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                     ? 'bg-blue-600 text-white rounded-br-none'
                     : 'bg-gray-700 text-white rounded-bl-none'
                 }`}>
-                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                    <ReactMarkdown
+                    components={{
+                        h2: ({node, ...props}) => <h2 className="text-lg font-bold text-blue-400 my-2" {...props} />,
+                        ul: ({node, ...props}) => <ul className="list-disc ml-6 my-2" {...props} />,
+                        code: ({node, ...props}) => <code className="bg-gray-800 px-2 py-1 rounded" {...props} />,
+                    }}
+                    >
+                    {msg.content}
+                    </ReactMarkdown>
                 </div>
                 <div className="text-xs text-gray-400 mt-1" suppressHydrationWarning>
                     {msg.role === 'user' ? 'You' : 'AI Chatbot'} - {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()}

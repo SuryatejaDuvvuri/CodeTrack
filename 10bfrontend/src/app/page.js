@@ -62,7 +62,8 @@ export default function Home()
       {
         const data = await res.json();
         console.log(data);
-        setAssignedProblems(data);
+        const activeProblems = data.filter(p => new Date(p.dueDate) > new Date());
+        setAssignedProblems(activeProblems);
       }
     };
     fetchAssigned();

@@ -917,8 +917,15 @@ public class FirestoreService
     public void assignProblems(String netId, List<Map<String, Object>> problems) throws Exception
     {
         DocumentReference ref = firestore.collection("section").document(netId);
+        DocumentSnapshot doc = ref.get().get();
+        List<Map<String, Object>> assignedProblems = (List<Map<String, Object>>) doc.get("Assigned Problems");
+        if(assignedProblems == null)
+        {
+            assignedProblems = new ArrayList<>();
+        }
+        assignedProblems.addAll(problems);
         Map<String,Object> updates = new HashMap<>();
-        updates.put("Assigned Problems", problems);
+        updates.put("Assigned Problems", assignedProblems);
         ref.update(updates).get();
     }
 

@@ -279,6 +279,9 @@ export default function Instructor() {
                 <a href="/" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
                   Home
                 </a>
+                <a href="/components/instructor" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
+                  Roster
+                </a>
                 <a onClick={() => {
                   localStorage.removeItem('token');
                   localStorage.removeItem('role');
@@ -482,7 +485,7 @@ export default function Instructor() {
                                   );
                                 }}
                               >
-                                See Graph
+                                Show
                               </button>
                             </div>
                           ))}
