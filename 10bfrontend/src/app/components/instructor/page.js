@@ -22,6 +22,7 @@ export default function Instructor() {
   const [roster, setRoster] = useState([]);
   const [role, setRole] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedStudents, setSelectedStudents] = useState([]);
   const [selectedProblems, setSelectedProblems] = useState([]);
   const [studentDetails, setStudentDetails] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
@@ -194,14 +195,20 @@ export default function Instructor() {
     }
   }
 
-  const assignedProblems = selectedProblems.map(p => ({
-    problem: p,
-    completed: false,
-    dueDate:dueDate
-  }));
+  const assignedProblems = selectedProblems.map(prob => {
+    const probObj = problemsList.find(p => p.id === prob);
+    return {
+      problem: probObj.Name,
+      completed: false,
+      dueDate:dueDate
+    };
+  });
 
   const handleAssignProblems = async () => {
-    if (!selectedStudent || selectedProblems.length === 0 || !dueDate)
+    console.log("selectedStudents:", selectedStudents);
+    console.log("selectedProblems:", selectedProblems);
+    console.log("dueDate:", dueDate);
+    if (selectedStudents.length === 0 || selectedProblems.length === 0 || !dueDate)
     {
       alert("Please select a student, at least one problem, and a due date.");
       return
@@ -210,11 +217,11 @@ export default function Instructor() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          netId: selectedStudent.netId,
+          netIds: selectedStudents.map(s => s.netId).filter(id => id && id.trim() !== ""),
           problems: assignedProblems,
         }),
       });
-    alert(`Problems assigned to ${selectedStudent.name}!`);
+    alert(`Problems assigned to students!`);
   }
 
   useEffect(() => {
@@ -289,12 +296,15 @@ export default function Instructor() {
                 {roster.map((student) => (
                   <div key={student.netId} className="border border-gray-700 rounded-lg overflow-hidden transition-all duration-300">
                     <div
-                      className="bg-gray-700 p-3 rounded cursor-pointer hover:bg-gray-600 transform transition-all hover:scale-101"
-                      onClick={() => setSelectedStudent(student)}
-                    >
-                      <div className="font-medium text-white">{student.name}</div>
-                      <div className="text-sm text-blue-200">NetId: {student.netId}</div>
-                      <div className="text-xs text-gray-300">Progress: {student.progress}%</div>
+                      className="bg-gray-700 p-3 rounded cursor-pointer hover:bg-gray-600 transform transition-all hover:scale-101">
+                        <input type="checkbox" checked={selectedStudents.some(s => s.netId === student.netId)} onChange={() => {
+                          setSelectedStudents(selectedStudents => selectedStudents.some(s => s.netId === student.netId) ? selectedStudents.filter(s => s.netId !== student.netId): [...selectedStudents,student]);
+                        }} className = "mr-2"/>
+                      <div className = "cursor-pointer flex-1" onClick = {() => setSelectedStudent(student)}>
+                        <div className="font-medium text-white">{student.name}</div>
+                        <div className="text-sm text-blue-200">NetId: {student.netId}</div>
+                        <div className="text-xs text-gray-300">Progress: {student.progress}%</div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -407,7 +417,7 @@ export default function Instructor() {
                       onChange={e => setDueDate(e.target.value)}
                       className="rounded px-2 py-1 bg-gray-700 text-white border border-gray-600"
                     />
-                    <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer transform transition-all hover:scale-105 hover:bg-blue-500 active:scale-95 focus:ring-2 focus:ring-blue-400" onClick={handleAssignProblems}>Assign Problems</button>
+                    <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer transform transition-all hover:scale-105 hover:bg-blue-500 active:scale-95 focus:ring-2 focus:ring-blue-400" onClick={handleAssignProblems}>Assign Problems to Selected Students</button>
                     <button className="bg-blue-400 text-white px-4 py-1 rounded cursor-pointer transform transition-all hover:scale-105 hover:bg-blue-500 active:scale-95 focus:ring-2 focus:ring-blue-400" onClick={handleAssignAllProblems}>Assign All</button>
                     <button className="bg-red-400 text-white px-4 py-1 rounded cursor-pointer transform transition-all hover:scale-105 hover:bg-red-500 active:scale-95 focus:ring-2 focus:ring-red-400" onClick={handleRemoveStudent}>Remove</button>
                   </div>

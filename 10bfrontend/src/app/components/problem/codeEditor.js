@@ -65,7 +65,13 @@ export default function CodeEditor({defaultCode, code,setCode,handleRun, saveCod
                 height="600px"
                 theme={dracula}
                 extensions={[cpp()]}
-                onChange={(value) => setCode(value)}
+                editable={!readOnly}
+                onChange={(value) => {
+                    if(!readOnly) 
+                    {
+                        setCode(value);
+                    }
+                }}
             />
             </div>
             {!readOnly && (

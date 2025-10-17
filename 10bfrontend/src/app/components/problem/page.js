@@ -13,34 +13,54 @@ export default function Problem()
   const router = useRouter();
   const search = useSearchParams();
   const topic = search.get("topic");
-  const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
   const difficulty = search.get("difficulty");
   const problemName = search.get("problem");
+  const viewingStudent = search.get("viewingStudent");
   const maxProblems = 5;
   const match = problemName?.match(/(\d+)$/);
-  const problemNum = match ? parseInt(match[1],10) : 1;
+  const problemNum = match ? parseInt(match[1], 10) : 1;
+
+  const [netid, setNetid] = useState(null);
+  const [role, setRole] = useState(null);
+  const [ready, setReady] = useState(false);
   const [defaultCode, setDefaultCode] = useState("");
   const [isLoading, setLoading] = useState(false);
-  const[aiAttempts,setAIAttempts] = useState(0);
-  const [code, setCode] = useState(""); 
+  const [aiAttempts, setAIAttempts] = useState(0);
+  const [code, setCode] = useState("");
   const [problemDetails, setProblemDetails] = useState(null);
   const [selectedAttempt, setSelectedAttempt] = useState(null);
-  const role = typeof window !== "undefined" ? localStorage.getItem("role") : null;
-  const viewingStudent = search.get("viewingStudent");
-  const readOnly = role === "INSTRUCTOR" && viewingStudent;
+  const [results, setResults] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [showGraph, setShowGraph] = useState(false);
+  const [progressData, setProgressData] = useState([]);
+  const [startTime, setStartTime] = useState(null);
+  const [latestScore, setLatestScore] = useState(null);
   const MAX_ATTEMPTS = 4;
 
   useEffect(() => {
-    if ( role === "STUDENT" && viewingStudent && viewingStudent !== netid) 
+    if (typeof window !== "undefined") 
+      {
+        setNetid(localStorage.getItem('netid'));
+        console.log(localStorage.getItem('role'));
+        setRole(localStorage.getItem('role'));
+        setReady(true);
+      }
+  }, []);
+
+  useEffect(() => {
+    if (role === "STUDENT" && viewingStudent && viewingStudent !== netid) 
     {
       router.replace("/components/login");
     }
-  }, [role, viewingStudent, netid, router]);
+  }, [ready,role, viewingStudent, netid, router]);
 
+  const currNetId = (role === "INSTRUCTOR" && Boolean(viewingStudent)) ? viewingStudent : netid;
+  const readOnly = role === "INSTRUCTOR" && Boolean(viewingStudent);
   const start = async () => {
+
     if(role === "INSTRUCTOR" && viewingStudent)
     {
-        const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${viewingStudent}`);
+        const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
         if (res.ok) {
           const data = await res.text();
           setCode(data);
@@ -81,14 +101,17 @@ export default function Problem()
   useEffect(() => {
     loadProblem();
   },[topic,difficulty,problemName]);
-  
+
   useEffect(() => {
+  if (ready && role && netid) {
     start();
-  }, [topic, difficulty, problemName]);
+  }
+}, [topic, difficulty, problemName, ready, role, netid, viewingStudent]);
+  
 
   const loadCode = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${netid}`, {
+    const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`, {
       method: "GET",
       headers: {
         "Content-Type":"application/json"
@@ -108,16 +131,19 @@ export default function Problem()
 
   const saveCode = async () =>
   {
-      const chatRes = await fetch ("http://localhost:8080/api/grade/update", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({topic,difficulty,problem:problemName,code:code,netId: netid}),
-    });
+      if (role === "STUDENT")
+      {
+        await fetch ("http://localhost:8080/api/grade/update", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({topic,difficulty,problem:problemName,code:code,netId: netid}),
+      });
+      }
   }
   const fetchAttempts = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${netid}`);
-    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${netid}`);
+    const res = await fetch(`http://localhost:8080/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
+    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
 
     if(res.ok && resTwo.ok)
     {
@@ -130,17 +156,20 @@ export default function Problem()
       if(hoursPassed >= 5)
       {
         setAIAttempts(0);
-        await fetch("http://localhost:8080/api/progress/update", {
-          method: "POST",
-          headers: {"Content-Type" : "application/json"},
-          body: JSON.stringify({
-            topic,
-            difficulty,
-            problem:problemName,
-            aiAttempts: 0,
-            netId: netid
-          })
-        });
+        if (role === "STUDENT")
+        {
+          await fetch("http://localhost:8080/api/progress/update", {
+            method: "POST",
+            headers: {"Content-Type" : "application/json"},
+            body: JSON.stringify({
+              topic,
+              difficulty,
+              problem:problemName,
+              aiAttempts: 0,
+              netId: netid
+            })
+          });
+        }
       }
       else
       {
@@ -152,7 +181,7 @@ export default function Problem()
 
   const fetchScore = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${netid}`);
+    const res = await fetch(`http://localhost:8080/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
     if (res.ok) 
     {
       const data = await res.json();
@@ -168,8 +197,18 @@ export default function Problem()
     await loadCode()
 };
 
+useEffect(() => {
+  if (ready && netid) {
+    refreshAll();
+  }
+}, [problemName, ready, netid, viewingStudent]);
+
   const handleRun = async () =>
   {
+    if (role === "INSTRUCTOR") 
+    {
+      return; 
+    }
     setLoading(true);
     setTimeout(fetchAttempts,100);
     const runStart = Date.now();
@@ -320,13 +359,6 @@ export default function Problem()
     refreshAll();
   }, [problemName]);
 
-  const [results, setResults] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [showGraph, setShowGraph] = useState(false);
-  const [progressData, setProgressData] = useState([]);
-  const [startTime, setStartTime] = useState(null);
-  const [latestScore, setLatestScore] = useState(null);
-
    useEffect(() => {
     const chatCont = document.querySelector('.overflow-y-auto');
     if(chatCont)
@@ -336,7 +368,7 @@ export default function Problem()
   },[messages,isLoading]);
 
   const fetchProgress = async () => {
-    const progressRes = await fetch(`http://localhost:8080/api/progress?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${netid}`);
+    const progressRes = await fetch(`http://localhost:8080/api/progress?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
     if(progressRes.ok)
     {
       const data = await progressRes.json();
@@ -358,12 +390,14 @@ export default function Problem()
 
   useEffect(() => {
     fetchScore();
-  }, [problemName]);
+  }, [problemName, ready, netid, viewingStudent]);
 
   useEffect(() => {
-    fetchAttempts();
-    fetchProgress();
-  },[problemName]);
+    if (ready && netid) {
+      fetchAttempts();
+      fetchProgress();
+    }
+  }, [problemName, ready, netid, viewingStudent]);
 
   const toggle = () => 
   {
@@ -393,7 +427,10 @@ export default function Problem()
   const latestAttemptIndex = progressData.length > 0 ? progressData.length - 1 : null;
   const currentAttemptIndex = selectedAttempt !== null ? selectedAttempt : latestAttemptIndex;
   const currentAttempt = progressData[currentAttemptIndex] || {};
-  
+  if (!ready) 
+  {
+    return <div className="min-h-screen flex items-center justify-center text-gray-300">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen w-full font-sans flex flex-col bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800">
