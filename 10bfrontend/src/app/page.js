@@ -1,178 +1,103 @@
 "use client";
+import { useState,useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link"
-import {useState,useEffect} from "react";
-import { useRouter } from "next/navigation";
-
-
-
-function canGetPasscode(problems)
-{
-  const now = new Date();
-  return problems.length > 0 && problems.every(
-    p => p.completed && new Date(p.dueDate) >= now
-  );
-}
-
-export default function Home() 
-{
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [msg, setMsg] = useState('');
   const router = useRouter();
-  const [selectedTopic, setSelectedTopic] = useState(null);
-  const [topTopics, setTopTopics] = useState([]);
-  const[assignedProblems, setAssignedProblems] = useState([]);
-  const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
-  const topics = [
-    { name: "Warm up 1", color: "bg-emerald-300", description: "Get started by warming up!", route: "easy"},
-    { name: "Warm up 2", color: "bg-emerald-300", description: "More warm up problems to challenge yourself", route: "easy" },
-    { name: "File Streams 1", color: "bg-emerald-300", description: "Practice Stream Concepts", route: "choices" },
-    { name: "Arrays and Strings", color: "bg-emerald-300", description: "Array problems", route: "choices" },
-    { name: "Classes 1", color: "bg-amber-300", description: "Basic problems on classes", route: "choices" },
-    { name: "Classes 2", color: "bg-amber-300", description: "More classes problem to challenge yourself!", route: "choices" },
-    { name: "Inheritance and Polymorphism", color: "bg-amber-300", description: "Test your OOPS!", route: "choices"},
-    { name: "Recursion", color: "bg-amber-300", description: "Dive deeper on solving recursive problems!", route: "choices" },
-    { name: "Search and Sorting", color: "bg-orange-600", description: "Basic DSA Problems", route: "choices" },
-    { name: "Stacks and Queues", color: "bg-orange-600", description: "More DSA to challenge yourself", route: "choices" },
-    { name: "Linked List 1", color: "bg-orange-600", description: "Basic Linked List for getting started", route: "choices"},
-    { name: "Linked List 2", color: "bg-orange-600", description: "More Linked List problems to challenge yourself!", route: "choices" },
-  ];
-  const progressColors = ["green-300", "red-300", "blue-300", "yellow-300", "indigo-300"]
 
   useEffect(() => {
-    const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
-    if (!netid) {
-      router.replace("/components/login");
+  localStorage.removeItem('netid');
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+}, []);
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch("http://localhost:8080/api/auth/login", {
+      method: "POST",
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({Email:email, Password:password}),
+    });
+
+    if(res.ok)
+    {
+      const {token,role} = await res.json();
+      localStorage.setItem('token',token);
+      localStorage.setItem('role',role);
+      const netid = email.split('@')[0];
+      localStorage.setItem('netid', netid);
+      if (role === "INSTRUCTOR")
+      {
+        router.push("/components/instructor");
+      }
+      else
+      {
+          router.push("/components/home");
+      }
     }
-  }, [router]);
-  useEffect(() => {
-    const fetchRankings = async () => {
-      const res = await fetch(`http://localhost:8080/api/progress/ranks?netId=${netid}`);
-      if(res.ok)
-      {
-        const data = await res.json();
-        setTopTopics(data.slice(0,5));
-      }
-    };
-    fetchRankings();
-  },[]);
-
-  useEffect(() => {
-    const fetchAssigned= async () => {
-      const res = await fetch(`http://localhost:8080/api/chat/assigned?netId=${netid}`);
-      if(res.ok)
-      {
-        const data = await res.json();
-        console.log(data);
-        const activeProblems = data.filter(p => new Date(p.dueDate) > new Date());
-        setAssignedProblems(activeProblems);
-      }
-    };
-    fetchAssigned();
-  },[]);
+    else
+    {
+      setMsg("Invalid credentials");
+    }
+  }
 
   return (
-    <div className="min-h-screen w-full font-sans bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800">
-      <nav className="bg-black shadow-lg">
-        <div className="flex flex-wrap justify-between items-center p-4">
-          <div className="flex space-x-4">
-            <a href="/components/login" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
-              Home
-            </a>
-            <button
-              onClick={() => {
-                localStorage.removeItem('netid');
-                localStorage.removeItem('token');
-                localStorage.removeItem('role');
-                router.replace('/components/login');
-              }}
-              className="text-blue-300 hover:text-white text-lg font-semibold transition-all cursor-pointer transform hover:scale-110"
-            >
-              Logout
-            </button>
+     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800 font-sans">
+      <div className="w-full max-w-md bg-gray-950 rounded-2xl shadow-2xl p-8 border border-gray-800">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-sky-300 mb-2">CodeTrack Portal</h1>
+          <p className="text-gray-200">Sign in to continue</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-gray-200 mb-1" htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="your@ucr.edu"
+              required
+              className="w-full px-4 py-2 rounded-lg bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
-        </div>
-      </nav>
-      <div className="grid grid-cols-4 gap-6 px-8 py-6">
-        {topics.map((topic, index) => {
-          const isWarmUp = topic.name.toLowerCase().includes("warm up");
-          const href = isWarmUp
-            ? `/components/problems?topic=${encodeURIComponent(topic.name)}&difficulty=Easy`
-            : `/components/${topic.route}?topic=${encodeURIComponent(topic.name)}`;
-          return (
-            <Link
-              key={index}
-              href={href}
-              className={`block ${topic.color} rounded-xl shadow-lg p-6 hover:scale-105 transition-all cursor-pointer`}
-              onClick={() => setSelectedTopic(topic.name)}
-            >
-              <h1 className="mb-2 text-xl font-bold tracking-tight text-gray-900">{topic.name}</h1>
-              <div className="font-normal text-sm text-gray-800">{topic.description}</div>
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="grid grid-cols-2 gap-8 px-8 py-6">
-        <div className="bg-gray-800 rounded-xl shadow-lg p-6">
-          <h3 className="text-xl text-rose-400 mb-3 font-bold">Top 5 Topics</h3>
-          {topTopics.map((topic, index) => (
-            <div key={index}>
-              <div className={`mb-2 font-medium text-${progressColors[index]}`}>
-                {topic.topic}
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-5 mb-4">
-                <div
-                  className={`bg-${progressColors[index]} text-sm font-medium text-white p-1 text-center leading-none h-5 rounded-full`}
-                  style={{ width: `${Math.round(topic.strength)}%` }}
-                >
-                  {Math.round(topic.strength)}%
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="bg-gray-800 rounded-xl shadow-lg p-6">
-          <h3 className="text-lg mb-3 font-bold text-blue-300">Assignments Bulletin Board</h3>
-          <div className="p-4 bg-black rounded-xl border-l-4 border-l-rose-400 shadow">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium text-gray-200">Assigned Problems</span>
-            </div>
-            <ul className="space-y-2">
-              {assignedProblems.length === 0 ? (
-                <li className="text-gray-400">No assigned yet! But it doesn't hurt to practice right?</li>
-              ) : (
-                assignedProblems.map((problem, index) => (
-                  <li key={index} className="mb-2 flex justify-between items-center bg-gray-900 rounded px-4 py-3">
-                    <div className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        checked={problem.completed}
-                        readOnly
-                        className={`form-checkbox h-5 w-5 ${problem.completed ? "text-green-500" : "text-rose-400"} border-gray-400`}
-                      />
-                      <span className={`text-lg ${problem.completed ? "line-through text-gray-400" : "text-white"}`}>
-                        Finish the {problem.problem} problem
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs bg-gray-700 text-gray-200 px-2 py-1 rounded">
-                        Due: {problem.dueDate ? new Date(problem.dueDate).toLocaleDateString() : "TBA"}
-                      </span>
-                    </div>
-                  </li>
-                ))
-              )}
-            </ul>
+          <div>
+            <label className="block text-gray-200 mb-1" htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+              className="w-full px-4 py-2 rounded-lg bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
+          <button
+            type="submit"
+            className="w-full bg-gray-800 hover:bg-rose-400 text-white font-semibold py-2 rounded-lg shadow transition-all"
+          >
+            Login
+          </button>
+          {msg && <div className="text-red-400 text-center">{msg}</div>}
+        </form>
+        <div className="flex items-center justify-center mt-6">
+          <button
+            onClick={() => router.push('/components/signup')}
+            className="bg-gray-800 hover:bg-rose-400 px-6 py-2 rounded-lg shadow-sm font-medium transition-all"
+          >
+            Sign up
+          </button>
         </div>
+        <footer className="mt-8 text-center text-gray-400 text-sm">
+          &copy; 2025 CodeTrack. Made with Love
+        </footer>
       </div>
-      <footer className="w-full mt-8 mb-4 px-4 rounded-lg shadow-lg bg-gray-900 border-t border-gray-800">
-        <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 py-4">
-          <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</a>
-          <span className="text-gray-500">|</span>
-          <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</a>
-        </div>
-        <div className="text-center text-gray-500 text-xs pb-2">&copy; 2025 CodeTrack</div>
-      </footer>
     </div>
 
   );

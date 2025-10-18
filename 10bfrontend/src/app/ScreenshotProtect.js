@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState, useRef } from 'react';
-import { tinykeys } from "tinykeys";
 
 export default function ScreenShotProtect({ children }) {
     const [isProtected, setIsProtected] = useState(false);
     const [isTabVisible, setIsTabVisible] = useState(true);
+    const [userRole, setUserRole] = useState(null);
     const visibilityTimestamp = useRef(0);
     const warnTimeout = useRef(null);
     const keyState = useRef({
@@ -14,6 +14,13 @@ export default function ScreenShotProtect({ children }) {
     });
 
     useEffect(() => {
+        const role = typeof window !== "undefined" ? localStorage.getItem('role') : null;
+        setUserRole(role);
+        
+        if (role === 'INSTRUCTOR') {
+            return;
+        }
+
         const applyProtection = () => {
             const style = document.createElement('style');
             style.textContent = `
@@ -24,21 +31,8 @@ export default function ScreenShotProtect({ children }) {
                     user-select: none;
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
-                    -webkit-backdrop-filter: blur(0px);
-                    backdrop-filter: blur(0px);
                     position: relative;
                     overflow: hidden;
-                }
-                .protected-content::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: transparent;
-                    z-index: -1;
-                    pointer-events: none;
                 }
                 @media print {
                     .protected-content * {
@@ -46,9 +40,8 @@ export default function ScreenShotProtect({ children }) {
                         background: black !important;
                         color: black !important;
                     }
-                    
                     .protected-content::after {
-                        content: "Protection";
+                        content: "Content Protected";
                         visibility: visible !important;
                         position: fixed;
                         top: 50%;
@@ -67,9 +60,30 @@ export default function ScreenShotProtect({ children }) {
             setIsProtected(true);
         };
 
-        const showWarning = (message = "Restricted action") => {
-            console.log(`Blocked: ${message}`);
+        const logActivity = async (action, details = {}) => {
+            const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
+            const timestamp = new Date().toISOString();
+            
+            console.log(`Activity Log: ${action}`, { ...details, timestamp, netid });
+            try {
+                await fetch('/api/log-activity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action,
+                        details,
+                        timestamp,
+                        netid,
+                        userAgent: navigator.userAgent,
+                        url: window.location.href
+                    })
+                });
+            } catch (error) {
+                console.log('Failed to log activity:', error);
+            }
+        };
 
+        const showWarning = (message = "Action detected") => {
             const exist = document.querySelector('.screenshot-warning-overlay');
             if (exist) {
                 const messageElement = exist.querySelector('.warning-message');
@@ -80,10 +94,6 @@ export default function ScreenShotProtect({ children }) {
             }
 
             const warning = document.createElement('div');
-            const KeysPressed = keyState.current.ctrlKey || 
-                              keyState.current.metaKey || 
-                              keyState.current.shiftKey;
-
             warning.className = 'screenshot-warning-overlay';
             warning.innerHTML = `
                 <div style="
@@ -92,7 +102,7 @@ export default function ScreenShotProtect({ children }) {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0,0,0,1);
+                    background: rgba(0,0,0,0.95);
                     color: white;
                     display: flex;
                     align-items: center;
@@ -100,15 +110,16 @@ export default function ScreenShotProtect({ children }) {
                     z-index: 9999999;
                     font-family: Arial, sans-serif;
                 ">
-                    <div style="text-align: center; padding: 20px; max-width: 500px;">
-                        <h2 style="color: #ff4a4a; margin-bottom: 20px;">Protection Active</h2>
-                        <p style="font-size: 18px; margin-bottom: 15px;" class="warning-message">${message}</p>
-                        ${KeysPressed ? `<div>Release the keys</div>` : ''}
-                        <button id="continue" ${KeysPressed ? 'disabled' : ''}
-                            style="margin-top: 20px; padding: 10px 20px; 
-                            background: ${KeysPressed ? '#555' : '#dc2626'}; 
-                            color: white; border: none; border-radius: 5px;
-                            cursor: ${KeysPressed ? 'not-allowed' : 'pointer'};">
+                    <div style="text-align: center; padding: 30px; max-width: 500px; background: rgba(31, 41, 55, 0.9); border-radius: 12px; border: 1px solid #374151;">
+                        <h2 style="color: #fbbf24; margin-bottom: 20px; font-size: 24px;">Activity Detected</h2>
+                        <p style="font-size: 18px; margin-bottom: 20px; color: #d1d5db;" class="warning-message">${message}</p>
+                        <p style="font-size: 14px; margin-bottom: 25px; color: #9ca3af;">This activity has been logged for security purposes.</p>
+                        <button id="continue"
+                            style="padding: 12px 24px; 
+                            background: #3b82f6; 
+                            color: white; border: none; border-radius: 8px;
+                            cursor: pointer; font-size: 16px; font-weight: 600;
+                            transition: background 0.2s;">
                             Continue
                         </button>
                     </div>
@@ -117,33 +128,28 @@ export default function ScreenShotProtect({ children }) {
             document.body.appendChild(warning);
 
             const continueButton = warning.querySelector('#continue');
-            const checkKeys = setInterval(() => {
-                const KeysStillPressed = keyState.current.ctrlKey || 
-                                      keyState.current.metaKey || 
-                                      keyState.current.shiftKey;
-                
-                if (KeysStillPressed) {
-                    continueButton.disabled = true;
-                    continueButton.style.background = '#555';
-                    continueButton.style.cursor = 'not-allowed';
-                } else {
-                    continueButton.disabled = false;
-                    continueButton.style.background = '#dc2626';
-                    continueButton.style.cursor = 'pointer';
-                }
-            }, 100);
-
+            continueButton.addEventListener('mouseenter', () => {
+                continueButton.style.background = '#2563eb';
+            });
+            continueButton.addEventListener('mouseleave', () => {
+                continueButton.style.background = '#3b82f6';
+            });
             continueButton.addEventListener('click', () => {
-                clearInterval(checkKeys);
                 if (warning.parentNode) {
                     warning.parentNode.removeChild(warning);
                 }
             });
+
+            setTimeout(() => {
+                if (warning.parentNode) {
+                    warning.parentNode.removeChild(warning);
+                }
+            }, 5000);
         };
 
         const detect = () => {
             const handle = (e) => {
-                console.log('Key down:', {
+                logActivity('key_press', {
                     key: e.key,
                     code: e.code,
                     metaKey: e.metaKey,
@@ -155,37 +161,36 @@ export default function ScreenShotProtect({ children }) {
                 if (e.key === 'Control' || e.ctrlKey) {
                     keyState.current.ctrlKey = true;
                 }
-
                 if (e.key === 'Meta' || e.metaKey) {
                     keyState.current.metaKey = true;
                 }
-
                 if (e.key === 'Shift' || e.shiftKey) {
                     keyState.current.shiftKey = true;
                 }
 
-                if (e.ctrlKey || e.metaKey) {
+                if ((e.metaKey || e.ctrlKey) && e.shiftKey && ['3', '4', '5'].includes(e.key)) {
                     e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    showWarning("Cannot use these keys");
+                    logActivity('screenshot_attempt', { combination: `${e.metaKey ? 'Cmd' : 'Ctrl'}+Shift+${e.key}` });
+                    showWarning("Screenshot attempt detected");
                     return false;
                 }
 
-                if (e.key === 'PrintScreen' || e.key === 'F12' || e.key === 'Escape') {
+                if (e.key === 'PrintScreen') {
                     e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    showWarning("Cannot print or take screenshots");
+                    logActivity('screenshot_attempt', { method: 'PrintScreen' });
+                    showWarning("Screenshot attempt detected");
                     return false;
                 }
 
-                if ((e.metaKey || e.ctrlKey) && e.shiftKey) {
+                if (e.key === 'F12') {
                     e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    showWarning("Cannot take screenshots");
+                    logActivity('devtools_attempt', { key: 'F12' });
+                    showWarning("Developer tools access blocked");
                     return false;
+                }
+
+                if ((e.ctrlKey || e.metaKey) && ['c', 'v'].includes(e.key.toLowerCase())) {
+                    logActivity('clipboard_action', { action: e.key.toLowerCase() === 'c' ? 'copy' : 'paste' });
                 }
             };
 
@@ -205,83 +210,65 @@ export default function ScreenShotProtect({ children }) {
                 const now = Date.now();
                 const visible = document.visibilityState === 'visible';
 
-                console.log('Tab visibility changed:', {
-                    visible: visible,
-                    timestamp: now,
-                    timeSinceLast: now - visibilityTimestamp.current
-                });
-
                 setIsTabVisible(visible);
 
                 if (!visible) {
                     visibilityTimestamp.current = now;
+                    logActivity('tab_hidden', { timestamp: now });
+                    
                     warnTimeout.current = setTimeout(() => {
-                        showWarning("Tab switched");
-                    }, 1000);
+                        showWarning("Tab switch detected - activity logged");
+                    }, 2000);
                 } else {
                     if (warnTimeout.current) {
                         clearTimeout(warnTimeout.current);
                     }
 
                     const hideTime = now - visibilityTimestamp.current;
-                    if (hideTime > 3000) {
-                        showWarning(`Tab was hidden`);
+                    if (hideTime > 5000) 
+                    { 
+                        logActivity('tab_restored', { hideDuration: hideTime });
+                        showWarning(`Tab was hidden for ${Math.round(hideTime/1000)} seconds`);
                     }
                 }
             };
 
-            const blur = () => {
-                console.log("Lost focus");
+            const handleBlur = () => {
+                logActivity('window_blur', { timestamp: Date.now() });
                 setIsTabVisible(false);
-                setTimeout(() => {
-                    if (!document.hasFocus()) {
-                        showWarning("Window focus lost");
-                    }
-                }, 300);
             };
 
-            const focus = () => {
-                console.log("Window got focus");
+            const handleFocus = () => {
+                logActivity('window_focus', { timestamp: Date.now() });
                 setIsTabVisible(true);
             };
 
             const blockRightClick = (e) => {
-                e.preventDefault();
-                showWarning("Right-click blocked");
-                return false;
-            };
-
-            const blockClipboard = (e) => {
-                e.preventDefault();
-                showWarning("No Copy/Pasting");
-                return false;
+                const target = e.target;
+                const isCodeEditor = target.closest('.cm-editor') || target.closest('.CodeMirror');
+                
+                if (!isCodeEditor) {
+                    e.preventDefault();
+                    logActivity('right_click_attempt', { target: target.tagName });
+                    showWarning("Right-click logged");
+                    return false;
+                }
             };
 
             document.addEventListener('keydown', handle, true);
-            window.addEventListener('keydown', handle, true);
-            document.addEventListener('contextmenu', blockRightClick, true);
-            window.addEventListener('contextmenu', blockRightClick, true);
-            document.addEventListener('visibilitychange', handleVisibilityChange, true);
-            window.addEventListener('blur', blur, true);
-            window.addEventListener('focus', focus, true);
             document.addEventListener('keyup', handleKeyUp, true);
-            window.addEventListener('keyup', handleKeyUp, true);
-            document.addEventListener('copy', blockClipboard, true);
-            document.addEventListener('cut', blockClipboard, true);
-            document.addEventListener('paste', blockClipboard, true);
+            document.addEventListener('contextmenu', blockRightClick, true);
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            window.addEventListener('blur', handleBlur);
+            window.addEventListener('focus', handleFocus);
 
             return () => {
-                document.removeEventListener('contextmenu', blockRightClick, true);
-                window.removeEventListener('contextmenu', blockRightClick, true);
                 document.removeEventListener('keydown', handle, true);
-                window.removeEventListener('keydown', handle, true);
                 document.removeEventListener('keyup', handleKeyUp, true);
-                window.removeEventListener('keyup', handleKeyUp, true);
-                window.removeEventListener('blur', blur, true);
-                window.removeEventListener('focus', focus, true);
-                document.removeEventListener('copy', blockClipboard, true);
-                document.removeEventListener('cut', blockClipboard, true);
-                document.removeEventListener('paste', blockClipboard, true);
+                document.removeEventListener('contextmenu', blockRightClick, true);
+                document.removeEventListener('visibilitychange', handleVisibilityChange);
+                window.removeEventListener('blur', handleBlur);
+                window.removeEventListener('focus', handleFocus);
 
                 if (warnTimeout.current) {
                     clearTimeout(warnTimeout.current);
@@ -293,6 +280,11 @@ export default function ScreenShotProtect({ children }) {
         const cleanUp = detect();
         return cleanUp;
     }, []);
+
+    if (userRole === 'INSTRUCTOR') 
+    {
+        return <div className="min-h-screen">{children}</div>;
+    }
 
     return (
         <div className={`${isProtected ? 'protected-content' : ''} min-h-screen`}>

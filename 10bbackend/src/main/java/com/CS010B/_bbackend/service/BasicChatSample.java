@@ -37,29 +37,31 @@ public final class BasicChatSample
         StringBuilder sys = new StringBuilder();
         sys.append("You are a helpful C++ programming tutor for introductory college students.");
         sys.append("Take a look at this problem " + problemDesc + "and provide helpful guidance but don't write complete solutions.");
-        sys.append("When analyzing student code, provide feedback in this exact format:\n\n");
-
-
-        sys.append("## What You Did Well\n");
-        sys.append("[List 2-3 specific positive aspects of their code]\n\n");
-
-        sys.append("## Areas for Improvement\n");
-        sys.append("[Identify 2-3 specific issues or misconceptions]\n\n");
-
-        sys.append("## Specific Suggestions\n");
-        sys.append("[Provide concrete, actionable improvements with brief code examples]\n\n");
-
-        sys.append("## Learning Resources\n");
-        sys.append("[Suggest 1-2 specific topics to study based on their code]\n\n");
-
-        sys.append("Keep explanations beginner-friendly, use simple language, and focus on learning rather than just fixing. ");
+        
+        boolean isAutomatedFeedback = userPrompt.startsWith("AUTOMATED_FEEDBACK:");
+    
+        if (isAutomatedFeedback) 
+        {
+            userPrompt = userPrompt.replace("AUTOMATED_FEEDBACK: ", "");
+            
+            sys.append("\n\nProvide feedback in this exact format:\n\n");
+            sys.append("## What You Did Well\n");
+            sys.append("[List 2-3 specific positive aspects of their code]\n\n");
+            sys.append("## Areas for Improvement\n");
+            sys.append("[Identify 2-3 specific issues or misconceptions]\n\n");
+            sys.append("## Specific Suggestions\n");
+            sys.append("[Provide concrete, actionable improvements with brief code examples]\n\n");
+            sys.append("## Learning Resources\n");
+            sys.append("[Suggest 1-2 specific topics to study based on their code]\n\n");
+            sys.append("Keep explanations beginner-friendly, use simple language, and focus on learning rather than just fixing. ");
+        } else {
+            sys.append("\n\nAnswer the student's question conversationally and helpfully. ");
+            sys.append("Provide hints and explanations, but don't write complete solutions. ");
+            sys.append("Guide them to discover the answer themselves. ");
+        }
+    
         sys.append("Don't provide complete solutions - guide them to discover the answer. ");
         sys.append("If their code has syntax errors, explain the concept behind the fix rather than just the correction.\n\n");
-        
-        // sys.append("You're an assistant helping students learn C++ programming on their own without using AI ");
-        // sys.append("Take a look at this problem " + problemDesc + "and provide helpful guidance but don't write complete solutions.");
-        // sys.append("Suggest approaches, explain concepts, and guide students through debugging. Make it short and concise.");
-
         try
         {
                 sys.append("\nThe student is working on this problem: \n");
@@ -90,7 +92,6 @@ public final class BasicChatSample
             if(studentDetails != null)
             {
                 int attempts = ((Number) studentDetails.getOrDefault("# of Attempts", 0)).intValue();
-                // Object timeSpent = studentDetails.get("Avg Time Spent");
                 String latestCode = (String) studentDetails.get("Latest Code");
                 
                 sys.append("\nStudent Progress: \n");

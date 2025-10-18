@@ -1,5 +1,6 @@
 "use client";
 import { useState,useEffect } from 'react';
+import { diff } from 'react-ace';
 import ReactMarkdown from 'react-markdown';
 export default function chatHistory({topic,difficulty,problemName, messages = [], setMessages, isLoading, aiAttempts, setAIAttempts})
 {
@@ -32,7 +33,7 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                         const history = await response.json();
                         if (history && history.length > 0)
                         {
-                            setMessages(history.map(msg => {
+                            setMessages(history.flatMap(msg => {
                                const arr = [];
                                 if (msg.userMessage) 
                                 {
@@ -72,8 +73,11 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
             }
         }
 
-        loadChat();
-    }, [problemName]);
+        if (netid && problemName) 
+        {
+            loadChat();
+        }
+    }, [problemName,topic,difficulty,netid]);
 
     useEffect(() => {
         async function fetchAttempts() 
@@ -106,7 +110,11 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                 }
             }    
         }
-    },[problemName]);
+        if (netid && problemName) 
+        {
+            fetchAttempts();
+        }
+    },[problemName,topic,difficulty,netid]);
 
     const handleSend = async () => {
         if(!input.trim())
@@ -217,7 +225,12 @@ export default function chatHistory({topic,difficulty,problemName, messages = []
                     components={{
                         h2: ({node, ...props}) => <h2 className="text-lg font-bold text-blue-400 my-2" {...props} />,
                         ul: ({node, ...props}) => <ul className="list-disc ml-6 my-2" {...props} />,
-                        code: ({node, ...props}) => <code className="bg-gray-800 px-2 py-1 rounded" {...props} />,
+                        code: ({node, inline, ...props}) => 
+                        inline 
+                            ? <code className="bg-gray-800 px-2 py-1 rounded text-sm" {...props} />
+                            : <code className="block bg-gray-900 p-3 rounded my-2 overflow-x-auto text-sm font-mono whitespace-pre" {...props} />,
+                        pre: ({node, ...props}) => <pre className="bg-gray-900 rounded my-2 overflow-x-auto" {...props} />,
+                        p: ({node, ...props}) => <p className="my-2 whitespace-pre-wrap" {...props} />,
                     }}
                     >
                     {msg.content}

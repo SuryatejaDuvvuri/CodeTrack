@@ -37,7 +37,7 @@ public class ChatController
     @PostMapping
     public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest request) throws Exception
     {
-        
+        System.out.println(request.getPrompt());
         String response = chatSample.getChat(request.getTopic(), request.getDifficulty(), request.getProblem(), request.getPrompt(), request.getNetId());
         return ResponseEntity.ok(new ChatResponse(response));
     }

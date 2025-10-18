@@ -67,6 +67,8 @@ public class CompileService
         exec.setErrStream(os); 
         exec.connect();
 
+        long start = System.currentTimeMillis();
+
         while(!exec.isClosed())
         {
             Thread.sleep(100);

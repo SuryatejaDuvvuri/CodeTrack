@@ -59,10 +59,8 @@ public class InstructorController
         List<String> netIds = (List<String>) req.get("netIds");
         
         List<Map<String, Object>> problems = (List<Map<String, Object>>) req.get("problems");
-        for (String netId : netIds) {
-            // if (netId == null || netId.trim().isEmpty()) {
-            //     throw new IllegalArgumentException("Student netId must be a non-empty string");
-            // }
+        for (String netId : netIds) 
+        {
             fireStore.assignProblems(netId, problems);
         }
 

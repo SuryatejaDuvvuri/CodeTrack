@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.CS010B._bbackend.model.JwtUtil;
 import com.CS010B._bbackend.model.User;
-// import com.CS010B._bbackend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +36,6 @@ public class AuthController
             return ResponseEntity.badRequest().body("Email must end with @ucr.edu");
        }
 
-      //  User user = new User(name,email,password,"STUDENT");
        firestore.addStudent("sduvv003",email.substring(0,email.indexOf("@")), name, email,password,"STUDENT");
        return ResponseEntity.ok("Signup success!");
     }

@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link"
@@ -6,9 +7,8 @@ import CodeEditor from './codeEditor.js'
 import ProgressGraph from "./progressGraph.js";
 import ChatHistory from "./chatHistory.js";
 import { useSearchParams,useRouter } from "next/navigation";
-// import EmbeddedViewer from "./EmbeddedViewer.js";
 
-export default function Problem() 
+function ProblemTemp() 
 {
   const router = useRouter();
   const search = useSearchParams();
@@ -35,6 +35,7 @@ export default function Problem()
   const [progressData, setProgressData] = useState([]);
   const [startTime, setStartTime] = useState(null);
   const [latestScore, setLatestScore] = useState(null);
+  const [problemsList, setProblemsList] = useState([]);
   const MAX_ATTEMPTS = 4;
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function Problem()
   useEffect(() => {
     if (role === "STUDENT" && viewingStudent && viewingStudent !== netid) 
     {
-      router.replace("/components/login");
+      router.replace("/");
     }
   }, [ready,role, viewingStudent, netid, router]);
 
@@ -86,16 +87,46 @@ export default function Problem()
     }
   };
 
+  useEffect(() => {
+        const fetchProblems = async () => {
+            const res = await fetch(`http://localhost:8080/api/chat/problems?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}`);
+            if (res.ok) 
+            {
+                const data = await res.json();
+                setProblemsList(data); 
+            }
+        };
+        fetchProblems();
+  }, [topic, difficulty]);
+
   const handlePrev = () => {
-    const prevNum = problemNum === 1 ? maxProblems : problemNum - 1;
-    const newProblem = `${difficulty} ${prevNum}`;
-    router.push(`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(newProblem)}`);
+    const id = problemsList.findIndex(p => p.id === problemName);
+    if (id === -1)
+    {
+      return;
+    }
+    var prevId = id - 1;
+    if (id === 0)
+    {
+      prevId = problemsList.length - 1;
+    } 
+    const prevProblem = problemsList[prevId];
+    router.push(`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(prevProblem.id)}`);
   }
 
   const handleNext = () => {
-    const prevNum = problemNum === maxProblems ? 1 : problemNum + 1;
-    const newProblem = `${difficulty} ${prevNum}`;
-    router.push(`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(newProblem)}`);
+    const id = problemsList.findIndex(p => p.id === problemName);
+    if (id === -1) 
+    {
+        return;
+    }
+    var nextId = id + 1;
+    if (id === problemsList.length - 1)
+    {
+      nextId = 0;
+    }
+    const nextProblem = problemsList[nextId];
+    router.push(`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(nextProblem.id)}`);
   }
 
   useEffect(() => {
@@ -219,8 +250,25 @@ useEffect(() => {
       },
       body: JSON.stringify({topic,difficulty,problem:problemName,code: code, netId: netid}),
     });
-    const result = await res.json();
-    console.log(result);
+
+    const text = await res.text();
+    let result;
+    try 
+    {
+      result = JSON.parse(text);
+      console.log("Parsed result:", result);
+    } 
+    catch (parseError) 
+    {
+      console.error("JSON parse error:", parseError);
+      console.error("Failed to parse:", text);
+      setMessages(prev => [
+        ...prev,
+        {role: "system", content: "Error: Invalid response from server. Please try again."}
+      ]);
+      setLoading(false);
+      return;
+    }
     const runEnd = Date.now();
     const timeSpent = startTime ? Math.round((runEnd - runStart) / 1000) : 0;
     setStartTime(null); 
@@ -265,7 +313,7 @@ useEffect(() => {
               topic,
               difficulty,
               problem:problemName,
-              prompt: "I'm learning programming. Please analyze my code and explain: 1) What I did well, 2) What concepts I might be misunderstanding, 3) Specific improvements with examples, 4) Learning resources for areas I'm struggling with. Keep explanations beginner-friendly.",
+              prompt: "AUTOMATED_FEEDBACK: I'm learning programming. Please analyze my code and explain: 1) What I did well, 2) What concepts I might be misunderstanding, 3) Specific improvements with examples, 4) Learning resources for areas I'm struggling with. Keep explanations beginner-friendly.",
               netId: netid
           }),
         });
@@ -306,7 +354,7 @@ useEffect(() => {
                 topic,
                 difficulty,
                 problem:problemName,
-                prompt: "I'm learning programming. Please analyze my code and explain: 1) What I did well, 2) What concepts I might be misunderstanding, 3) Specific improvements with examples, 4) Learning resources for areas I'm struggling with. Keep explanations beginner-friendly.",
+                prompt: "AUTOMATED_FEEDBACK: I'm learning programming. Please analyze my code and explain: 1) What I did well, 2) What concepts I might be misunderstanding, 3) Specific improvements with examples, 4) Learning resources for areas I'm struggling with. Keep explanations beginner-friendly.",
                 netId: netid
             }),
           });
@@ -433,216 +481,225 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen w-full font-sans flex flex-col bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800">
-      <nav className="w-full rounded-lg shadow-lg mb-8">
-        <div className="flex flex-wrap justify-between items-center p-4">
-          <div className="flex space-x-4">
-            <Link href="/" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">Home</Link>
-            <Link href="/components/login" className="text-blue-300 hover:text-white text-lg font-semibold transition-all cursor-pointer transform hover:scale-110">Logout</Link>
+      <div className="min-h-screen w-full font-sans flex flex-col bg-gradient-to-r from-gray-700 via-gray-900 to-gray-800">
+        <nav className="w-full rounded-lg shadow-lg mb-8">
+          <div className="flex flex-wrap justify-between items-center p-4">
+            <div className="flex space-x-4">
+              <Link href="/components/home" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">Home</Link>
+              <Link href="/" className="text-blue-300 hover:text-white text-lg font-semibold transition-all cursor-pointer transform hover:scale-110">Logout</Link>
+            </div>
           </div>
-        </div>
-      </nav>
-      <main className="flex-1 flex flex-col items-center justify-center w-full px-4">
-        <div className="max-w-7xl w-full">
-          <header className="mb-8">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex space-x-3">
-                <button onClick={handlePrev} className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer">Prev</button>
-                <button onClick={handleNext} className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer">Next</button>
+        </nav>
+        <main className="flex-1 flex flex-col items-center justify-center w-full px-4">
+          <div className="max-w-7xl w-full">
+            <header className="mb-8">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex space-x-3">
+                  <button onClick={handlePrev} className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer">Prev</button>
+                  <button onClick={handleNext} className="px-4 py-2 bg-gray-800 hover:bg-gray-600 rounded-lg text-center transition-colors cursor-pointer">Next</button>
+                </div>
+                <span className={`px-3 py-1 ${color} rounded-lg text-sm font-medium text-black`}>
+                  Difficulty: {diff || "0"} / 10
+                </span>
               </div>
-              <span className={`px-3 py-1 ${color} rounded-lg text-sm font-medium text-black`}>
-                Difficulty: {diff || "0"} / 10
-              </span>
-            </div>
-            <h1 className="text-3xl font-bold mb-2 text-blue-400">{problemDetails?.Problem || "Loading..."}</h1>
-            <p className="text-gray-300 text-lg mb-4 leading-relaxed">{problemDetails?.Description || " "}</p>
-            <h2 className="text-xl font-bold mb-2 text-blue-400">Examples</h2>
-            <div className="text-gray-200 text-base space-y-2">
-              {problemDetails?.Examples
-                ? problemDetails.Examples.split('\n').map((ex, i) => (
-                    <div key={i} className="font-mono">{ex}</div>
-                  ))
-                : ""}
-            </div>
-          </header>
-          <section className="bg-gray-800 rounded-xl border border-gray-700 w-full mx-auto mb-8">
-            <div className="p-4 border-b border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
-            </div>
-            <div className="bg-gray-800 rounded-xl border border-gray-700">
-              <CodeEditor
-                defaultCode={defaultCode}
-                code={code}
-                setCode={setCode}
-                handleRun={handleRun}
-                saveCode={saveCode}
-                toggle={toggle}
-                showGraph={showGraph}
-                setStartTime={setStartTime}
-                readOnly={readOnly}
-              />
-            </div>
-          </section>
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div className="bg-gray-800 rounded-xl border border-gray-700">
+              <h1 className="text-3xl font-bold mb-2 text-blue-400">{problemDetails?.Problem || "Loading..."}</h1>
+              <p className="text-gray-300 text-lg mb-4 leading-relaxed">{problemDetails?.Description || " "}</p>
+              <h2 className="text-xl font-bold mb-2 text-blue-400">Examples</h2>
+              <div className="text-gray-200 text-base space-y-2">
+                {problemDetails?.Examples
+                  ? problemDetails.Examples.split('\n').map((ex, i) => (
+                      <div key={i} className="font-mono">{ex}</div>
+                    ))
+                  : ""}
+              </div>
+            </header>
+            <section className="bg-gray-800 rounded-xl border border-gray-700 w-full mx-auto mb-8">
               <div className="p-4 border-b border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-200 mb-4">Test Results</h2>
-                <div className="mb-2">
-                  <span className="text-gray-200 font-medium mr-2">Latest Score:</span>
-                  <span className="text-xl font-bold text-blue-400">{latestScore !== null ? `${Math.round(latestScore)}%` : "0"}</span>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-600">
-                        <th className="text-left py-3 px-4 font-medium text-gray-300">Test Case</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-300">Input</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-300">Expected</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-300">Your Output</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-600">
-                      {results.length > 0 ? (results.map((test, index) => (
-                        <tr key={index} className="hover:bg-gray-700/50">
-                          <td className="py-3 px-4">Case {index + 1}</td>
-                          <td>{test.input}</td>
-                          <td className="py-3 px-4 font-mono text-blue-400">{test.expectedOutput}</td>
-                          <td className="py-3 px-4 font-mono text-gray-300">{test.userOutput}</td>
-                          <td className="py-3 px-4">
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              test.result === "PASS"
-                                ? 'bg-green-900 text-green-300'
-                                : 'bg-red-900 text-red-300'
-                            }`}>
-                              {test.result === "PASS" ? '✓ Pass' : '✗ Fail'}
-                            </span>
-                          </td>
-                        </tr>
-                      ))
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="py-3 px-4 text-center text-gray-400">
-                            Click Run to test your code and see results.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                <h2 className="text-xl font-semibold text-gray-200">Code Editor</h2>
               </div>
-            </div>
-            <div className="p-4 bg-gray-800 rounded-xl border border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-200 mb-1">AI Assistant</h3>
-              <ChatHistory
-                topic={topic}
-                difficulty={difficulty}
-                problemName={problemName}
-                messages={messages}
-                setMessages={setMessages}
-                isLoading={isLoading}
-                aiAttempts={aiAttempts}
-                setAIAttempts={setAIAttempts}
-              />
-            </div>
-          </section>
-          {showGraph && (
-            <section className="bg-gray-800 rounded-xl border border-gray-700 p-11 mb-6">
-              <h3 className="text-xl font-semibold text-gray-200 mb-4">Progress Overview</h3>
-              <ProgressGraph
-                attemptData={progressData}
-                totalAttempts={totalAttempts}
-                avgTime={avgTime}
-                overallSuccess={overallSuccess}
-                barClick={setSelectedAttempt}
-              />
+              <div className="bg-gray-800 rounded-xl border border-gray-700">
+                <CodeEditor
+                  defaultCode={defaultCode}
+                  code={code}
+                  setCode={setCode}
+                  handleRun={handleRun}
+                  saveCode={saveCode}
+                  toggle={toggle}
+                  showGraph={showGraph}
+                  setStartTime={setStartTime}
+                  readOnly={readOnly}
+                />
+              </div>
             </section>
-          )}
-          {showGraph && selectedAttempt !== null && currentAttempt && (
-            <section className="bg-gray-900 rounded-xl p-6 mb-6 mt-4">
-              <h3 className="text-lg font-semibold mb-4">
-                Attempt {currentAttemptIndex + 1} Details
-              </h3>
-              <div className="mb-4">
-                <h4 className="text-md font-bold text-gray-200 mb-2">Code</h4>
-                <CodeEditor code={currentAttempt.code || code} readOnly={true} />
-              </div>
-              <div>
-                <div className="overflow-x-auto">
-                  <h4 className="text-md font-bold text-gray-200 mb-2">Test Results</h4>
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-600">
-                        <th className="text-left py-3 px-4 font-medium text-gray-300">Test Case</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-300">Input</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-300">Expected</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-300">Your Output</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-600">
-                      {currentAttempt.testResults && currentAttempt.testResults.length > 0 ? (currentAttempt.testResults.map((test, index) => (
-                        <tr key={index} className="hover:bg-gray-700/50">
-                          <td className="py-3 px-4">Case {index + 1}</td>
-                          <td>{test.input}</td>
-                          <td className="py-3 px-4 font-mono text-blue-400">{test.expectedOutput}</td>
-                          <td className="py-3 px-4 font-mono text-gray-300">{test.userOutput}</td>
-                          <td className="py-3 px-4">
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              test.result === "PASS"
-                                ? 'bg-green-900 text-green-300'
-                                : 'bg-red-900 text-red-300'
-                            }`}>
-                              {test.result === "PASS" ? '✓ Pass' : '✗ Fail'}
-                            </span>
-                          </td>
+            <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <div className="bg-gray-800 rounded-xl border border-gray-700">
+                <div className="p-4 border-b border-gray-700">
+                  <h2 className="text-xl font-semibold text-gray-200 mb-4">Test Results</h2>
+                  <div className="mb-2">
+                    <span className="text-gray-200 font-medium mr-2">Latest Score:</span>
+                    <span className="text-xl font-bold text-blue-400">{latestScore !== null ? `${Math.round(latestScore)}%` : "0"}</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-600">
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Test Case</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Input</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Expected</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Your Output</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
                         </tr>
-                      ))
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="py-3 px-4 text-center text-gray-400">
-                            No test results for this attempt.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-gray-600">
+                        {results.length > 0 ? (results.map((test, index) => (
+                          <tr key={index} className="hover:bg-gray-700/50">
+                            <td className="py-3 px-4">Case {index + 1}</td>
+                            <td>{test.input}</td>
+                            <td className="py-3 px-4 font-mono text-blue-400">{test.expectedOutput}</td>
+                            <td className="py-3 px-4 font-mono text-gray-300">{test.userOutput}</td>
+                            <td className="py-3 px-4">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                test.result === "PASS"
+                                  ? 'bg-green-900 text-green-300'
+                                  : 'bg-red-900 text-red-300'
+                              }`}>
+                                {test.result === "PASS" ? '✓ Pass' : '✗ Fail'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                        ) : (
+                          <tr>
+                            <td colSpan={5} className="py-3 px-4 text-center text-gray-400">
+                              Click Run to test your code and see results.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
-              <button className="mt-4 px-4 py-2 rounded text-white bg-gray-600 cursor-pointer" onClick={() => setSelectedAttempt(null)}>
-                Close
-              </button>
+              <div className="p-4 bg-gray-800 rounded-xl border border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-200 mb-1">AI Assistant</h3>
+                <ChatHistory
+                  topic={topic}
+                  difficulty={difficulty}
+                  problemName={problemName}
+                  messages={messages}
+                  setMessages={setMessages}
+                  isLoading={isLoading}
+                  aiAttempts={aiAttempts}
+                  setAIAttempts={setAIAttempts}
+                />
+              </div>
             </section>
-          )}
-          <section className="bg-gray-800 rounded-xl border border-gray-700 p-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-200 mb-4">Learning Resources</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { name: "Ascii Chart", url: "https://www.asciitable.com/" },
-                { name: "Cheatsheet", url: "https://www.codewithharry.com/blogpost/cpp-cheatsheet" },
-                { name: "LearnCpp.com", url: "https://www.learncpp.com/" },
-                { name: "Tutorial Videos", url: "https://www.youtube.com/watch?v=cec5DV42wjI&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS&index=14" }
-              ].map((resource, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleResourceClick(resource)}
-                  className="block p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-center transition-colors border border-gray-600 hover:border-blue-500 w-full"
-                >
-                  <span className="text-blue-400 font-medium">{resource.name}</span>
+            {showGraph && (
+              <section className="bg-gray-800 rounded-xl border border-gray-700 p-11 mb-6">
+                <h3 className="text-xl font-semibold text-gray-200 mb-4">Progress Overview</h3>
+                <ProgressGraph
+                  attemptData={progressData}
+                  totalAttempts={totalAttempts}
+                  avgTime={avgTime}
+                  overallSuccess={overallSuccess}
+                  barClick={setSelectedAttempt}
+                />
+              </section>
+            )}
+            {showGraph && selectedAttempt !== null && currentAttempt && (
+              <section className="bg-gray-900 rounded-xl p-6 mb-6 mt-4">
+                <h3 className="text-lg font-semibold mb-4">
+                  Attempt {currentAttemptIndex + 1} Details
+                </h3>
+                <div className="mb-4">
+                  <h4 className="text-md font-bold text-gray-200 mb-2">Code</h4>
+                  <CodeEditor code={currentAttempt.code || code} readOnly={true} />
+                </div>
+                <div>
+                  <div className="overflow-x-auto">
+                    <h4 className="text-md font-bold text-gray-200 mb-2">Test Results</h4>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-600">
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Test Case</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Input</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Expected</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Your Output</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-600">
+                        {currentAttempt.testResults && currentAttempt.testResults.length > 0 ? (currentAttempt.testResults.map((test, index) => (
+                          <tr key={index} className="hover:bg-gray-700/50">
+                            <td className="py-3 px-4">Case {index + 1}</td>
+                            <td>{test.input}</td>
+                            <td className="py-3 px-4 font-mono text-blue-400">{test.expectedOutput}</td>
+                            <td className="py-3 px-4 font-mono text-gray-300">{test.userOutput}</td>
+                            <td className="py-3 px-4">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                test.result === "PASS"
+                                  ? 'bg-green-900 text-green-300'
+                                  : 'bg-red-900 text-red-300'
+                              }`}>
+                                {test.result === "PASS" ? '✓ Pass' : '✗ Fail'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                        ) : (
+                          <tr>
+                            <td colSpan={5} className="py-3 px-4 text-center text-gray-400">
+                              No test results for this attempt.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <button className="mt-4 px-4 py-2 rounded text-white bg-gray-600 cursor-pointer" onClick={() => setSelectedAttempt(null)}>
+                  Close
                 </button>
-              ))}
-            </div>
-          </section>
-        </div>
-      </main>
-      <footer className="w-full mt-8 mb-4 px-4 rounded-lg shadow-lg bg-gray-900 border-t border-gray-800">
-        <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 py-4">
-          <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</Link>
-          <span className="text-gray-500">|</span>
-          <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</Link>
-        </div>
-        <div className="text-center text-gray-500 text-xs pb-2">&copy; 2025 CodeTrack</div>
-      </footer>
-    </div>
+              </section>
+            )}
+            <section className="bg-gray-800 rounded-xl border border-gray-700 p-6 mb-8">
+              <h3 className="text-lg font-semibold text-gray-200 mb-4">Learning Resources</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { name: "Ascii Chart", url: "https://www.asciitable.com/" },
+                  { name: "Cheatsheet", url: "https://www.codewithharry.com/blogpost/cpp-cheatsheet" },
+                  { name: "LearnCpp.com", url: "https://www.learncpp.com/" },
+                  { name: "Tutorial Videos", url: "https://www.youtube.com/watch?v=cec5DV42wjI&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS&index=14" }
+                ].map((resource, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleResourceClick(resource)}
+                    className="block p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-center transition-colors border border-gray-600 hover:border-blue-500 w-full"
+                  >
+                    <span className="text-blue-400 font-medium">{resource.name}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          </div>
+        </main>
+        <footer className="w-full mt-8 mb-4 px-4 rounded-lg shadow-lg bg-gray-900 border-t border-gray-800">
+          <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 py-4">
+            <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</Link>
+            <span className="text-gray-500">|</span>
+            <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</Link>
+          </div>
+          <div className="text-center text-gray-500 text-xs pb-2">&copy; 2025 CodeTrack</div>
+        </footer>
+      </div>
+  );
+}
+
+export default function Problem()
+{
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-300">Loading...</div>}>
+      <ProblemTemp/>
+    </Suspense>
   );
 }

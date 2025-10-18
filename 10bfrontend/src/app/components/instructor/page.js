@@ -276,7 +276,7 @@ export default function Instructor() {
           <nav className="shadow-lg">
             <div className="flex flex-wrap justify-between items-center p-4">
               <div className="flex space-x-4">
-                <a href="/" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
+                <a href="/components/home" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
                   Home
                 </a>
                 <a href="/components/instructor" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
@@ -285,7 +285,7 @@ export default function Instructor() {
                 <a onClick={() => {
                   localStorage.removeItem('token');
                   localStorage.removeItem('role');
-                  window.location.href = '/components/login';
+                  window.location.href = '/';
                 }} className="text-blue-300 hover:text-white text-lg font-semibold transition-all cursor-pointer transform hover:scale-110">
                   Logout
                 </a>

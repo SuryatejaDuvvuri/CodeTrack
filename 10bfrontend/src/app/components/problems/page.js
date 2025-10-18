@@ -1,11 +1,12 @@
 "use client";
+export const dynamic = 'force-dynamic';
 import {useState,useEffect} from "react";
 import Link from "next/link";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function ProblemList()
+function Problems()
 {
-
     const search = useSearchParams();
     const topic = search.get("topic");
     const difficulty = search.get("difficulty");
@@ -69,7 +70,7 @@ export default function ProblemList()
                             onClick={() => {
                                 localStorage.removeItem('token');
                                 localStorage.removeItem('role');
-                                window.location.href = '/components/login';
+                                window.location.href = '/';
                             }}
                             className="text-blue-300 hover:text-white text-lg font-semibold transition-all cursor-pointer transform hover:scale-110"
                         >
@@ -111,5 +112,14 @@ export default function ProblemList()
                 <div className="text-center text-gray-500 text-xs pb-1">&copy; 2025 CodeTrack</div>
             </footer>
         </div>
+    );
+}
+
+export default function ProblemList()
+{
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-300">Loading...</div>}>
+            <Problems/>
+        </Suspense>
     );
 }
