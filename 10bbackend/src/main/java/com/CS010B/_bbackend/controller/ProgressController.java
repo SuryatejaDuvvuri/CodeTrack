@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/progress")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "https://code-track-eight.vercel.app", allowCredentials = "true")
 public class ProgressController 
 {
     @Autowired

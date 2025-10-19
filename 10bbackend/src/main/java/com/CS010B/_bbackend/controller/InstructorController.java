@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/instructor")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "https://code-track-eight.vercel.app", allowCredentials = "true")
 public class InstructorController 
 {
 

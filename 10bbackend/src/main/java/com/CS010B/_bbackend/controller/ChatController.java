@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/chat")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "https://code-track-eight.vercel.app", allowCredentials = "true")
 public class ChatController 
 {
     @Autowired
