@@ -214,7 +214,7 @@ export default function Instructor() {
       alert("Please select a student, at least one problem, and a due date.");
       return
     }
-     await fetch("process.env.NEXT_PUBLIC_API_URL/api/instructor/assignProblems", {
+     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructor/assignProblems`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -259,7 +259,7 @@ export default function Instructor() {
       return;
     }
     const fetchProblems = async () => {
-        const res = await fetch(`process.env.NEXT_PUBLIC_API_URL/api/chat/problems?topic=${encodeURIComponent(selectedTopic.name)}&difficulty=${encodeURIComponent(selectedDifficulty)}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/problems?topic=${encodeURIComponent(selectedTopic.name)}&difficulty=${encodeURIComponent(selectedDifficulty)}`);
         if (res.ok) 
         {
             const data = await res.json();
