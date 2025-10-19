@@ -26,7 +26,7 @@ function Problems()
     useEffect(() => {
       const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
       const fetchProgress = async () => {
-            const res = await fetch(`http://localhost:8080/api/progress/getTotal?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&netId=${netid}`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/getTotal?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&netId=${netid}`);
             if(res.ok)
             {
                 const data = await res.json();
@@ -38,7 +38,7 @@ function Problems()
 
     useEffect(() => {
         const fetchProblems = async () => {
-            const res = await fetch(`http://localhost:8080/api/chat/problems?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/problems?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}`);
             if (res.ok) 
             {
                 const data = await res.json();

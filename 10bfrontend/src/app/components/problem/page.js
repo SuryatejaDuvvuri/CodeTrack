@@ -61,7 +61,7 @@ function ProblemTemp()
 
     if(role === "INSTRUCTOR" && viewingStudent)
     {
-        const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
         if (res.ok) {
           const data = await res.text();
           setCode(data);
@@ -71,7 +71,7 @@ function ProblemTemp()
     }
     else
     {
-      const res = await fetch (`http://localhost:8080/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
+      const res = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/chat/load?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
       const wait = await res.text();
       setCode(wait);
       setDefaultCode(wait);
@@ -79,7 +79,7 @@ function ProblemTemp()
   };
 
   const loadProblem = async () => {
-    const res = await fetch (`http://localhost:8080/api/chat/loadProblem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
+    const res = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/chat/loadProblem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}`)
     if(res.ok)
     {
       const data = await res.json();
@@ -89,7 +89,7 @@ function ProblemTemp()
 
   useEffect(() => {
         const fetchProblems = async () => {
-            const res = await fetch(`http://localhost:8080/api/chat/problems?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/problems?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}`);
             if (res.ok) 
             {
                 const data = await res.json();
@@ -142,7 +142,7 @@ function ProblemTemp()
 
   const loadCode = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/grade/code?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`, {
       method: "GET",
       headers: {
         "Content-Type":"application/json"
@@ -164,7 +164,7 @@ function ProblemTemp()
   {
       if (role === "STUDENT")
       {
-        await fetch ("http://localhost:8080/api/grade/update", {
+        await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/grade/update`, {
           method: "POST",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({topic,difficulty,problem:problemName,code:code,netId: netid}),
@@ -173,8 +173,8 @@ function ProblemTemp()
   }
   const fetchAttempts = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
-    const resTwo = await fetch(`http://localhost:8080/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/lastTime?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
+    const resTwo = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/attempts?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
 
     if(res.ok && resTwo.ok)
     {
@@ -189,7 +189,7 @@ function ProblemTemp()
         setAIAttempts(0);
         if (role === "STUDENT")
         {
-          await fetch("http://localhost:8080/api/progress/update", {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/update`, {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
             body: JSON.stringify({
@@ -212,7 +212,7 @@ function ProblemTemp()
 
   const fetchScore = async () => 
   {
-    const res = await fetch(`http://localhost:8080/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/latestScore?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
     if (res.ok) 
     {
       const data = await res.json();
@@ -243,7 +243,7 @@ useEffect(() => {
     setLoading(true);
     setTimeout(fetchAttempts,100);
     const runStart = Date.now();
-    const res = await fetch("http://localhost:8080/api/grade", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/grade`, {
       method: "POST",
       headers: {
         "Content-Type":"application/json"
@@ -288,7 +288,7 @@ useEffect(() => {
       
       const passed = result.filter(r => r.result === "PASS").length;
       const total = result.length;
-      await fetch("http://localhost:8080/api/progress", {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress`, {
         method: "POST",
         headers: {
           "Content-Type":"application/json"
@@ -306,7 +306,7 @@ useEffect(() => {
 
     if(aiAttempts < MAX_ATTEMPTS)
     {
-        const chatRes = await fetch ("http://localhost:8080/api/chat", {
+        const chatRes = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/chat`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
@@ -332,7 +332,7 @@ useEffect(() => {
             await refreshAll();
             setLoading(false);
         }
-        await fetch("http://localhost:8080/api/progress/update", {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/update`, {
           method: "POST",
           headers: {"Content-Type" : "application/json"},
           body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId:netid})
@@ -347,7 +347,7 @@ useEffect(() => {
 
         if(rate >= 80 && aiAttempts <= MAX_ATTEMPTS)
         {
-            const chatRes = await fetch ("http://localhost:8080/api/chat", {
+            const chatRes = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/chat`, {
               method: "POST",
               headers: {"Content-Type": "application/json"},
               body: JSON.stringify({
@@ -373,7 +373,7 @@ useEffect(() => {
               await refreshAll();
               setLoading(false);
           }
-          await fetch("http://localhost:8080/api/progress/update", {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/update`, {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
             body: JSON.stringify({topic,difficulty,problem:problemName,aiAttempts:aiAttempts+1,netId: netid})
@@ -416,7 +416,7 @@ useEffect(() => {
   },[messages,isLoading]);
 
   const fetchProgress = async () => {
-    const progressRes = await fetch(`http://localhost:8080/api/progress?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
+    const progressRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(problemName)}&netId=${currNetId}`);
     if(progressRes.ok)
     {
       const data = await progressRes.json();

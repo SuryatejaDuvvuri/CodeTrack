@@ -70,7 +70,7 @@ export default function Instructor() {
   const createProblem = async (e) => {
     e.preventDefault();
     setCreating(true);
-    await fetch("http://localhost:8080/api/instructor/create", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructor/create`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
@@ -95,7 +95,7 @@ export default function Instructor() {
   const handleAddStudent = async (e) => {
     e.preventDefault();
     setAdding(true);
-    await fetch("http://localhost:8080/api/instructor/addStudent", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructor/addStudent`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({name: newName, netId: newNetId}),
@@ -107,7 +107,7 @@ export default function Instructor() {
     setSelectedStudent(null);
     setStudentDetails(null);
 
-    const res = await fetch("http://localhost:8080/api/instructor/roster")
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructor/roster`)
     if(res.ok)
     {
       const data = await res.json();
@@ -141,7 +141,7 @@ export default function Instructor() {
 
   useEffect(() => {
     const fetchRoster = async () => {
-      const res = await fetch("http://localhost:8080/api/instructor/roster");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructor/roster`);
       if (res.ok) {
         const data = await res.json();
         setRoster(data);
@@ -154,7 +154,7 @@ export default function Instructor() {
     if(selectedStudent)
     {
       const fetchStudent = async () => {
-        const res = await fetch (`http://localhost:8080/api/instructor/studentDetails?netId=${selectedStudent.netId}`);
+        const res = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/instructor/studentDetails?netId=${selectedStudent.netId}`);
         if(res.ok)
         {
           const data = await res.json();
@@ -180,7 +180,7 @@ export default function Instructor() {
   const handleRemoveStudent = async () => {
     if (!selectedStudent){return;}
     if(!window.confirm(`Remove Student ${selectedStudent.name}?`)) return;
-    await fetch("http://localhost:8080/api/instructor/removeStudent", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructor/removeStudent`, {
       method:"POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({netId: selectedStudent.netId}),
@@ -188,7 +188,7 @@ export default function Instructor() {
     setSelectedStudent(null);
     setStudentDetails(null);
 
-    const res = await fetch("http://localhost:8080/api/instructor/roster")
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructor/roster`)
     if(res.ok)
     {
       const data = await res.json();
@@ -214,7 +214,7 @@ export default function Instructor() {
       alert("Please select a student, at least one problem, and a due date.");
       return
     }
-     await fetch("http://localhost:8080/api/instructor/assignProblems", {
+     await fetch("process.env.NEXT_PUBLIC_API_URL/api/instructor/assignProblems", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -228,7 +228,7 @@ export default function Instructor() {
   useEffect(() => {
     if(!modal)
     {
-      fetch("http://localhost:8080/api/instructor/roster").then(res => res.ok ? res.json() : []).then(data => setRoster(data));
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructor/roster`).then(res => res.ok ? res.json() : []).then(data => setRoster(data));
     }
   },[modal]);
 
@@ -239,7 +239,7 @@ export default function Instructor() {
       return
     }
 
-    await fetch("http://localhost:8080/api/instructor/assignProblemsAll", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructor/assignProblemsAll`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -259,7 +259,7 @@ export default function Instructor() {
       return;
     }
     const fetchProblems = async () => {
-        const res = await fetch(`http://localhost:8080/api/chat/problems?topic=${encodeURIComponent(selectedTopic.name)}&difficulty=${encodeURIComponent(selectedDifficulty)}`);
+        const res = await fetch(`process.env.NEXT_PUBLIC_API_URL/api/chat/problems?topic=${encodeURIComponent(selectedTopic.name)}&difficulty=${encodeURIComponent(selectedDifficulty)}`);
         if (res.ok) 
         {
             const data = await res.json();

@@ -47,7 +47,7 @@ export default function Home()
   }, [router]);
   useEffect(() => {
     const fetchRankings = async () => {
-      const res = await fetch(`http://localhost:8080/api/progress/ranks?netId=${netid}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/ranks?netId=${netid}`);
       if(res.ok)
       {
         const data = await res.json();
@@ -59,7 +59,7 @@ export default function Home()
 
   useEffect(() => {
     const fetchAssigned= async () => {
-      const res = await fetch(`http://localhost:8080/api/chat/assigned?netId=${netid}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/assigned?netId=${netid}`);
       if(res.ok)
       {
         const data = await res.json();

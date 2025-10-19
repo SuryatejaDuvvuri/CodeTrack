@@ -16,7 +16,7 @@ export default function ChatHistory({topic,difficulty,problemName, messages = []
         {
             try
             {
-                const response = await fetch('http://localhost:8080/api/chat/history', {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/history`, {
                     method:"POST",
                     headers: {
                         'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export default function ChatHistory({topic,difficulty,problemName, messages = []
     useEffect(() => {
         async function fetchAttempts() 
         {
-            const res = await fetch(`http://localhost:8080/api/progress/attempts?topic=${topic}&difficulty=${difficulty}&problem=${problemName}&netId=${netid}`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/attempts?topic=${topic}&difficulty=${difficulty}&problem=${problemName}&netId=${netid}`);
             if(res.ok)
             {
                 const data = await res.json();
@@ -93,7 +93,7 @@ export default function ChatHistory({topic,difficulty,problemName, messages = []
                 if(hoursPassed >= 5)
                 {
                     setAIAttempts(0);
-                    await fetch("http://localhost:8080/api/progress/update", {
+                    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/update`, {
                     method: "POST",
                     headers: {"Content-Type" : "application/json"},
                     body: JSON.stringify({
@@ -132,7 +132,7 @@ export default function ChatHistory({topic,difficulty,problemName, messages = []
             }]);
             return;
         }
-        await fetch('http://localhost:8080/api/progress/update', 
+        await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/progress/update', 
         {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -157,7 +157,7 @@ export default function ChatHistory({topic,difficulty,problemName, messages = []
 
         try
         {
-            const response = await fetch(`http://localhost:8080/api/chat`, 
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat`, 
             {
                 method:'POST',
                 headers: {'Content-Type':'application/json',},
