@@ -40,13 +40,6 @@ public class FirestoreService
     {
         try
         {
-            // InputStream account = getClass().getResourceAsStream("/firebase-service-account.json");
-        
-            // if(account == null)
-            // {
-            //     account = new FileInputStream("src/main/resources/firebase-service-account.json");
-            // }
-
             String credentialsPath = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
 
             if (credentialsPath == null || credentialsPath.isEmpty()) 
