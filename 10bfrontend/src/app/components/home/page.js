@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = 'force-dynamic';
 import Image from "next/image";
 import Link from "next/link"
 import {useState,useEffect} from "react";
@@ -6,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 
 
-function canGetPasscode(problems)
+function CanGetPasscode(problems)
 {
   const now = new Date();
   return problems.length > 0 && problems.every(
@@ -21,6 +22,7 @@ export default function Home()
   const [topTopics, setTopTopics] = useState([]);
   const[assignedProblems, setAssignedProblems] = useState([]);
   const netid = typeof window !== "undefined" ? localStorage.getItem('netid') : null;
+  const userName = typeof window !== "undefined" ? localStorage.getItem('name') : null;
   const topics = [
     { name: "Warm up 1", color: "bg-emerald-300", description: "Get started by warming up!", route: "easy"},
     { name: "Warm up 2", color: "bg-emerald-300", description: "More warm up problems to challenge yourself", route: "easy" },
@@ -80,9 +82,9 @@ export default function Home()
       <nav className="bg-black shadow-lg">
         <div className="flex flex-wrap justify-between items-center p-4">
           <div className="flex space-x-4">
-            <a href="/components/login" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
+            <Link href="/components/home" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
               Home
-            </a>
+            </Link>
             <button
               onClick={() => {
                 localStorage.removeItem('netid');
@@ -138,13 +140,16 @@ export default function Home()
         </div>
         <div className="bg-gray-800 rounded-xl shadow-lg p-6">
           <h3 className="text-lg mb-3 font-bold text-blue-300">Assignments Bulletin Board</h3>
+          <div className="text-blue-300 text-lg font-semibold">
+            Welcome, {userName || netid}!
+          </div>
           <div className="p-4 bg-black rounded-xl border-l-4 border-l-rose-400 shadow">
             <div className="flex justify-between items-center mb-2">
               <span className="font-medium text-gray-200">Assigned Problems</span>
             </div>
             <ul className="space-y-2">
               {assignedProblems.length === 0 ? (
-                <li className="text-gray-400">No assigned yet! But it doesn't hurt to practice right?</li>
+                <li className="text-gray-400">No assigned yet! But it doesn&apos;t hurt to practice right?</li>
               ) : (
                 assignedProblems.map((problem, index) => (
                   <li key={index} className="mb-2 flex justify-between items-center bg-gray-900 rounded px-4 py-3">
@@ -178,9 +183,9 @@ export default function Home()
       </div>
       <footer className="w-full mt-8 mb-4 px-4 rounded-lg shadow-lg bg-gray-900 border-t border-gray-800">
         <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 py-4">
-          <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</a>
+          <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</Link >
           <span className="text-gray-500">|</span>
-          <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</a>
+          <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</Link >
         </div>
         <div className="text-center text-gray-500 text-xs pb-2">&copy; 2025 CodeTrack</div>
       </footer>

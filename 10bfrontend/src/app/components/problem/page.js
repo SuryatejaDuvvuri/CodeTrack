@@ -1,7 +1,7 @@
 'use client';
 export const dynamic = 'force-dynamic';
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect,Suspense } from "react";
 import Link from "next/link"
 import CodeEditor from './codeEditor.js'
 import ProgressGraph from "./progressGraph.js";
@@ -93,38 +93,38 @@ function ProblemTemp()
             if (res.ok) 
             {
                 const data = await res.json();
-                setProblemsList(data); 
+                setProblemsList(data.slice(0,5)); 
             }
         };
         fetchProblems();
   }, [topic, difficulty]);
 
   const handlePrev = () => {
+    if (problemsList.length === 0)
+    {
+      return;
+    }
     const id = problemsList.findIndex(p => p.id === problemName);
     if (id === -1)
     {
       return;
     }
-    var prevId = id - 1;
-    if (id === 0)
-    {
-      prevId = problemsList.length - 1;
-    } 
+    const prevId = (id-1 + problemsList.length) % problemsList.length;
     const prevProblem = problemsList[prevId];
     router.push(`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(prevProblem.id)}`);
   }
 
   const handleNext = () => {
+    if (problemsList.length === 0)
+    {
+      return;
+    }
     const id = problemsList.findIndex(p => p.id === problemName);
     if (id === -1) 
     {
         return;
     }
-    var nextId = id + 1;
-    if (id === problemsList.length - 1)
-    {
-      nextId = 0;
-    }
+    var nextId = (id + 1) % problemsList.length;
     const nextProblem = problemsList[nextId];
     router.push(`/components/problem?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}&problem=${encodeURIComponent(nextProblem.id)}`);
   }

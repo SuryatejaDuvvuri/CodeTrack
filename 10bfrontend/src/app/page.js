@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = 'force-dynamic';
 import { useState,useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -26,9 +27,10 @@ export default function Login() {
 
     if(res.ok)
     {
-      const {token,role} = await res.json();
+      const {token,role,name} = await res.json();
       localStorage.setItem('token',token);
       localStorage.setItem('role',role);
+      localStorage.setItem('name', name); 
       const netid = email.split('@')[0];
       localStorage.setItem('netid', netid);
       if (role === "INSTRUCTOR")

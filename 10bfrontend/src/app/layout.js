@@ -1,6 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ScreenShotProtect from "./ScreenshotProtect";
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

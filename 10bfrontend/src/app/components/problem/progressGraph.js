@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = 'force-dynamic';
 import {useEffect, useState, useRef} from 'react';
 import {format} from 'date-fns'
 
@@ -39,7 +40,7 @@ function AnimatedBar({success, successRate})
   );
 }
 
-export default function progressGraph({attemptData = [],totalAttempts,avgTime,overrallSuccess, barClick})
+export default function ProgressGraph({attemptData = [],totalAttempts,avgTime,overrallSuccess, barClick})
 {
   
   return (

@@ -13,9 +13,8 @@ function Easy() {
         <nav className="bg-black w-full rounded-lg shadow-lg mb-8">
           <div className="flex flex-wrap justify-between items-center p-4">
             <div className="flex space-x-4">
-              <a href="/" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">Home</a>
-              <a
-                onClick={() => {
+              <Link href="/components/home" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">Home</Link>
+              <Link href = "/" onClick={() => {
                   localStorage.removeItem('token');
                   localStorage.removeItem('role');
                   window.location.href = '/';
@@ -23,7 +22,7 @@ function Easy() {
                 className="text-blue-300 hover:text-white text-lg font-semibold transition-all cursor-pointer transform hover:scale-110"
               >
                 Logout
-              </a>
+              </Link>
             </div>
           </div>
         </nav>
@@ -42,10 +41,9 @@ function Easy() {
               href={`/components/problems?topic=${encodeURIComponent(topic)}&difficulty=Medium`}
             >
               <span className="mb-2 text-2xl font-bold tracking-tight text-white text-center">Medium</span>
-              <span className="font-normal text-base text-amber-100 text-center">You think that's easy? Try this!</span>
+              <span className="font-normal text-base text-amber-100 text-center">You think that&apos;s easy? Try this!</span>
             </Link>
-            <Link
-              className="flex-1 flex flex-col items-center justify-center bg-orange-500 rounded-2xl shadow-lg p-10 hover:scale-105 transition-all border-2 border-orange-700 hover:border-orange-400 min-w-[220px] max-w-xs"
+            <Link className="flex-1 flex flex-col items-center justify-center bg-orange-500 rounded-2xl shadow-lg p-10 hover:scale-105 transition-all border-2 border-orange-700 hover:border-orange-400 min-w-[220px] max-w-xs"
               href={`/components/problems?topic=${encodeURIComponent(topic)}&difficulty=Hard`}
             >
               <span className="mb-2 text-2xl font-bold tracking-tight text-white text-center">Hard</span>
@@ -55,9 +53,9 @@ function Easy() {
         </main>
         <footer className="w-full mt-12 mb-4 px-4 rounded-lg shadow-lg bg-gray-900 border-t border-gray-800">
           <div className="flex justify-center space-x-6 py-4">
-            <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</a>
+            <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</Link>
             <span className="text-gray-500">|</span>
-            <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</a>
+            <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</Link>
           </div>
           <div className="text-center text-gray-500 text-xs pb-2">&copy; 2025 CodeTrack</div>
         </footer>
@@ -69,7 +67,7 @@ export default function Choices()
 {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-300">Loading...</div>}>
-      <Choices/>
+      <Easy/>
     </Suspense>
   );
 }

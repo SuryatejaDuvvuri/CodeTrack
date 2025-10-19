@@ -1,8 +1,9 @@
 "use client";
+export const dynamic = 'force-dynamic';
 import { useState,useEffect } from 'react';
 import { diff } from 'react-ace';
 import ReactMarkdown from 'react-markdown';
-export default function chatHistory({topic,difficulty,problemName, messages = [], setMessages, isLoading, aiAttempts, setAIAttempts})
+export default function ChatHistory({topic,difficulty,problemName, messages = [], setMessages, isLoading, aiAttempts, setAIAttempts})
 {
     
     const [input, setInput] = useState('');

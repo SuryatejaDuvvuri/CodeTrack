@@ -1,11 +1,12 @@
 "use client";
+export const dynamic = 'force-dynamic';
 import Image from "next/image";
 import Link from "next/link"
 import {useEffect, useState} from 'react';
 import {useRouter} from "next/navigation";
 
 
-function filterDifficulties(topic)
+function FilterDifficulties(topic)
 {
   if(topic != null && (topic === "Warm up 1" || topic === "Warm up 2"))
   {
@@ -276,12 +277,12 @@ export default function Instructor() {
           <nav className="shadow-lg">
             <div className="flex flex-wrap justify-between items-center p-4">
               <div className="flex space-x-4">
-                <a href="/components/home" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
+                <Link href="/components/home" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
                   Home
-                </a>
-                <a href="/components/instructor" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
+                </Link>
+                <Link href="/components/instructor" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
                   Roster
-                </a>
+                </Link>
                 <a onClick={() => {
                   localStorage.removeItem('token');
                   localStorage.removeItem('role');
@@ -345,7 +346,7 @@ export default function Instructor() {
                     <div>
                       <label className="block text-gray-200 mb-1">Difficulty:</label>
                       <div className="flex gap-2">
-                        {filterDifficulties(selectedTopic).map(diff => (
+                        {FilterDifficulties(selectedTopic).map(diff => (
                           <button type="button" key={diff} className={`px-3 py-1 rounded font-semibold ${selectedDifficulty === diff ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-200"} transform transition-all hover:scale-105`} onClick={() => setSelectedDifficulty(diff)}>
                             {diff}
                           </button>
@@ -439,7 +440,7 @@ export default function Instructor() {
                   <>
                     <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 mt-4">
                       <div className="space-y-2">
-                        {filterDifficulties(selectedTopic).map((diff) => (
+                        {FilterDifficulties(selectedTopic).map((diff) => (
                           <div
                             key={diff}
                             className={`flex justify-between items-center bg-gray-800 p-2 rounded mb-2 cursor-pointer ${selectedDifficulty === diff ? "bg-gray-600" : ""} transform transition-all hover:scale-105`}
@@ -500,7 +501,7 @@ export default function Instructor() {
         </>
       ) : role === 'STUDENT' ? (
         <div>
-          You're not supposed to be here. Please go back and login correctly. 
+          You&apos;re not supposed to be here. Please go back and login correctly. 
         </div>
       ) : (
         <div>
@@ -509,9 +510,9 @@ export default function Instructor() {
       )}
       <footer className="w-full mt-8 mb-4 px-4 rounded-lg shadow-lg bg-gray-900 border-t border-gray-800">
         <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 py-4">
-          <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</a>
+          <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</Link>
           <span className="text-gray-500">|</span>
-          <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</a>
+          <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</Link>
         </div>
         <div className="text-center text-gray-500 text-xs pb-2">&copy; 2025 CodeTrack</div>
       </footer>

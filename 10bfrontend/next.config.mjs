@@ -1,11 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental: {
-    workerThreads: false,
-    cpus: 1
-  },
-  skipTrailingSlashRedirect: true,
-  skipMiddlewareUrlNormalize: true,
+  images: { unoptimized: true },
+  experimental: { workerThreads: false, cpus: 1 },
 };
 
 export default nextConfig;

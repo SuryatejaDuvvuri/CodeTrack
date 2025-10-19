@@ -1,8 +1,7 @@
 "use client";
 export const dynamic = 'force-dynamic';
-import {useState,useEffect} from "react";
+import {useState,useEffect, Suspense} from "react";
 import Link from "next/link";
-import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 function Problems()
@@ -43,8 +42,7 @@ function Problems()
             if (res.ok) 
             {
                 const data = await res.json();
-                console.log(data);
-                setProblemsList(data); 
+                setProblemsList(data.slice(0, 5)); 
             }
         };
         fetchProblems();
@@ -63,11 +61,10 @@ function Problems()
             <nav className="bg-black shadow w-full">
                 <div className="flex flex-wrap justify-between items-center p-2">
                     <div className="flex space-x-4">
-                        <a href="/" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
+                        <Link href="/" className="text-blue-300 hover:text-white text-lg font-semibold transition-all transform hover:scale-110">
                             Home
-                        </a>
-                        <a
-                            onClick={() => {
+                        </Link>
+                        <Link href = "/" onClick={() => {
                                 localStorage.removeItem('token');
                                 localStorage.removeItem('role');
                                 window.location.href = '/';
@@ -75,7 +72,7 @@ function Problems()
                             className="text-blue-300 hover:text-white text-lg font-semibold transition-all cursor-pointer transform hover:scale-110"
                         >
                             Logout
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </nav>
@@ -105,9 +102,9 @@ function Problems()
             </main>
             <footer className="w-full px-4 rounded bg-gray-900 border-t border-gray-800 shadow">
                 <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 py-2">
-                    <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</a>
+                    <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Home</Link>
                     <span className="text-gray-500">|</span>
-                    <a href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</a>
+                    <Link href="#" className="text-blue-300 hover:text-white cursor-pointer font-semibold transition-all transform hover:scale-110">Contact</Link >
                 </div>
                 <div className="text-center text-gray-500 text-xs pb-1">&copy; 2025 CodeTrack</div>
             </footer>

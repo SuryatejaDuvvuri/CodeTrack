@@ -1,1 +1,6 @@
 10bbackend/src/main/resources/application.properties
+.env
+*.pem
+*firebase*.json
+target/
+.mvn/
