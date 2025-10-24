@@ -42,7 +42,18 @@ public class CompileService
         }
         String cases = convertCases.toString();
         JSch jsch = new JSch();
-        jsch.addIdentity(KEY);
+        String keyPath = KEY;
+        if (KEY != null && KEY.trim().startsWith("-----BEGIN")) 
+        {
+            File tmp = File.createTempFile("jsch-key", ".pem");
+            try (FileOutputStream fos = new FileOutputStream(tmp)) 
+            {
+                fos.write(KEY.getBytes());
+            }
+            tmp.deleteOnExit();
+            keyPath = tmp.getAbsolutePath();
+        }
+        jsch.addIdentity(keyPath);
         Session sesh = jsch.getSession(USER,HOST,22);
         sesh.setConfig("StrictHostKeyChecking","no");
         sesh.connect();
